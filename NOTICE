@@ -1,0 +1,22 @@
+OpenCashew - Personal Finance & Budget Tracker
+=============================================
+
+This project is a fork of Cashew (originally created and copyrighted by James Kokoska).
+
+Upstream Original Project:
+- Author / Copyright: (C) 2021-2024 James Kokoska
+- Original Repository: https://github.com/jameskokoska/Cashew
+- License: GNU General Public License v3.0 (GPLv3)
+
+Fork Details:
+- Derivative Project: OpenCashew (org.opencashew.app)
+- Fork Maintenance & Modernization: (C) 2026 drshtmstry and contributors
+- License: GNU General Public License v3.0 (GPLv3)
+
+Summary of Modifications in this Fork:
+1. Removed all legacy desktop (Windows, macOS, Linux) and web deployment configurations.
+2. Focused development strictly on mobile platforms (Android and iOS).
+3. Upgraded Android build targets to modern compileSdk 37, targetSdk 37, AGP 9.1.1, and Gradle 9.3.1 with Java 17 toolchain.
+4. Upgraded iOS deployment platform target.
+5. Rebranded application identity from Cashew to OpenCashew with package identifier org.opencashew.app.
+6. Decoupled upstream Firebase and web endpoint dependencies.

@@ -1,0 +1,44 @@
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+rootProject.buildDir = '../build'
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+}
+
+subprojects { subproject ->
+    subproject.afterEvaluate { project ->
+        if (project.hasProperty("android")) {
+            project.android {
+                compileSdkVersion 36
+            }
+        }
+    }
+    subproject.plugins.withId("com.android.library") {
+        if (subproject.name == "file_picker") {
+            def isBuiltInKotlin = (project.findProperty('android.builtInKotlin') ?: rootProject.findProperty('android.builtInKotlin'))?.toString()?.toBoolean() ?: false
+            if (!isBuiltInKotlin && !subproject.plugins.hasPlugin("org.jetbrains.kotlin.android")) {
+                subproject.apply plugin: "org.jetbrains.kotlin.android"
+            }
+        }
+        def manifestFile = file("${subproject.projectDir}/src/main/AndroidManifest.xml")
+        if (manifestFile.exists()) {
+            def match = (manifestFile.text =~ /package\s*=\s*"([^"]+)"/)
+            if (match.find()) {
+                subproject.android {
+                    if (namespace == null) {
+                        namespace match.group(1)
+                    }
+                }
+            }
+        }
+    }
+}
+
+tasks.register("clean", Delete) {
+    delete rootProject.buildDir
+}

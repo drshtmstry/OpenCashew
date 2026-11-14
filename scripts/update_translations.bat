@@ -1,4 +1,3 @@
-cd ..
-cd budget\assets\translations
+cd assets\translations
 python generate-translations.py
 pause
