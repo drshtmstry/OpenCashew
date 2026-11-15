@@ -54,6 +54,8 @@ Future<bool> initializeSettings() async {
       // Always reset the language/locale when restoring a backup
       userSettings["locale"] = "System";
       userSettings["databaseJustImported"] = false;
+      await sharedPreferences.setString(
+          'userSettings', json.encode(userSettings));
       print("Settings were restored");
     } catch (e) {
       print("Error restoring imported settings " + e.toString());
