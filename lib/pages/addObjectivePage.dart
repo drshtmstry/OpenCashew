@@ -1343,12 +1343,16 @@ class _InstallmentObjectivePopupState extends State<InstallmentObjectivePopup> {
                               selectedPeriodLength: selectedPeriodLength,
                               onChanged: (selectedRecurrence,
                                   selectedRecurrenceEnum,
-                                  selectedRecurrenceDisplay) {
+                                  selectedRecurrenceDisplay,
+                                  [newPeriodLength]) {
                                 this.selectedRecurrence = selectedRecurrence;
                                 this.selectedRecurrenceEnum =
                                     selectedRecurrenceEnum;
                                 this.selectedRecurrenceDisplay =
                                     selectedRecurrenceDisplay;
+                                if (newPeriodLength != null) {
+                                  this.selectedPeriodLength = newPeriodLength;
+                                }
                                 setState(() {});
                               },
                             );

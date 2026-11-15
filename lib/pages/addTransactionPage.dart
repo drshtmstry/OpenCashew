@@ -4787,12 +4787,7 @@ Future<void> selectRecurrence(
     {required BuildContext context,
     required String selectedRecurrence,
     required int selectedPeriodLength,
-    required Function(
-      String selectedRecurrence,
-      BudgetReoccurence selectedRecurrenceEnum,
-      String selectedRecurrenceDisplay,
-      int selectedPeriodLength,
-    ) onChanged}) async {
+    required Function onChanged}) async {
   String initialValue = selectedRecurrence;
   if (selectedPeriodLength == 2 && selectedRecurrence == "Weekly") {
     initialValue = "Biweekly";
@@ -4839,8 +4834,13 @@ Future<void> selectRecurrence(
           } else {
             selectedRecurrenceDisplay = namesRecurrence[newRecurrence].toString().tr();
           }
-          onChanged(newRecurrence, selectedRecurrenceEnum,
-              selectedRecurrenceDisplay, newPeriodLength);
+          try {
+            (onChanged as dynamic)(newRecurrence, selectedRecurrenceEnum,
+                selectedRecurrenceDisplay, newPeriodLength);
+          } catch (_) {
+            (onChanged as dynamic)(newRecurrence, selectedRecurrenceEnum,
+                selectedRecurrenceDisplay);
+          }
           popRoute(
             context,
           );
