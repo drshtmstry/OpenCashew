@@ -3,6 +3,7 @@ import 'package:budget/functions.dart';
 import 'package:budget/pages/addTransactionPage.dart';
 import 'package:budget/pages/editWalletsPage.dart';
 import 'package:budget/pages/settingsPage.dart';
+import 'package:budget/struct/accountTypes.dart';
 import 'package:budget/struct/currencyFunctions.dart';
 import 'package:budget/struct/databaseGlobal.dart';
 import 'package:budget/struct/settings.dart';
@@ -66,10 +67,16 @@ class _AddWalletPageState extends State<AddWalletPage> {
       getDevicesDefaultCurrencyCode(); //if no currency selected use empty string
   int selectedDecimals = 2;
   FocusNode _titleFocusNode = FocusNode();
+  late AccountType selectedAccountType =
+      getAccountTypeFromWallet(widget.wallet);
+  bool userManuallySelectedAccountType = false;
 
   void setSelectedTitle(String title) {
     setState(() {
       selectedTitle = title;
+      if (!userManuallySelectedAccountType && widget.wallet == null) {
+        selectedAccountType = getAccountTypeFromPk("-1", name: title);
+      }
     });
     determineBottomButton();
     return;
@@ -93,6 +100,16 @@ class _AddWalletPageState extends State<AddWalletPage> {
     print("Added wallet");
     final int? rowId = await database.createOrUpdateWallet(
         insert: widget.wallet == null, await createTransactionWallet());
+
+    if (rowId != null) {
+      final TransactionWallet walletJustAdded =
+          await database.getWalletFromRowId(rowId);
+      await setAccountTypeForWallet(
+          walletJustAdded.walletPk, selectedAccountType);
+    } else if (widget.wallet != null) {
+      await setAccountTypeForWallet(
+          widget.wallet!.walletPk, selectedAccountType);
+    }
 
     // set initial amount
     if (widget.wallet == null && initialBalance != 0) {
@@ -168,6 +185,7 @@ class _AddWalletPageState extends State<AddWalletPage> {
           : HexColor(widget.wallet!.colour);
       selectedCurrency = widget.wallet!.currency ?? "usd";
       selectedDecimals = widget.wallet!.decimals;
+      selectedAccountType = getAccountTypeFromWallet(widget.wallet);
     }
     populateCurrencies();
     Future.delayed(Duration.zero, () async {
@@ -470,6 +488,46 @@ class _AddWalletPageState extends State<AddWalletPage> {
           ),
           SliverToBoxAdapter(
             child: SizedBox(height: 15),
+          ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsetsDirectional.only(
+                start: 20,
+                end: 20,
+                bottom: 12,
+              ),
+              child: SettingsContainerDropdown(
+                icon: getAccountTypeIcon(selectedAccountType,
+                    outlined: appStateSettings["outlinedIcons"]),
+                title: "Account Type",
+                initial: selectedAccountType.name,
+                items: [
+                  AccountType.bank.name,
+                  AccountType.cash.name,
+                  AccountType.card.name,
+                  AccountType.prepaid.name,
+                  AccountType.savings.name,
+                  AccountType.other.name,
+                ],
+                getLabel: (item) {
+                  for (AccountType t in AccountType.values) {
+                    if (t.name == item) return getAccountTypeName(t);
+                  }
+                  return item;
+                },
+                onChanged: (item) {
+                  for (AccountType t in AccountType.values) {
+                    if (t.name == item) {
+                      setState(() {
+                        userManuallySelectedAccountType = true;
+                        selectedAccountType = t;
+                      });
+                      break;
+                    }
+                  }
+                },
+              ),
+            ),
           ),
           SliverToBoxAdapter(
             child: widget.wallet == null ||

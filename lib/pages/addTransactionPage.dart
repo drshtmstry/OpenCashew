@@ -1847,9 +1847,7 @@ class _AddTransactionPageState extends State<AddTransactionPage>
                           : null,
                     ),
                   ),
-                  if (appStateSettings["showTransactionsBalanceTransferTab"] ==
-                          true &&
-                      enableBalanceTransferTab)
+                  if (enableBalanceTransferTab)
                     Flexible(
                       flex: 1,
                       child: Column(

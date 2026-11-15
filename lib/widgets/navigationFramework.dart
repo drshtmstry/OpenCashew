@@ -573,8 +573,7 @@ class AddMoreThingsPopup extends StatelessWidget {
           widgetAfter: SelectChips(
             padding: EdgeInsetsDirectional.symmetric(horizontal: 13),
             items: [
-              if (Provider.of<AllWallets>(context).list.length > 1)
-                "transfer-balance",
+              "transfer-balance",
               "correct-total-balance"
             ],
             getSelected: (_) {
@@ -583,15 +582,39 @@ class AddMoreThingsPopup extends StatelessWidget {
             onSelected: (String selection) async {
               if (selection == "transfer-balance") {
                 popRoute(context);
-                openBottomSheet(
-                  context,
-                  fullSnap: true,
-                  TransferBalancePopup(
-                    allowEditWallet: true,
-                    wallet: Provider.of<AllWallets>(context, listen: false)
-                        .indexedByPk[appStateSettings["selectedWalletPk"]]!,
-                  ),
-                );
+                AllWallets allWallets =
+                    Provider.of<AllWallets>(context, listen: false);
+                if (allWallets.indexedByPk.keys.length < 2) {
+                  openPopup(
+                    context,
+                    icon: appStateSettings["outlinedIcons"]
+                        ? Icons.compare_arrows_outlined
+                        : Icons.compare_arrows_rounded,
+                    title: "transfer".tr(),
+                    description: "select-2-different-accounts".tr(),
+                    onSubmit: () {
+                      popRoute(context);
+                      pushRoute(
+                        context,
+                        AddWalletPage(
+                          routesToPopAfterDelete: RoutesToPopAfterDelete.None,
+                        ),
+                      );
+                    },
+                    onSubmitLabel: "add-account".tr(),
+                  );
+                } else {
+                  openBottomSheet(
+                    context,
+                    fullSnap: true,
+                    TransferBalancePopup(
+                      allowEditWallet: true,
+                      wallet: allWallets.indexedByPk[
+                              appStateSettings["selectedWalletPk"]] ??
+                          allWallets.list.firstOrNull,
+                    ),
+                  );
+                }
               } else if (selection == "correct-total-balance") {
                 TransactionWallet? wallet =
                     Provider.of<AllWallets>(context, listen: false)

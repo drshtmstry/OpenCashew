@@ -10,6 +10,7 @@ import 'package:budget/pages/pastBudgetsPage.dart';
 import 'package:budget/pages/transactionFilters.dart';
 import 'package:budget/pages/transactionsSearchPage.dart';
 import 'package:budget/pages/upcomingOverdueTransactionsPage.dart';
+import 'package:budget/struct/accountTypes.dart';
 import 'package:budget/struct/databaseGlobal.dart';
 import 'package:budget/struct/settings.dart';
 import 'package:budget/struct/spendingSummaryHelper.dart';
@@ -1246,6 +1247,19 @@ class WalletDetailsPageState extends State<WalletDetailsPage>
         ),
         title:
             widget.wallet == null ? "all-spending".tr() : widget.wallet!.name,
+        subtitle: widget.wallet == null
+            ? null
+            : StreamBuilder<TransactionWallet>(
+                stream: database.getWallet(widget.wallet!.walletPk),
+                builder: (context, snapshot) {
+                  TransactionWallet wallet = snapshot.data ?? widget.wallet!;
+                  return TextFont(
+                    text: getAccountTypeName(getAccountTypeFromWallet(wallet)),
+                    fontSize: 14,
+                    textColor: getColor(context, "textLight"),
+                  );
+                },
+              ),
         capitalizeTitle: widget.wallet == null,
         actions: enableDoubleColumn(context) && widget.wallet == null
             ? [

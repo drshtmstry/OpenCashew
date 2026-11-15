@@ -2,8 +2,7 @@ import 'package:budget/colors.dart';
 import 'package:budget/database/tables.dart' hide TransactionTag;
 import 'package:budget/functions.dart';
 import 'package:budget/pages/addWalletPage.dart';
-import 'package:budget/pages/editAssociatedTitlesPage.dart';
-import 'package:budget/pages/editBudgetPage.dart';
+import 'package:budget/struct/accountTypes.dart';
 import 'package:budget/struct/databaseGlobal.dart';
 import 'package:budget/struct/settings.dart';
 import 'package:budget/widgets/animatedExpanded.dart';
@@ -324,6 +323,18 @@ class _EditWalletsPageState extends State<EditWalletsPage> {
                                         ),
                                       )
                                     : Container(),
+                              ),
+                              Padding(
+                                padding: const EdgeInsetsDirectional.only(
+                                    top: 1, end: 5),
+                                child: TransactionTag(
+                                  padding: const EdgeInsetsDirectional.symmetric(
+                                      horizontal: 7, vertical: 1.1),
+                                  color: accentColor,
+                                  name: getAccountTypeName(
+                                      getAccountTypeFromWallet(wallet)),
+                                  margin: EdgeInsetsDirectional.zero,
+                                ),
                               ),
                               TextFont(
                                 textAlign: TextAlign.start,
