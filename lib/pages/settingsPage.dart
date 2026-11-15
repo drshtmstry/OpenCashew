@@ -2236,18 +2236,18 @@ class SelectTransactionTypeBeforeAddingSetting extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SettingsContainerSwitch(
-      title: "Select Type Before Adding",
+      title: "Speed Dial Mini-List on Add Button",
       description:
-          "Show Expense, Income, and Transfer options when pressing the add button",
+          "Show floating Expense, Income, and Transfer options when pressing the + button instead of opening add transaction directly",
       onSwitched: (value) {
         updateSettings("selectTransactionTypeBeforeAdding", value,
             updateGlobalState: true);
       },
       initialValue:
-          appStateSettings["selectTransactionTypeBeforeAdding"] != false,
+          appStateSettings["selectTransactionTypeBeforeAdding"] == true,
       icon: appStateSettings["outlinedIcons"]
-          ? Icons.call_split_outlined
-          : Icons.call_split_rounded,
+          ? Icons.unfold_more_outlined
+          : Icons.unfold_more_rounded,
     );
   }
 }

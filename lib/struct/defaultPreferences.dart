@@ -215,7 +215,7 @@ Future<Map<String, dynamic>> getDefaultPreferences() async {
     "showCurrencyLabel": false,
     "showTransactionsMonthlySpendingSummary": true,
     "showTransactionsBalanceTransferTab": true,
-    "selectTransactionTypeBeforeAdding": true,
+    "selectTransactionTypeBeforeAdding": false,
     "balanceTransferAmountColor": "green-or-red", // "green-or-red", "no-color"
     "countBalanceCorrectionInSummary": false,
     "countedBalanceCorrectionPks": <String>[],
@@ -414,6 +414,16 @@ attemptToMigrateDefaultNavBarShortcuts() {
             updateGlobalState: false);
       }
       updateSettings("customNavBarShortcutMigratedToSummaryAndAccounts", true,
+          updateGlobalState: false);
+    }
+    if (appStateSettings["selectTransactionTypeBeforeAddingDefaultMigrated"] !=
+        true) {
+      if (appStateSettings["selectTransactionTypeBeforeAdding"] == true) {
+        appStateSettings["selectTransactionTypeBeforeAdding"] = false;
+        updateSettings("selectTransactionTypeBeforeAdding", false,
+            updateGlobalState: false);
+      }
+      updateSettings("selectTransactionTypeBeforeAddingDefaultMigrated", true,
           updateGlobalState: false);
     }
   } catch (e) {

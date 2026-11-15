@@ -31,7 +31,7 @@ class AddFAB extends StatelessWidget {
   Widget build(BuildContext context) {
     if (onTap == null &&
         openPage is AddTransactionPage &&
-        appStateSettings["selectTransactionTypeBeforeAdding"] != false) {
+        appStateSettings["selectTransactionTypeBeforeAdding"] == true) {
       return TransactionSpeedDialFAB(
         openPage: openPage,
         color: color,
