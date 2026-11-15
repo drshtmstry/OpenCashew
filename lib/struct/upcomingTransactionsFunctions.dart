@@ -264,8 +264,14 @@ Future openPayPopup(
     onSubmit: () async {
       if (runBefore != null) await runBefore();
       double? amount;
-      if (appStateSettings["confirmUpcomingTransactionAmount"] == true ||
-          transaction.amount == 0) {
+      bool shouldConfirmAmount = appStateSettings["confirmUpcomingAmount"] ==
+              "always" ||
+          (appStateSettings["confirmUpcomingAmount"] == "if-amount-is-zero" &&
+              transaction.amount == 0) ||
+          appStateSettings["confirmUpcomingTransactionAmount"] == true ||
+          (appStateSettings["confirmUpcomingAmount"] != "never" &&
+              transaction.amount == 0);
+      if (shouldConfirmAmount) {
         amount = await openBottomSheet(
           context,
           fullSnap: true,
@@ -318,8 +324,10 @@ Future markAsPaid({
   Transaction transactionNew = transaction.copyWith(
     amount: customAmount ?? transaction.amount,
     paid: true,
-    dateCreated:
-        appStateSettings["markAsPaidOnOriginalDay"] ? null : DateTime.now(),
+    dateCreated: (appStateSettings["markPaidDate"] == "scheduledDate" ||
+            appStateSettings["markAsPaidOnOriginalDay"] == true)
+        ? null
+        : DateTime.now(),
     createdAnotherFutureTransaction: Value(true),
     originalDateDue: Value(transaction.dateCreated),
   );

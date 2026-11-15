@@ -222,6 +222,12 @@ Future<Map<String, dynamic>> getDefaultPreferences() async {
     "showTransactionTime": false,
     "confirmUpcomingTransactionAmount": false,
     "groupTransfers": true,
+    "showTransferBalanceTab": true,
+    "showAddAttachmentsButton": true,
+    "showTagIcons": true,
+    "markPaidDate": "currentDate",
+    "confirmUpcomingAmount": "never",
+    "pinnedTransactions": <String>[],
     "balanceTransferAmountColor": "green-or-red", // "green-or-red", "no-color"
     "countBalanceCorrectionInSummary": false,
     "countedBalanceCorrectionPks": <String>[],

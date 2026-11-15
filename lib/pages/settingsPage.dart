@@ -25,9 +25,10 @@ import 'package:budget/pages/activityPage.dart';
 import 'package:budget/pages/editAssociatedTitlesPage.dart';
 import 'package:budget/pages/editBudgetPage.dart';
 import 'package:budget/pages/editCategoriesPage.dart';
-import 'package:budget/pages/editTagsPage.dart';
 import 'package:budget/pages/editWalletsPage.dart';
 import 'package:budget/pages/notificationsPage.dart';
+import 'package:budget/pages/managePinnedTransactionsPage.dart';
+import 'package:budget/pages/initialInputPromptsPage.dart';
 import 'package:budget/pages/subscriptionsPage.dart';
 import 'package:budget/widgets/accountAndBackup.dart';
 import 'package:budget/widgets/importDB.dart';
@@ -754,47 +755,76 @@ class TransactionsSettingsPage extends StatelessWidget {
       dragDownToDismiss: true,
       horizontalPaddingConstrained: true,
       listWidgets: [
-        SettingsHeader(title: "transactions".tr()),
-        const SelectTransactionTypeBeforeAddingSetting(),
-        const TransactionActionSetting(),
-        const DefaultTransactionTypeSetting(),
-        const UseSubcategoryIconSetting(),
-        const ShowTransactionTimeSetting(),
+        SettingsHeader(
+          title: "layout".tr() != "layout" ? "layout".tr() : "Layout",
+        ),
+        SettingsContainer(
+          icon: appStateSettings["outlinedIcons"]
+              ? Icons.table_rows_outlined
+              : Icons.table_rows_rounded,
+          title: "transactions-list-and-layout".tr() !=
+                  "transactions-list-and-layout"
+              ? "transactions-list-and-layout".tr()
+              : "Transactions List & Layout",
+          onTap: () {
+            openBottomSheet(
+              context,
+              fullSnap: true,
+              const SelectLayoutBottomSheet(),
+            );
+          },
+        ),
+        SettingsHeader(
+          title: "add-new-transactions".tr() != "add-new-transactions"
+              ? "add-new-transactions".tr()
+              : "Add New Transactions",
+        ),
+        const TransferBalanceTabSetting(),
+        const AddAttachmentsButtonSetting(),
+        const AutoAddTitlesSetting(),
+        SettingsContainerOpenPage(
+          openPage: const InitialInputPromptsPage(),
+          title: "initial-input-prompts".tr() != "initial-input-prompts"
+              ? "initial-input-prompts".tr()
+              : "Initial Input Prompts",
+          description: "initial-input-prompts-description".tr() !=
+                  "initial-input-prompts-description"
+              ? "initial-input-prompts-description".tr()
+              : "When first adding a transaction",
+          icon: appStateSettings["outlinedIcons"]
+              ? Icons.edit_note_outlined
+              : Icons.edit_note_rounded,
+        ),
+        SettingsHeader(
+          title: "scheduled-transactions".tr() != "scheduled-transactions"
+              ? "scheduled-transactions".tr()
+              : "Scheduled Transactions",
+        ),
+        const AutoPayUpcomingSetting(),
+        const PaidDateSetting(),
         const ConfirmUpcomingTransactionAmountSetting(),
-        const GroupTransfersSetting(),
-        const TransactionsSettings(),
-        const IncognitoKeyboardSetting(),
-        const BatterySaverSetting(),
-        const CountBalanceCorrectionInSummarySetting(),
-        SettingsHeader(title: "accounts".tr()),
-        const WalletsSettings(),
-        const LongTermLoansDifferenceSetting(),
-        SettingsHeader(title: "budgets".tr()),
-        const AnimatedBudgetBackgroundSetting(),
-        const BudgetSettings(),
-        SettingsHeader(title: "goals".tr()),
-        const ObjectiveSettings(),
-        SettingsHeader(title: "titles".tr()),
-        const TitlesSettings(),
-        SettingsHeader(title: "tags".tr()),
         SettingsContainerOpenPage(
-          openPage: EditTagsPage(),
-          title: "edit-tags".tr() != "edit-tags"
-              ? "edit-tags".tr()
-              : "Edit Tags",
+          openPage: const NotificationsPage(),
+          title: "notifications".tr(),
           icon: appStateSettings["outlinedIcons"]
-              ? Icons.label_outlined
-              : Icons.label_rounded,
+              ? Icons.notifications_outlined
+              : Icons.notifications_rounded,
+        ),
+        SettingsHeader(
+          title: "pinned-transactions".tr() != "pinned-transactions"
+              ? "pinned-transactions".tr()
+              : "Pinned Transactions",
         ),
         SettingsContainerOpenPage(
-          openPage: const ActivityPage(),
-          title: "transaction-activity-log".tr(),
+          openPage: const ManagePinnedTransactionsPage(),
+          title: "manage-pinned-transactions".tr() !=
+                  "manage-pinned-transactions"
+              ? "manage-pinned-transactions".tr()
+              : "Manage Pinned Transactions",
           icon: appStateSettings["outlinedIcons"]
-              ? Icons.ballot_outlined
-              : Icons.ballot_rounded,
+              ? Icons.push_pin_outlined
+              : Icons.push_pin_rounded,
         ),
-        SettingsHeader(title: "widgets".tr()),
-        const WidgetSettings(),
         const SizedBox(height: 20),
       ],
     );
@@ -2407,8 +2437,8 @@ class DateFormatSetting extends StatelessWidget {
           ? "date-format".tr()
           : "Date Format",
       icon: appStateSettings["outlinedIcons"]
-          ? Icons.event_outlined
-          : Icons.event_rounded,
+          ? Icons.edit_calendar_outlined
+          : Icons.edit_calendar_rounded,
       initial: appStateSettings["dateFormat"]?.toString() ?? "full",
       items: ["full", "ddmmyyyy", "mmddyyyy", "yyyymmdd"],
       onChanged: (value) async {
@@ -2767,23 +2797,554 @@ class ConfirmUpcomingTransactionAmountSetting extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SettingsContainerSwitch(
+    return SettingsContainerDropdown(
       title: "confirm-amount".tr() != "confirm-amount"
           ? "confirm-amount".tr()
           : "Confirm Amount",
       description: "confirm-amount-description".tr() !=
               "confirm-amount-description"
           ? "confirm-amount-description".tr()
-          : "When manually paying scheduled transactions, prompt to confirm amount.",
+          : "When manually paying scheduled transactions",
       icon: appStateSettings["outlinedIcons"]
-          ? Icons.price_check_outlined
-          : Icons.price_check_rounded,
-      initialValue:
-          appStateSettings["confirmUpcomingTransactionAmount"] ?? false,
-      onSwitched: (value) {
-        updateSettings("confirmUpcomingTransactionAmount", value,
+          ? Icons.calculate_outlined
+          : Icons.calculate_rounded,
+      initial: appStateSettings["confirmUpcomingAmount"] ?? "never",
+      items: const ["never", "always", "if-amount-is-zero"],
+      onChanged: (value) async {
+        await updateSettings("confirmUpcomingAmount", value,
+            updateGlobalState: true);
+        await updateSettings(
+            "confirmUpcomingTransactionAmount", value == "always",
             updateGlobalState: true);
       },
+      getLabel: (item) {
+        if (item == "never") {
+          return "never".tr() != "never" ? "never".tr() : "Never";
+        }
+        if (item == "always") {
+          return "always".tr() != "always" ? "always".tr() : "Always";
+        }
+        if (item == "if-amount-is-zero") {
+          return "if-amount-is-zero".tr() != "if-amount-is-zero"
+              ? "if-amount-is-zero".tr()
+              : "If amount is 0";
+        }
+        return item.tr();
+      },
+    );
+  }
+}
+
+class TransferBalanceTabSetting extends StatelessWidget {
+  const TransferBalanceTabSetting({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SettingsContainerSwitch(
+      title: "Transfer Balance Tab",
+      description: "On 'Add New Transaction' page",
+      icon: appStateSettings["outlinedIcons"]
+          ? Icons.swap_horiz_outlined
+          : Icons.swap_horiz_rounded,
+      initialValue: appStateSettings["showTransferBalanceTab"] ?? true,
+      onSwitched: (value) {
+        updateSettings("showTransferBalanceTab", value,
+            updateGlobalState: true);
+      },
+    );
+  }
+}
+
+class AddAttachmentsButtonSetting extends StatelessWidget {
+  const AddAttachmentsButtonSetting({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SettingsContainerSwitch(
+      title: "add-attachments-button".tr() != "add-attachments-button"
+          ? "add-attachments-button".tr()
+          : "Add Attachments Button",
+      description: "add-attachments-button-description".tr() !=
+              "add-attachments-button-description"
+          ? "add-attachments-button-description".tr()
+          : "Show under the notes section",
+      icon: appStateSettings["outlinedIcons"]
+          ? Icons.attach_file_outlined
+          : Icons.attach_file_rounded,
+      initialValue: appStateSettings["showAddAttachmentsButton"] ?? true,
+      onSwitched: (value) {
+        updateSettings("showAddAttachmentsButton", value,
+            updateGlobalState: true);
+      },
+    );
+  }
+}
+
+class AutoAddTitlesSetting extends StatelessWidget {
+  const AutoAddTitlesSetting({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SettingsContainerSwitch(
+      title: "auto-add-titles".tr() != "auto-add-titles"
+          ? "auto-add-titles".tr()
+          : "Automatically Add Titles",
+      description: "auto-add-titles-description".tr() !=
+              "auto-add-titles-description"
+          ? "auto-add-titles-description".tr()
+          : "When a transaction is added",
+      icon: appStateSettings["outlinedIcons"]
+          ? Icons.playlist_add_check_outlined
+          : Icons.playlist_add_check_rounded,
+      initialValue: appStateSettings["autoAddAssociatedTitles"] ?? false,
+      onSwitched: (value) {
+        updateSettings("autoAddAssociatedTitles", value,
+            updateGlobalState: true);
+      },
+    );
+  }
+}
+
+class AutoPayUpcomingSetting extends StatelessWidget {
+  const AutoPayUpcomingSetting({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SettingsContainerSwitch(
+      title: "auto-pay-transactions".tr() != "auto-pay-transactions"
+          ? "auto-pay-transactions".tr()
+          : "Automatically Pay Transactions",
+      description: "auto-pay-transactions-description".tr() !=
+              "auto-pay-transactions-description"
+          ? "auto-pay-transactions-description".tr()
+          : "Automatically mark overdue transactions as paid",
+      icon: appStateSettings["outlinedIcons"]
+          ? Icons.event_available_outlined
+          : Icons.event_available_rounded,
+      initialValue: appStateSettings["autoPayUpcoming"] ?? false,
+      onSwitched: (value) {
+        updateSettings("autoPayUpcoming", value, updateGlobalState: true);
+      },
+    );
+  }
+}
+
+class PaidDateSetting extends StatelessWidget {
+  const PaidDateSetting({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SettingsContainerDropdown(
+      title: "paid-date".tr() != "paid-date" ? "paid-date".tr() : "Paid Date",
+      description: "paid-date-description".tr() != "paid-date-description"
+          ? "paid-date-description".tr()
+          : "When a transaction is manually marked",
+      icon: appStateSettings["outlinedIcons"]
+          ? Icons.edit_calendar_outlined
+          : Icons.edit_calendar_rounded,
+      initial: appStateSettings["markPaidDate"] ?? "currentDate",
+      items: const ["currentDate", "scheduledDate"],
+      onChanged: (value) async {
+        await updateSettings("markPaidDate", value, updateGlobalState: true);
+        await updateSettings(
+            "markAsPaidOnOriginalDay", value == "scheduledDate",
+            updateGlobalState: true);
+      },
+      getLabel: (item) {
+        if (item == "currentDate") return "Current Date";
+        if (item == "scheduledDate") return "Scheduled Date";
+        return item;
+      },
+    );
+  }
+}
+
+class TagIconSetting extends StatelessWidget {
+  const TagIconSetting({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SettingsContainerSwitch(
+      title: "tag-icon".tr() != "tag-icon" ? "tag-icon".tr() : "Tag Icon",
+      description: "tag-icon-description".tr() != "tag-icon-description"
+          ? "tag-icon-description".tr()
+          : "Show relating icon for the tag",
+      icon: appStateSettings["outlinedIcons"]
+          ? Icons.image_outlined
+          : Icons.image_rounded,
+      initialValue: appStateSettings["showTagIcons"] ?? true,
+      onSwitched: (value) {
+        updateSettings("showTagIcons", value,
+            updateGlobalState: true, pagesNeedingRefresh: [0, 1, 2, 3]);
+      },
+    );
+  }
+}
+
+class SelectLayoutBottomSheet extends StatefulWidget {
+  const SelectLayoutBottomSheet({super.key});
+
+  @override
+  State<SelectLayoutBottomSheet> createState() =>
+      _SelectLayoutBottomSheetState();
+}
+
+class _SelectLayoutBottomSheetState extends State<SelectLayoutBottomSheet> {
+  @override
+  Widget build(BuildContext context) {
+    bool isLarge = appStateSettings["largeTransactionEntry"] == true;
+
+    return PopupFramework(
+      title: "select-layout".tr() != "select-layout"
+          ? "select-layout".tr()
+          : "Select Layout",
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextFont(
+                  text: getWordedDateShort(DateTime.now()),
+                  fontSize: 13,
+                  textColor: getColor(context, "textLight"),
+                ),
+                TextFont(
+                  text: convertToMoney(Provider.of<AllWallets>(context), 100),
+                  fontSize: 13,
+                  textColor: getColor(context, "textLight"),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 6),
+          // Compact layout preview card
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: isLarge
+                    ? Theme.of(context).colorScheme.outline.withOpacity(0.15)
+                    : Theme.of(context).colorScheme.primary,
+                width: isLarge ? 1.5 : 2,
+              ),
+            ),
+            child: Tappable(
+              borderRadius: 20,
+              color: isLarge
+                  ? Theme.of(context).colorScheme.surface
+                  : Theme.of(context)
+                      .colorScheme
+                      .secondaryContainer
+                      .withOpacity(0.35),
+              onTap: () async {
+                await updateSettings("largeTransactionEntry", false,
+                    updateGlobalState: true, pagesNeedingRefresh: [0, 1, 2, 3]);
+                setState(() {});
+              },
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                child: Row(
+                  children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFF3D2ED),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.fastfood_rounded,
+                      color: Color(0xFFC75185),
+                      size: 22,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const TextFont(
+                          text: "Transaction Name Placeh...",
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          maxLines: 1,
+                        ),
+                        const SizedBox(height: 5),
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFE8D4F8),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: const TextFont(
+                                text: "Axis Bank",
+                                fontSize: 11,
+                                textColor: Color(0xFF5B307D),
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFFFE0D0),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: const TextFont(
+                                text: "🍜 Food",
+                                fontSize: 11,
+                                textColor: Color(0xFF94451A),
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFD7EFE6),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: const TextFont(
+                                text: "Info Ta...",
+                                fontSize: 11,
+                                textColor: Color(0xFF226E52),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.receipt_long_outlined,
+                            size: 15,
+                            color: getColor(context, "textLight"),
+                          ),
+                          const SizedBox(width: 4),
+                          TextFont(
+                            text: "2:47 pm",
+                            fontSize: 11.5,
+                            textColor: getColor(context, "textLight"),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 2),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.arrow_drop_down,
+                            size: 18,
+                            color: Colors.red,
+                          ),
+                          TextFont(
+                            text: convertToMoney(
+                                Provider.of<AllWallets>(context), 100),
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
+                            textColor: getColor(context, "expenseAmount"),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+          // Large / Non-compact layout preview card
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: isLarge
+                    ? Theme.of(context).colorScheme.primary
+                    : Theme.of(context).colorScheme.outline.withOpacity(0.15),
+                width: isLarge ? 2 : 1.5,
+              ),
+            ),
+            child: Tappable(
+              borderRadius: 20,
+              color: isLarge
+                  ? Theme.of(context)
+                      .colorScheme
+                      .secondaryContainer
+                      .withOpacity(0.35)
+                  : Theme.of(context).colorScheme.surface,
+              onTap: () async {
+                await updateSettings("largeTransactionEntry", true,
+                    updateGlobalState: true, pagesNeedingRefresh: [0, 1, 2, 3]);
+                setState(() {});
+              },
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 44,
+                      height: 44,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFF3D2ED),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.fastfood_rounded,
+                        color: Color(0xFFC75185),
+                        size: 22,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const TextFont(
+                            text: "Transaction Name\nPlaceholder",
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          const SizedBox(height: 4),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Icon(
+                                Icons.article_outlined,
+                                size: 15,
+                                color: getColor(context, "textLight"),
+                              ),
+                              const SizedBox(width: 4),
+                              Expanded(
+                                child: TextFont(
+                                  text:
+                                      "This is a note that is part of the transaction. It is just a placeholder.",
+                                  fontSize: 11,
+                                  textColor: getColor(context, "textLight"),
+                                  maxLines: 2,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFE8D4F8),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: const TextFont(
+                                  text: "Axis Bank",
+                                  fontSize: 11,
+                                  textColor: Color(0xFF5B307D),
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFFE0D0),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: const TextFont(
+                                  text: "🍜 Food",
+                                  fontSize: 11,
+                                  textColor: Color(0xFF94451A),
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Flexible(
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFD7EFE6),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: const TextFont(
+                                    text: "Info Tag Placeholder",
+                                    fontSize: 11,
+                                    maxLines: 1,
+                                    textColor: Color(0xFF226E52),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        TextFont(
+                          text: "2:47 pm",
+                          fontSize: 11.5,
+                          textColor: getColor(context, "textLight"),
+                        ),
+                        const SizedBox(height: 2),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.arrow_drop_down,
+                              size: 18,
+                              color: Colors.red,
+                            ),
+                            TextFont(
+                              text: convertToMoney(
+                                  Provider.of<AllWallets>(context), 100),
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold,
+                              textColor: getColor(context, "expenseAmount"),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          const TransactionActionSetting(),
+          const NetSpendingDayTotalSetting(),
+          const ShowAccountLabelSettingToggle(),
+          const TagIconSetting(),
+          const UseSubcategoryIconSetting(),
+          const ShowTransactionTimeSetting(),
+          SettingsHeader(
+            title: "related-settings".tr() != "related-settings"
+                ? "related-settings".tr()
+                : "Related Settings",
+          ),
+          const CategoryIconPackSetting(),
+          const CountBalanceCorrectionInSummarySetting(),
+          const NumberFormattingSetting(),
+          const DateFormatSetting(),
+          const SizedBox(height: 20),
+        ],
+      ),
     );
   }
 }
@@ -2857,8 +3418,8 @@ class TransactionActionSetting extends StatelessWidget {
           ? "tap-to-expand-help-description".tr()
           : "Tap a transaction to expand options or open directly",
       icon: appStateSettings["outlinedIcons"]
-          ? Icons.touch_app_outlined
-          : Icons.touch_app_rounded,
+          ? Icons.speed_outlined
+          : Icons.speed_rounded,
       initial: appStateSettings["transactionAction"] ?? "tapToExpand",
       items: ["tapToExpand", "openEdit"],
       onChanged: (value) async {

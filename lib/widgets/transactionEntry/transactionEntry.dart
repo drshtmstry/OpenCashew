@@ -30,7 +30,6 @@ import 'package:budget/widgets/transactionEntry/transactionEntryNote.dart';
 import 'package:budget/widgets/transactionEntry/transactionEntryTag.dart';
 import 'package:budget/pages/addTransactionPage.dart';
 import 'package:budget/widgets/selectedTransactionsAppBar.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:budget/widgets/openPopup.dart';
 import 'package:budget/widgets/transactionEntry/balancedTagRow.dart';
 
@@ -800,89 +799,71 @@ class _TransactionEntryState extends State<TransactionEntry> {
                                     expand: isExpanded &&
                                         areTransactionsBeingSelected != true,
                                     axis: Axis.vertical,
-                                    duration: const Duration(milliseconds: 250),
+                                    duration:
+                                        const Duration(milliseconds: 250),
                                     child: Padding(
-                                      padding: const EdgeInsetsDirectional.only(
-                                        top: 6,
-                                        bottom: 2,
-                                        start: 2,
-                                        end: 2,
+                                      padding:
+                                          const EdgeInsetsDirectional.only(
+                                        top: 8,
+                                        bottom: 6,
+                                        start: 8,
+                                        end: 4,
                                       ),
                                       child: Row(
                                         mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
+                                            MainAxisAlignment.end,
                                         children: [
-                                          Expanded(
-                                            child: TransactionActionButtonTile(
-                                              icon: appStateSettings[
-                                                      "outlinedIcons"]
-                                                  ? Icons.edit_outlined
-                                                  : Icons.edit_rounded,
-                                              label: "edit".tr(),
-                                              onTap: () {
-                                                openContainer();
-                                              },
-                                            ),
-                                          ),
-                                          const SizedBox(width: 6),
-                                          Expanded(
-                                            child: TransactionActionButtonTile(
-                                              icon: appStateSettings[
-                                                      "outlinedIcons"]
-                                                  ? Icons.file_copy_outlined
-                                                  : Icons.file_copy_rounded,
-                                              label: "duplicate".tr() !=
-                                                      "duplicate"
-                                                  ? "duplicate".tr()
-                                                  : "copy".tr(),
-                                              onTap: () async {
-                                                await duplicateTransaction(
-                                                  context,
-                                                  transaction.transactionPk,
-                                                  useCurrentDate: false,
-                                                );
-                                              },
-                                            ),
-                                          ),
-                                          const SizedBox(width: 6),
-                                          Expanded(
-                                            child: TransactionActionButtonTile(
-                                              icon: appStateSettings[
-                                                      "outlinedIcons"]
-                                                  ? Icons.delete_outlined
-                                                  : Icons.delete_rounded,
-                                              label: "delete".tr(),
-                                              isDestructive: true,
-                                              onTap: () async {
-                                                deleteTransactionPopup(
-                                                  context,
-                                                  transaction: transaction,
-                                                  category: category,
-                                                  routesToPopAfterDelete:
-                                                      RoutesToPopAfterDelete
-                                                          .None,
-                                                );
-                                              },
-                                            ),
-                                          ),
                                           if (transaction.type != null) ...[
-                                            const SizedBox(width: 6),
-                                            Expanded(
-                                              child:
-                                                  TransactionActionButtonTile(
-                                                icon: getTransactionTypeIcon(
-                                                    transaction.type),
-                                                label:
-                                                    getTransactionActionNameFromType(
-                                                        transaction),
-                                                isPrimaryAction: true,
-                                                onTap: () async {
-                                                  await openTransactionActionFromType(
-                                                      context, transaction);
-                                                },
-                                              ),
+                                            TransactionActionButtonTile(
+                                              icon: getTransactionTypeIcon(
+                                                  transaction.type),
+                                              onTap: () async {
+                                                await openTransactionActionFromType(
+                                                    context, transaction);
+                                              },
                                             ),
+                                            const SizedBox(width: 8),
                                           ],
+                                          TransactionActionButtonTile(
+                                            icon: appStateSettings[
+                                                    "outlinedIcons"]
+                                                ? Icons.copy_outlined
+                                                : Icons.copy_rounded,
+                                            onTap: () async {
+                                              await duplicateTransaction(
+                                                context,
+                                                transaction.transactionPk,
+                                                useCurrentDate: false,
+                                              );
+                                            },
+                                          ),
+                                          const SizedBox(width: 8),
+                                          TransactionActionButtonTile(
+                                            icon: appStateSettings[
+                                                    "outlinedIcons"]
+                                                ? Icons.delete_outline
+                                                : Icons.delete_rounded,
+                                            onTap: () async {
+                                              deleteTransactionPopup(
+                                                context,
+                                                transaction: transaction,
+                                                category: category,
+                                                routesToPopAfterDelete:
+                                                    RoutesToPopAfterDelete
+                                                        .None,
+                                              );
+                                            },
+                                          ),
+                                          const SizedBox(width: 8),
+                                          TransactionActionButtonTile(
+                                            icon: appStateSettings[
+                                                    "outlinedIcons"]
+                                                ? Icons.edit_outlined
+                                                : Icons.edit_rounded,
+                                            onTap: () {
+                                              openContainer();
+                                            },
+                                          ),
                                         ],
                                       ),
                                     ),
@@ -1149,58 +1130,32 @@ class TransactionSelectionCheck extends StatelessWidget {
 class TransactionActionButtonTile extends StatelessWidget {
   const TransactionActionButtonTile({
     required this.icon,
-    required this.label,
     required this.onTap,
-    this.isDestructive = false,
-    this.isPrimaryAction = false,
+    this.iconSize = 20,
     super.key,
   });
 
   final IconData icon;
-  final String label;
   final VoidCallback onTap;
-  final bool isDestructive;
-  final bool isPrimaryAction;
+  final double iconSize;
 
   @override
   Widget build(BuildContext context) {
-    Color bg = isDestructive
-        ? Colors.red.withOpacity(0.12)
-        : isPrimaryAction
-            ? Theme.of(context).colorScheme.primary.withOpacity(0.15)
-            : Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.6);
+    Color bg = Theme.of(context).brightness == Brightness.light
+        ? const Color(0xFFE2E7EE)
+        : Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.6);
 
-    Color fg = isDestructive
-        ? (getColor(context, "expenseAmount"))
-        : isPrimaryAction
-            ? Theme.of(context).colorScheme.primary
-            : Theme.of(context).colorScheme.secondary;
+    Color fg = Theme.of(context).brightness == Brightness.light
+        ? const Color(0xFF4C667B)
+        : Theme.of(context).colorScheme.onSecondaryContainer;
 
     return Tappable(
       color: bg,
-      borderRadius: 12,
+      borderRadius: 14,
       onTap: onTap,
       child: Padding(
-        padding:
-            const EdgeInsetsDirectional.symmetric(vertical: 7, horizontal: 4),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 16, color: fg),
-            const SizedBox(width: 5),
-            Flexible(
-              child: TextFont(
-                text: label,
-                fontSize: 12.5,
-                fontWeight: FontWeight.bold,
-                textColor: fg,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        child: Icon(icon, size: iconSize, color: fg),
       ),
     );
   }

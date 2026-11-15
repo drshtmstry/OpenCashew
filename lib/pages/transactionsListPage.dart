@@ -395,8 +395,8 @@ class NetSpendingDayTotalSetting extends StatelessWidget {
     return SettingsContainerDropdown(
       title: "date-banner-total".tr(),
       icon: appStateSettings["outlinedIcons"]
-          ? Icons.playlist_add_outlined
-          : Icons.playlist_add_rounded,
+          ? Icons.calendar_view_day_outlined
+          : Icons.calendar_view_day_rounded,
       initial: appStateSettings["netSpendingDayTotal"].toString(),
       items: ["false", "true"],
       onChanged: (value) async {
