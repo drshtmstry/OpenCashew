@@ -739,7 +739,8 @@ class _TransactionEntryState extends State<TransactionEntry> {
                                 return;
                               }
                               if (appStateSettings["transactionAction"] ==
-                                  "openEdit") {
+                                      "openEdit" ||
+                                  appStateSettings["transactionAction"] == 1) {
                                 openContainer();
                               } else {
                                 setState(() {

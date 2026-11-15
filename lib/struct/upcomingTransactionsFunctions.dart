@@ -266,10 +266,13 @@ Future openPayPopup(
       double? amount;
       bool shouldConfirmAmount = appStateSettings["confirmUpcomingAmount"] ==
               "always" ||
-          (appStateSettings["confirmUpcomingAmount"] == "if-amount-is-zero" &&
+          appStateSettings["confirmUpcomingAmount"] == 1 ||
+          ((appStateSettings["confirmUpcomingAmount"] == "if-amount-is-zero" ||
+                  appStateSettings["confirmUpcomingAmount"] == 2) &&
               transaction.amount == 0) ||
           appStateSettings["confirmUpcomingTransactionAmount"] == true ||
           (appStateSettings["confirmUpcomingAmount"] != "never" &&
+              appStateSettings["confirmUpcomingAmount"] != 0 &&
               transaction.amount == 0);
       if (shouldConfirmAmount) {
         amount = await openBottomSheet(
@@ -325,6 +328,7 @@ Future markAsPaid({
     amount: customAmount ?? transaction.amount,
     paid: true,
     dateCreated: (appStateSettings["markPaidDate"] == "scheduledDate" ||
+            appStateSettings["markPaidDate"] == 1 ||
             appStateSettings["markAsPaidOnOriginalDay"] == true)
         ? null
         : DateTime.now(),

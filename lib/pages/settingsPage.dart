@@ -2795,6 +2795,15 @@ class ShowTransactionTimeSetting extends StatelessWidget {
 class ConfirmUpcomingTransactionAmountSetting extends StatelessWidget {
   const ConfirmUpcomingTransactionAmountSetting({super.key});
 
+  static String getConfirmUpcomingAmountSettingString(dynamic val) {
+    if (val == 0 || val == "0" || val == "never") return "never";
+    if (val == 1 || val == "1" || val == "always") return "always";
+    if (val == 2 || val == "2" || val == "if-amount-is-zero") {
+      return "if-amount-is-zero";
+    }
+    return "never";
+  }
+
   @override
   Widget build(BuildContext context) {
     return SettingsContainerDropdown(
@@ -2808,7 +2817,8 @@ class ConfirmUpcomingTransactionAmountSetting extends StatelessWidget {
       icon: appStateSettings["outlinedIcons"]
           ? Icons.calculate_outlined
           : Icons.calculate_rounded,
-      initial: appStateSettings["confirmUpcomingAmount"] ?? "never",
+      initial: getConfirmUpcomingAmountSettingString(
+          appStateSettings["confirmUpcomingAmount"]),
       items: const ["never", "always", "if-amount-is-zero"],
       onChanged: (value) async {
         await updateSettings("confirmUpcomingAmount", value,
@@ -2921,9 +2931,14 @@ class AutoPayUpcomingSetting extends StatelessWidget {
       icon: appStateSettings["outlinedIcons"]
           ? Icons.event_available_outlined
           : Icons.event_available_rounded,
-      initialValue: appStateSettings["autoPayUpcoming"] ?? false,
-      onSwitched: (value) {
-        updateSettings("autoPayUpcoming", value, updateGlobalState: true);
+      initialValue: appStateSettings["automaticallyPayUpcoming"] ??
+          appStateSettings["autoPayUpcoming"] ??
+          true,
+      onSwitched: (value) async {
+        await updateSettings("automaticallyPayUpcoming", value,
+            updateGlobalState: true);
+        await updateSettings("autoPayUpcoming", value,
+            updateGlobalState: true);
       },
     );
   }
@@ -2931,6 +2946,12 @@ class AutoPayUpcomingSetting extends StatelessWidget {
 
 class PaidDateSetting extends StatelessWidget {
   const PaidDateSetting({super.key});
+
+  static String getPaidDateSettingString(dynamic val) {
+    if (val == 0 || val == "0" || val == "currentDate") return "currentDate";
+    if (val == 1 || val == "1" || val == "scheduledDate") return "scheduledDate";
+    return "currentDate";
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -2942,7 +2963,7 @@ class PaidDateSetting extends StatelessWidget {
       icon: appStateSettings["outlinedIcons"]
           ? Icons.edit_calendar_outlined
           : Icons.edit_calendar_rounded,
-      initial: appStateSettings["markPaidDate"] ?? "currentDate",
+      initial: getPaidDateSettingString(appStateSettings["markPaidDate"]),
       items: const ["currentDate", "scheduledDate"],
       onChanged: (value) async {
         await updateSettings("markPaidDate", value, updateGlobalState: true);
@@ -3407,6 +3428,11 @@ class DatePickerTypeSetting extends StatelessWidget {
 class TransactionActionSetting extends StatelessWidget {
   const TransactionActionSetting({super.key});
 
+  static String getTransactionActionString(dynamic val) {
+    if (val == 1 || val == "1" || val == "openEdit") return "openEdit";
+    return "tapToExpand";
+  }
+
   @override
   Widget build(BuildContext context) {
     return SettingsContainerDropdown(
@@ -3420,7 +3446,8 @@ class TransactionActionSetting extends StatelessWidget {
       icon: appStateSettings["outlinedIcons"]
           ? Icons.speed_outlined
           : Icons.speed_rounded,
-      initial: appStateSettings["transactionAction"] ?? "tapToExpand",
+      initial:
+          getTransactionActionString(appStateSettings["transactionAction"]),
       items: ["tapToExpand", "openEdit"],
       onChanged: (value) async {
         await updateSettings("transactionAction", value,
