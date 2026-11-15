@@ -7,7 +7,6 @@ import 'package:budget/widgets/framework/popupFramework.dart';
 import 'package:budget/widgets/navigationSidebar.dart';
 import 'package:budget/widgets/openBottomSheet.dart';
 import 'package:budget/widgets/scrollbarWrap.dart';
-import 'package:budget/database/tables.dart';
 import 'package:budget/functions.dart';
 import 'package:budget/pages/transactionsSearchPage.dart';
 import 'package:budget/widgets/selectedTransactionsAppBar.dart';
@@ -18,7 +17,6 @@ import 'package:budget/widgets/textWidgets.dart';
 import 'package:budget/widgets/transactionEntries.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 import 'package:budget/widgets/util/sliverPinnedOverlapInjector.dart';
 import 'package:budget/widgets/util/multiDirectionalInfiniteScroll.dart';
@@ -330,7 +328,6 @@ class TransactionsSettings extends StatelessWidget {
         MarkAsPaidOnDaySetting(),
         NetSpendingDayTotalSetting(),
         ShowTransactionsMonthlySpendingSummarySettingToggle(),
-        ShowTransactionsBalanceTransferTabSettingToggle(),
       ],
     );
   }
@@ -386,20 +383,7 @@ class ShowTransactionsBalanceTransferTabSettingToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (Provider.of<AllWallets>(context).indexedByPk.keys.length <= 1)
-      return SizedBox.shrink();
-    return SettingsContainerSwitch(
-      title: "show-balance-transfer-tab".tr(),
-      description: "show-balance-transfer-tab-description".tr(),
-      onSwitched: (value) {
-        updateSettings("showTransactionsBalanceTransferTab", value,
-            updateGlobalState: false);
-      },
-      initialValue: appStateSettings["showTransactionsBalanceTransferTab"],
-      icon: appStateSettings["outlinedIcons"]
-          ? Icons.compare_arrows_outlined
-          : Icons.compare_arrows_rounded,
-    );
+    return SizedBox.shrink();
   }
 }
 

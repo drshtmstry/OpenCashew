@@ -49,7 +49,7 @@ void runQuickActionsPayLoads(context) async {
       } else if (quickAction.contains("openBudget")) {
         String budgetPk = quickAction.replaceAll("openBudget-", "");
         try {
-          Budget budget = await database.getBudgetInstance(budgetPk);
+          await database.getBudgetInstance(budgetPk);
           pushRoute(
             context,
             BudgetPage(
@@ -71,8 +71,7 @@ void runQuickActionsPayLoads(context) async {
       localizedTitle: "add-transaction".tr(),
       icon: "addtransaction",
     ),
-    if (appStateSettings["showTransactionsBalanceTransferTab"] == true &&
-        Provider.of<AllWallets>(context, listen: false).indexedByPk.length > 1)
+    if (Provider.of<AllWallets>(context, listen: false).indexedByPk.length > 1)
       ShortcutItem(
         type: "transferTransaction",
         localizedTitle: "transfer".tr(),

@@ -10,7 +10,6 @@ import 'package:budget/pages/editAssociatedTitlesPage.dart';
 import 'package:budget/pages/editWalletsPage.dart';
 import 'package:budget/pages/settingsPage.dart';
 import 'package:budget/pages/sharedBudgetSettings.dart';
-import 'package:budget/pages/transactionsListPage.dart';
 import 'package:budget/struct/databaseGlobal.dart';
 import 'package:budget/struct/navBarIconsData.dart';
 import 'package:budget/struct/settings.dart';
@@ -1847,20 +1846,7 @@ class _AddTransactionPageState extends State<AddTransactionPage>
       color: categoryColor,
       child: Column(
         children: [
-          GestureDetector(
-            onLongPress: () async {
-              if (enableBalanceTransferTab) {
-                await openBottomSheet(
-                  context,
-                  PopupFramework(
-                    hasPadding: false,
-                    child: ShowTransactionsBalanceTransferTabSettingToggle(),
-                  ),
-                );
-                setState(() {});
-              }
-            },
-            child: IntrinsicHeight(
+          IntrinsicHeight(
               child: Row(
                 children: [
                   Flexible(
@@ -1931,7 +1917,6 @@ class _AddTransactionPageState extends State<AddTransactionPage>
                 ],
               ),
             ),
-          ),
           Row(
             children: [
               Tappable(
