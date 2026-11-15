@@ -1,5 +1,7 @@
 # Walkthrough: Fork Restructure, Rebranding to OpenCashew & Mobile-Only Scoping
 
+> **Historical completion record (2026-11-14).** Build and analysis results below describe the restructure snapshot at that time; they are not fresh verification of the current working tree. Current outstanding work is tracked in [`todo.md`](todo.md).
+
 ## Overview
 The repository has been restructured from the upstream Cashew project into **OpenCashew** (`org.opencashew.app`), an independent, mobile-only application targeting the latest Android and iOS versions under the GNU General Public License v3.0 (GPLv3).
 

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:budget/struct/initializeBiometrics.dart';
+import 'package:budget/struct/settings.dart';
 
 AppLifecycleState appLifecycleState = AppLifecycleState.resumed;
 
@@ -57,6 +59,15 @@ class _OnAppResumeState extends State<OnAppResume> with WidgetsBindingObserver {
 
     if (widget.onAppPaused != null && state == AppLifecycleState.paused) {
       widget.onAppPaused!();
+    }
+
+    if (state == AppLifecycleState.paused && appStateSettings["requireAuth"] == true &&
+        appStateSettings["biometricAutoLockOnBackground"] == true) {
+      biometricAppNeedsAuthentication = true;
+    }
+    if (state == AppLifecycleState.resumed &&
+        biometricAppNeedsAuthentication) {
+      initializeBiometricsKey.currentState?.requireAuthentication();
     }
 
     _lastState = state;

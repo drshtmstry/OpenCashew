@@ -1,5 +1,7 @@
 # OpenCashew vs Live Cashew Web App — Gap Analysis
 
+> **Historical snapshot (2026-11-15):** This audit predates the current implementation pass and is not a statement of present code status. Several “missing” and “needs surfacing” items below have since been implemented. Use [`todo.md`](todo.md) for current status; remaining observations such as the stacked bar graph and pinned home section are leads to verify before work.
+
 > Compared: **OpenCashew** codebase (upstream commit `9cfbe50c` + our changes) vs **Cashew Web App v6.7.2+521** at `budget-track.web.app`
 
 ---

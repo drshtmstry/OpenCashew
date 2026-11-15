@@ -1291,6 +1291,23 @@ class WalletDetailsPageState extends State<WalletDetailsPage>
                         },
                       ),
                       DropdownItemMenu(
+                        id: "view-account-transactions",
+                        label: "transactions".tr(),
+                        icon: appStateSettings["outlinedIcons"]
+                            ? Icons.receipt_long_outlined
+                            : Icons.receipt_long_rounded,
+                        action: () {
+                          pushRoute(
+                            context,
+                            TransactionsSearchPage(
+                              initialFilters: SearchFilters().copyWith(
+                                walletPks: [widget.wallet!.walletPk],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      DropdownItemMenu(
                         id: "correct-total-balance",
                         label: "correct-total-balance".tr(),
                         icon: appStateSettings["outlinedIcons"]

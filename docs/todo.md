@@ -120,12 +120,12 @@
   - Register in `homePage.dart` and `editHomePage.dart`
 
 ### Transaction Features
-- [ ] **Pinned Transactions** (long press `+` button to pin) — _changelog 6.0.0_
+- [x] **Pinned Transactions** manager shortcut from the `+` long-press menu — manager already supports adding, ordering, and unpinning; direct pinning from a transaction's `+` action remains a follow-up — _changelog 6.0.0_
 - [x] **Bi-weekly and Quarterly** repeat options for scheduled transactions — _changelog 6.0.0_
 - [ ] **Excluded from Totals** transactions filter — _changelog 6.0.0 "Excluded from totals transactions filter"_
 - [ ] **Filter "Notes contains" and "Title contains" with AND (`&&`) / OR (`||`)** logic — _changelog 6.0.0_
 - [ ] **Sort Transactions** in Search page and monthly list — _changelog 6.0.0_
-- [ ] **Export Transactions** directly from Search page — _changelog 6.0.0_
+- [x] **Export Selected Transactions** from Search page as CSV — reuses transaction selection and CSV encoding/file saving — _changelog 6.0.0_
 - [ ] **Evaluate Partial Calculation** when entering amounts (e.g., `50+30`) — _changelog 6.0.0_
 - [ ] **Copy/Paste Calculations** when entering amounts — _changelog 6.0.0_
 - [ ] **Edit Note on All Selected Transactions** (bulk edit) — _changelog 6.0.0_
@@ -145,7 +145,7 @@
 
 ### Accounts & Import
 - [ ] **Account Details Options List (replace currency tiles)** — in account details/info section, replace the currency breakdown tiles with an options list.
-- [ ] **View Transactions with Account Filter** — dedicated action/button to view transactions that opens the transactions page with that account filter applied.
+- [x] **View Transactions with Account Filter** — account details menu opens Search with that account filter applied.
 - [ ] **Accounts List Page** (dedicated accounts overview) — _changelog 6.0.0_
 - [ ] **Account Spending Summary Table** — _changelog 5.2.6_
 - [ ] **Ability to Archive Accounts** — _changelog 6.0.0_

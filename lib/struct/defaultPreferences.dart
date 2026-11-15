@@ -169,6 +169,7 @@ Future<Map<String, dynamic>> getDefaultPreferences() async {
     "currentUserEmail": "",
     "usersNicknames": {},
     "requireAuth": false,
+    "biometricAutoLockOnBackground": false,
     "cachedCurrencyExchange": {},
     "customCurrencies": [],
     "lineGraphReferenceBudgetPk": null,

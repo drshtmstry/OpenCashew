@@ -11,6 +11,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:local_auth/local_auth.dart';
 
+bool biometricAppNeedsAuthentication = false;
+
 enum AuthResult {
   waiting,
   authenticated,
@@ -69,7 +71,10 @@ class InitializeBiometrics extends StatefulWidget {
   State<InitializeBiometrics> createState() => _InitializeBiometricsState();
 }
 
-class _InitializeBiometricsState extends State<InitializeBiometrics> {
+final GlobalKey<InitializeBiometricsState> initializeBiometricsKey =
+    GlobalKey<InitializeBiometricsState>();
+
+class InitializeBiometricsState extends State<InitializeBiometrics> {
   AuthResult authResult = AuthResult.waiting;
   @override
   void initState() {
@@ -81,6 +86,9 @@ class _InitializeBiometricsState extends State<InitializeBiometrics> {
 
   _biometricCheck() async {
     AuthResult result = await checkBiometrics();
+    if (result == AuthResult.authenticated) {
+      biometricAppNeedsAuthentication = false;
+    }
     setState(() {
       authResult = result;
     });
@@ -91,6 +99,12 @@ class _InitializeBiometricsState extends State<InitializeBiometrics> {
         authResult = AuthResult.authenticated;
       });
     }
+  }
+
+  void requireAuthentication() {
+    if (!mounted || appStateSettings["requireAuth"] != true) return;
+    setState(() => authResult = AuthResult.waiting);
+    _biometricCheck();
   }
 
   _biometricErrorPopup() {

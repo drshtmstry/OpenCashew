@@ -1404,6 +1404,21 @@ class _BiometricsSettingToggleState extends State<BiometricsSettingToggle> {
                         : Icons.lock_open_rounded,
               )
             : SizedBox.shrink(),
+        if (isLocked)
+          SettingsContainerSwitch(
+            title: "Auto-lock when app is closed",
+            description: "Require authentication after leaving the app",
+            initialValue:
+                appStateSettings["biometricAutoLockOnBackground"] == true,
+            icon: appStateSettings["outlinedIcons"]
+                ? Icons.lock_clock_outlined
+                : Icons.lock_clock_rounded,
+            onSwitched: (value) async {
+              await updateSettings("biometricAutoLockOnBackground", value,
+                  updateGlobalState: false);
+              return true;
+            },
+          ),
       ],
     );
   }

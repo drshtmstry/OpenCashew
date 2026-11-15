@@ -1,5 +1,7 @@
 # Implementation Plan: Fork Restructure, App Renaming & GPLv3 Compliance
 
+> **Historical plan — completed and superseded (2026-11-15).** Current identity is **OpenCashew**, Android application ID and iOS bundle identifier `org.opencashew.app`. The Flutter app now lives at the repository root. See [`walkthrough.md`](walkthrough.md) for the completion record; this file is retained as a historical proposal.
+
 ## Goal Description
 Transform the project from the upstream **Cashew** repository into a fully independent, standalone mobile application fork (targeting modern Android and iOS platforms exclusively). This involves:
 1. Complete removal of obsolete web and desktop platform artifacts and configurations (already initiated in workspace cleanup).
@@ -13,11 +15,7 @@ Transform the project from the upstream **Cashew** repository into a fully indep
 ## User Review Required
 
 > [!IMPORTANT]
-> **Decisions Confirmed**:
-> - **App Display Name**: `Cashly`
-> - **Android Application ID / Package Name**: `com.cashly.app`
-> - **iOS Bundle Identifier**: `com.cashly.app`
-> - **Backend / Sync**: Local-first with clean placeholder configuration for Firebase sync.
+> **Historical decisions in the original proposal (superseded):** The Cashly name and `com.cashly.app` identifiers were not adopted. The shipped fork identity is OpenCashew (`org.opencashew.app`).
 
 ---
 

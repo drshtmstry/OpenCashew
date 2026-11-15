@@ -2,6 +2,8 @@
 
 > Tracks every single item from the production 6.x release notes (v6.0.0 through v6.7.5) against the OpenCashew codebase.
 > Status legend: `[x]` Implemented in OpenCashew | `[ ]` Pending implementation | `[-]` iOS-only / App Store specific
+>
+> **Status note (2026-11-15):** This release-note tracker has not been fully reconciled with `todo.md` or the current code. Use [`todo.md`](todo.md) for current project priorities and completed-work status. Entries below are a historical cross-reference until individually audited.
 
 ## Version 6.7.0 (43 items)
 
@@ -136,22 +138,22 @@
 - [ ] Many bug fixes
 - [ ] Improved data sync algorithm and reliability
 - [ ] Revamp and organize settings page
-- [ ] Date format setting
-- [ ] Date selector type setting
+- [x] Date format setting *(tracked complete in current `todo.md`; `dateFormat` preference exists)*
+- [x] Date selector type setting *(tracked complete in current `todo.md`; `datePickerType` preference exists)*
 - [ ] Improved and added new number format settings
 - [ ] Automatic decimal placement setting
-- [ ] Biometrics auto lock after app closed
+- [x] Biometrics auto lock after app closed *(opt-in background relock; tracked in current `todo.md` implementation)*
 - [ ] Improved biometric unlocking flow
-- [ ] Amount totals colored style setting
+- [x] Amount totals colored style setting *(tracked complete in current `todo.md`)*
 - [ ] Haptic feedback interaction settings
 - [ ] Edit navigation bar tab setting
-- [ ] Left-handed access setting
+- [x] Left-handed access setting *(tracked complete in current `todo.md`)*
 - [x] Scroll behavior setting *(Implemented: ScrollBehaviorSetting with System, Bouncing, Clamping)*
-- [ ] Add gray theme color
-- [ ] Font scale setting
+- [x] Add gray theme color *(tracked complete in current `todo.md`)*
+- [x] Font scale setting *(tracked complete; `fontScale` preference exists)*
 - [ ] Support custom font files
-- [ ] Animated budget container setting (can significantly increase performance if disabled)
-- [ ] Prompt for upcoming transaction amount when paid setting
+- [x] Animated budget container setting (can significantly increase performance if disabled) *(tracked complete in current `todo.md`)*
+- [x] Prompt for upcoming transaction amount when paid setting *(tracked complete in current `todo.md`)*
 - [ ] Improved app loading performance
 - [ ] Improved performance when interacting with transaction lists
 - [ ] Improved performance with keyboard resizing
@@ -165,7 +167,7 @@
 - [ ] Improved scroll to bottom/top in large lists
 - [ ] Improved navigation bar layout rendering
 - [-] Support liquid glass navigation bar (i) *(iOS platform-specific)*
-- [ ] New floating navigation bar option (A)
+- [ ] New floating navigation bar option (A) *(still pending in current `todo.md`)*
 - [ ] Improved FAB rendering on all pages
 - [ ] Improved and recreated tab bar selection UI component
 - [ ] Improved and recreated dropdown menu action selection
@@ -173,21 +175,21 @@
 - [x] Category icon packs *(Implemented: CategoryIconPackSetting with Default, Mono, Outlined)*
 - [ ] Category icon background shapes
 - [x] Custom transaction layouts - compact and large *(Implemented: NonCompactTransactionsSetting)*
-- [ ] Display transaction time in transaction entry setting
-- [ ] Use subcategory icon instead of primary in transaction entry setting
-- [ ] Group transfer transactions together
-- [ ] Transaction row entry interactions setting: action button / tap to expand
-- [ ] Custom add transaction flow and prompts - disable and reorder prompts when adding a transaction
+- [x] Display transaction time in transaction entry setting *(tracked complete in current `todo.md`)*
+- [x] Use subcategory icon instead of primary in transaction entry setting *(tracked complete in current `todo.md`)*
+- [x] Group transfer transactions together *(tracked complete in current `todo.md`)*
+- [x] Transaction row entry interactions setting: action button / tap to expand *(tracked complete in current `todo.md`)*
+- [x] Custom add transaction flow and prompts - disable and reorder prompts when adding a transaction *(tracked complete in current `todo.md`)*
 - [ ] Selectable items bottom sheet list in Add Transaction page when more than 3 items listed
 - [ ] Swipe between dates to quickly change when adding a transaction
 - [ ] Fixed scroll-to selected item when horizontal list loaded
 - [-] Improve popup bottom sheet with keyboard fluidity (i) *(iOS platform-specific)*
 - [-] Fix auto correct from removing a recommended title choice click (i) *(iOS platform-specific)*
-- [ ] Add bi-weekly and quarterly repeat options and tutorial for selecting reoccurrence
+- [x] Add bi-weekly and quarterly repeat options *(tracked complete in current `todo.md`; tutorial may remain separate)*
 - [ ] Excluded from totals transactions filter
 - [ ] Filter "Notes contains" and "Title contains" using "and" "&&" or "or" "||"
 - [ ] Sort transactions in Search transactions page and monthly list page
-- [ ] Export transactions directly in Search transactions page
+- [x] Export selected transactions directly from Search transactions page as CSV *(implemented; current `todo.md`)*
 - [ ] Significantly improved search algorithm with multiple languages and latin character conversion
 - [ ] Added debug logging shortcut in about app page
 - [ ] Search titles by category name and title when editing
@@ -218,9 +220,9 @@
 - [ ] Budget spending limit total type
 - [ ] Budget page sorting transactions
 - [ ] Custom exchange rate when creating a transfer
-- [ ] Pinned transactions (long press + button)
+- [x] Pinned transaction manager shortcut from the `+` long-press menu *(current `todo.md`; direct pin action and pinned home section remain pending)*
 - [ ] Pinned transactions UI layout list type
-- [ ] Pinned transactions home page section
+- [ ] Pinned transactions home page section *(still pending in current `todo.md`)*
 - [ ] Merged common/frequent transactions feature with pinned transactions
 - [ ] Transactions monthly list page custom total type setting
 - [ ] Calendar page daily total, monthly total banner, filter and search support

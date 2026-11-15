@@ -1,4 +1,5 @@
 import 'package:budget/pages/addTransactionPage.dart';
+import 'package:budget/pages/managePinnedTransactionsPage.dart';
 import 'package:budget/struct/settings.dart';
 import 'package:budget/widgets/fabSpeedDial.dart';
 import 'package:budget/widgets/framework/popupFramework.dart';
@@ -27,6 +28,20 @@ class AddFAB extends StatelessWidget {
   final Color? color;
   final Color? colorIcon;
 
+  Future<void> _openAddOptions(BuildContext context) async {
+    await openBottomSheet(
+      context,
+      PopupFramework(
+        child: AddMoreThingsPopup(
+          onManagePinnedTransactions: () {
+            popRoute(context);
+            pushRoute(context, const ManagePinnedTransactionsPage());
+          },
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (onTap == null &&
@@ -53,14 +68,7 @@ class AddFAB extends StatelessWidget {
       onTap: onTap,
       fabSize: getIsFullScreen(context) == false ? 60 : 70,
       borderRadius: getIsFullScreen(context) == false ? 18 : 22,
-      onLongPress: () {
-        openBottomSheet(
-          context,
-          PopupFramework(
-            child: AddMoreThingsPopup(),
-          ),
-        );
-      },
+      onLongPress: () => _openAddOptions(context),
     );
   }
 }

@@ -3,6 +3,7 @@ import 'package:budget/database/tables.dart';
 import 'package:budget/functions.dart';
 import 'package:budget/pages/addTransactionPage.dart';
 import 'package:budget/pages/addWalletPage.dart';
+import 'package:budget/pages/managePinnedTransactionsPage.dart';
 import 'package:budget/struct/settings.dart';
 import 'package:budget/widgets/framework/popupFramework.dart';
 import 'package:budget/widgets/navigationFramework.dart';
@@ -226,7 +227,12 @@ class _TransactionSpeedDialFABState extends State<TransactionSpeedDialFAB>
           openBottomSheet(
             context,
             PopupFramework(
-              child: const AddMoreThingsPopup(),
+              child: AddMoreThingsPopup(
+                onManagePinnedTransactions: () {
+                  popRoute(context);
+                  pushRoute(context, const ManagePinnedTransactionsPage());
+                },
+              ),
             ),
           );
         },

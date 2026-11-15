@@ -19,6 +19,7 @@ import 'package:budget/pages/editObjectivesPage.dart';
 import 'package:budget/pages/editWalletsPage.dart';
 import 'package:budget/pages/homePage/homePage.dart';
 import 'package:budget/pages/notificationsPage.dart';
+import 'package:budget/pages/managePinnedTransactionsPage.dart';
 import 'package:budget/pages/objectivesListPage.dart';
 import 'package:budget/pages/onBoardingPage.dart';
 import 'package:budget/pages/settingsPage.dart';
@@ -532,7 +533,9 @@ class PageNavigationFrameworkState extends State<PageNavigationFramework> {
 }
 
 class AddMoreThingsPopup extends StatelessWidget {
-  const AddMoreThingsPopup({super.key});
+  const AddMoreThingsPopup({this.onManagePinnedTransactions, super.key});
+
+  final VoidCallback? onManagePinnedTransactions;
 
   createTransactionFromCommon({
     required BuildContext context,
@@ -565,6 +568,18 @@ class AddMoreThingsPopup extends StatelessWidget {
     return Column(
       children: [
         SizedBox(height: 5),
+        if (onManagePinnedTransactions != null)
+          AddThing(
+            iconData: appStateSettings["outlinedIcons"]
+                ? Icons.push_pin_outlined
+                : Icons.push_pin_rounded,
+            title: "manage-pinned-transactions".tr() ==
+                    "manage-pinned-transactions"
+                ? "Pinned Transactions"
+                : "manage-pinned-transactions".tr(),
+            openPage: const ManagePinnedTransactionsPage(),
+            onTap: onManagePinnedTransactions,
+          ),
         AddThing(
           iconData: navBarIconsData["accountDetails"]!.iconData,
           title: "account".tr(),

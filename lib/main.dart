@@ -152,6 +152,7 @@ class App extends StatelessWidget {
             await setHighRefreshRate();
           },
           child: InitializeBiometrics(
+            key: initializeBiometricsKey,
             child: InitializeNotificationService(
               child: InitializeAppLinks(
                 child: WatchForDayChange(

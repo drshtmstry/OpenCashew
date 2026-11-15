@@ -1,5 +1,7 @@
 # Cashew Data Architecture & Schema Insights
 
+> **Reverse-engineering reference, not the OpenCashew schema contract.** Findings below describe one Cashew 6.7.5+524 database export and APK. Preference keys and behaviors may differ from this fork; verify against current code and migrations before relying on them.
+
 Based on direct inspection of your SQLite database (`cashew-2026-11-15-11-55-18-868292.sql`) and binary reverse-engineering of `Cashew 6.7.5 (524).apks`.
 
 ---

@@ -1,5 +1,7 @@
 # Implementation Plan: Comprehensive Dependency & SDK Modernization for OpenCashew
 
+> **Historical plan — implementation recorded in [`walkthrough.md`](walkthrough.md).** Treat proposed versions, paths, commands, review requests, and verification steps below as the original plan, not current requirements. The repository was flattened after this plan was written; its `budget/` paths are historical.
+
 ## Goal Description
 OpenCashew is currently undergoing a modernization from Cashew to an independent, mobile-only (Android & iOS) open-source application under GNU GPLv3. 
 
