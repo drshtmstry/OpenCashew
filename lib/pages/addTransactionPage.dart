@@ -1324,13 +1324,16 @@ class _AddTransactionPageState extends State<AddTransactionPage>
                                           selectedPeriodLength,
                                       onChanged: (selectedRecurrence,
                                           selectedRecurrenceEnum,
-                                          selectedRecurrenceDisplay) {
+                                          selectedRecurrenceDisplay,
+                                          selectedPeriodLength) {
                                         this.selectedRecurrence =
                                             selectedRecurrence;
                                         this.selectedRecurrenceEnum =
                                             selectedRecurrenceEnum;
                                         this.selectedRecurrenceDisplay =
                                             selectedRecurrenceDisplay;
+                                        this.selectedPeriodLength =
+                                            selectedPeriodLength;
                                         setState(() {});
                                       },
                                     );
@@ -4784,32 +4787,60 @@ Future<void> selectRecurrence(
     {required BuildContext context,
     required String selectedRecurrence,
     required int selectedPeriodLength,
-    required onChanged(
+    required Function(
       String selectedRecurrence,
       BudgetReoccurence selectedRecurrenceEnum,
       String selectedRecurrenceDisplay,
-    )}) async {
+      int selectedPeriodLength,
+    ) onChanged}) async {
+  String initialValue = selectedRecurrence;
+  if (selectedPeriodLength == 2 && selectedRecurrence == "Weekly") {
+    initialValue = "Biweekly";
+  } else if (selectedPeriodLength == 3 && selectedRecurrence == "Monthly") {
+    initialValue = "Quarterly";
+  }
+
   openBottomSheet(
     context,
     PopupFramework(
       title: "select-period".tr(),
       child: RadioItems(
-        items: ["Daily", "Weekly", "Monthly", "Yearly"],
-        initial: selectedRecurrence,
+        items: const ["Daily", "Weekly", "Biweekly", "Monthly", "Quarterly", "Yearly"],
+        initial: initialValue,
         displayFilter: (item) {
+          if (item == "Biweekly") return "bi-weekly".tr();
+          if (item == "Quarterly") return "quarterly".tr();
           return item.toString().toLowerCase().tr();
         },
+        getDescription: (item) {
+          if (item == "Biweekly") return "bi-weekly-hint".tr();
+          if (item == "Quarterly") return "quarterly-hint".tr();
+          return "";
+        },
         onChanged: (value) {
-          String selectedRecurrence = value;
-          BudgetReoccurence selectedRecurrenceEnum = enumRecurrence[value];
-          String selectedRecurrenceDisplay;
-          if (selectedPeriodLength == 1) {
-            selectedRecurrenceDisplay = nameRecurrence[value].toString().tr();
-          } else {
-            selectedRecurrenceDisplay = namesRecurrence[value].toString().tr();
+          String newRecurrence = value;
+          int newPeriodLength = selectedPeriodLength;
+          if (value == "Biweekly") {
+            newRecurrence = "Weekly";
+            newPeriodLength = 2;
+          } else if (value == "Quarterly") {
+            newRecurrence = "Monthly";
+            newPeriodLength = 3;
+          } else if (selectedPeriodLength == 2 && selectedRecurrence == "Weekly" && value == "Weekly") {
+            newPeriodLength = 1;
+          } else if (selectedPeriodLength == 3 && selectedRecurrence == "Monthly" && value == "Monthly") {
+            newPeriodLength = 1;
           }
-          onChanged(selectedRecurrence, selectedRecurrenceEnum,
-              selectedRecurrenceDisplay);
+
+          BudgetReoccurence selectedRecurrenceEnum = enumRecurrence[newRecurrence];
+          String selectedRecurrenceDisplay;
+          if (newPeriodLength == 1) {
+            selectedRecurrenceDisplay = nameRecurrence[newRecurrence].toString().tr();
+          } else {
+            selectedRecurrenceDisplay = namesRecurrence[newRecurrence].toString().tr();
+          }
+          onChanged(newRecurrence, selectedRecurrenceEnum,
+              selectedRecurrenceDisplay, newPeriodLength);
           popRoute(
             context,
           );
