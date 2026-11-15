@@ -733,6 +733,7 @@ class ThemeAndStyleSettingsPage extends StatelessWidget {
         const FontPickerSetting(),
         const FontScaleSetting(),
         const LinearProgressBarStyleSetting(),
+        const NetTotalStyleSetting(),
         const AppAnimationSetting(),
         const CountingNumberAnimationSetting(),
         const IncreaseTextContrastSetting(),
@@ -1165,6 +1166,7 @@ class MoreOptionsPagePreferences extends StatelessWidget {
         FontPickerSetting(),
         FontScaleSetting(),
         LinearProgressBarStyleSetting(),
+        NetTotalStyleSetting(),
         AppAnimationSetting(),
         CountingNumberAnimationSetting(),
         IncreaseTextContrastSetting(),
@@ -2475,6 +2477,30 @@ class LinearProgressBarStyleSetting extends StatelessWidget {
         if (item == "0") return "Simple (Flat)";
         if (item == "1") return "Wavy (Modern)";
         return item;
+      },
+    );
+  }
+}
+
+class NetTotalStyleSetting extends StatelessWidget {
+  const NetTotalStyleSetting({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SettingsContainerDropdown(
+      title: "net-total-style".tr(),
+      description: "net-total-style-description".tr(),
+      icon: appStateSettings["outlinedIcons"]
+          ? Icons.palette_outlined
+          : Icons.palette_rounded,
+      initial: appStateSettings["netTotalsColorful"] == true ? "colorful" : "simple",
+      items: const ["simple", "colorful"],
+      onChanged: (value) async {
+        await updateSettings("netTotalsColorful", value == "colorful",
+            updateGlobalState: true, pagesNeedingRefresh: [0, 1, 2, 3]);
+      },
+      getLabel: (item) {
+        return item.tr();
       },
     );
   }
