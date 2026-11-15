@@ -1,5 +1,6 @@
 import 'package:budget/colors.dart';
 import 'package:budget/database/tables.dart';
+import 'package:budget/struct/categoryTypes.dart';
 import 'package:budget/pages/transactionFilters.dart';
 import 'package:budget/pages/walletDetailsPage.dart';
 import 'package:budget/struct/listenableSelector.dart';
@@ -304,19 +305,30 @@ class _TransactionEntriesState extends State<TransactionEntries> {
                             Provider.of<AllWallets>(context),
                             transactionWithCategory.transaction.walletFk));
               }
-              if (transactionWithCategory.transaction.paid &&
-                  transactionWithCategory.transaction.categoryFk != "0") {
-                double amountForDay =
-                    transactionWithCategory.transaction.amount *
-                        (amountRatioToPrimaryCurrencyGivenPk(
-                            Provider.of<AllWallets>(context),
-                            transactionWithCategory.transaction.walletFk));
-                totalSpentForDay += amountForDay;
-                if (amountForDay < 0) {
-                  totalExpense += amountForDay;
-                }
-                if (amountForDay > 0) {
-                  totalIncome += amountForDay;
+              bool isTransferTx =
+                  transactionWithCategory.transaction.pairedTransactionFk !=
+                          null ||
+                      isCategoryTypeTransfer(transactionWithCategory.category);
+              bool isBalanceCorrectionTx =
+                  transactionWithCategory.transaction.categoryFk == "0" ||
+                      isCategoryTypeBalanceCorrection(
+                          transactionWithCategory.category);
+
+              if (transactionWithCategory.transaction.paid && !isTransferTx) {
+                if (!isBalanceCorrectionTx ||
+                    appStateSettings["countBalanceCorrectionInSummary"] == true) {
+                  double amountForDay =
+                      transactionWithCategory.transaction.amount *
+                          (amountRatioToPrimaryCurrencyGivenPk(
+                              Provider.of<AllWallets>(context),
+                              transactionWithCategory.transaction.walletFk));
+                  totalSpentForDay += amountForDay;
+                  if (amountForDay < 0) {
+                    totalExpense += amountForDay;
+                  }
+                  if (amountForDay > 0) {
+                    totalIncome += amountForDay;
+                  }
                 }
               }
             }

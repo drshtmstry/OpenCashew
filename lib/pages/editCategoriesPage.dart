@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:budget/colors.dart';
 import 'package:budget/database/tables.dart';
+import 'package:budget/struct/categoryTypes.dart';
 import 'package:budget/functions.dart';
 import 'package:budget/pages/addCategoryPage.dart';
 import 'package:budget/pages/settingsPage.dart';
@@ -340,11 +341,24 @@ class _EditCategoriesPageState extends State<EditCategoriesPage> {
                                           ),
                                           TextFont(
                                             textAlign: TextAlign.start,
-                                            text: category.categoryPk == "0"
-                                                ? "balance-correction".tr()
-                                                : category.income
-                                                    ? "income".tr()
-                                                    : "expense".tr(),
+                                            text: () {
+                                              CategoryType type =
+                                                  getCategoryType(category);
+                                              switch (type) {
+                                                case CategoryType.both:
+                                                  return "Expense / Income";
+                                                case CategoryType.expense:
+                                                  return "expense".tr();
+                                                case CategoryType.income:
+                                                  return "income".tr();
+                                                case CategoryType.transfer:
+                                                  return "transfer".tr();
+                                                case CategoryType
+                                                      .balanceCorrection:
+                                                  return "balance-correction"
+                                                      .tr();
+                                              }
+                                            }(),
                                             fontSize: 14,
                                             textColor:
                                                 getColor(context, "black")

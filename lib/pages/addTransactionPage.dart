@@ -1,3 +1,4 @@
+import 'package:budget/struct/categoryTypes.dart';
 import 'package:budget/database/generatePreviewData.dart';
 import 'package:budget/database/tables.dart';
 import 'package:budget/functions.dart';
@@ -186,12 +187,18 @@ class _AddTransactionPageState extends State<AddTransactionPage>
 
   void setSelectedCategory(TransactionCategory category,
       {bool setIncome = true}) {
+    CategoryType catType = getCategoryType(category);
     if (isAddedToLoanObjective == false &&
         setIncome &&
         category.categoryPk != "0" &&
         selectedType != TransactionSpecialType.credit &&
         selectedType != TransactionSpecialType.debt) {
-      setSelectedIncome(category.income);
+      if (catType == CategoryType.income) {
+        setSelectedIncome(true);
+      } else if (catType == CategoryType.expense) {
+        setSelectedIncome(false);
+      }
+      // If catType == CategoryType.both (default blank), keep the current user's expense or income selection!
     }
     setState(() {
       if (selectedCategory != category) selectedSubCategory = null;

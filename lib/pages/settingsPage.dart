@@ -794,6 +794,7 @@ class MoreOptionsPagePreferences extends StatelessWidget {
         WalletsSettings(),
         PrimaryCurrencySetting(),
         LongTermLoansDifferenceSetting(),
+        CountBalanceCorrectionInSummarySetting(),
         SettingsHeader(title: "budgets".tr()),
         BudgetSettings(),
         SettingsHeader(title: "goals".tr()),
@@ -2241,6 +2242,27 @@ class LongTermLoansDifferenceSetting extends StatelessWidget {
       icon: appStateSettings["outlinedIcons"]
           ? Icons.compare_arrows_outlined
           : Icons.compare_arrows_rounded,
+    );
+  }
+}
+
+class CountBalanceCorrectionInSummarySetting extends StatelessWidget {
+  const CountBalanceCorrectionInSummarySetting({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SettingsContainerSwitch(
+      title: "Count Balance Corrections in Summary",
+      description:
+          "Count account balance correction adjustments as expense or income in total spending and summary",
+      onSwitched: (value) {
+        updateSettings("countBalanceCorrectionInSummary", value,
+            updateGlobalState: true, pagesNeedingRefresh: [0, 1, 2, 3]);
+      },
+      initialValue: appStateSettings["countBalanceCorrectionInSummary"] == true,
+      icon: appStateSettings["outlinedIcons"]
+          ? Icons.account_balance_wallet_outlined
+          : Icons.account_balance_wallet_rounded,
     );
   }
 }

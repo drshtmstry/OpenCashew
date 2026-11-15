@@ -1,4 +1,5 @@
 import 'package:budget/database/tables.dart';
+import 'package:budget/struct/categoryTypes.dart';
 import 'package:budget/functions.dart';
 import 'package:budget/modified/reorderable_list.dart';
 import 'package:budget/pages/addTransactionPage.dart';
@@ -13,7 +14,6 @@ import 'package:budget/widgets/framework/pageFramework.dart';
 import 'package:budget/widgets/framework/popupFramework.dart';
 import 'package:budget/widgets/globalSnackbar.dart';
 import 'package:budget/widgets/iconButtonScaled.dart';
-import 'package:budget/widgets/incomeExpenseTabSelector.dart';
 import 'package:budget/widgets/openBottomSheet.dart';
 import 'package:budget/widgets/openPopup.dart';
 import 'package:budget/widgets/openSnackbar.dart';
@@ -67,6 +67,7 @@ class _AddCategoryPageState extends State<AddCategoryPage>
       ? null
       : HexColor(widget.category?.colour);
   late bool selectedIncome = widget.initiallyIsExpense == false;
+  late CategoryType selectedCategoryType = CategoryType.both;
   bool? canAddCategory;
   TransactionCategory? widgetCategory;
   List<String>? selectedMembers;
@@ -152,9 +153,10 @@ class _AddCategoryPageState extends State<AddCategoryPage>
   Future addCategory() async {
     TransactionCategory createdCategory = await createTransactionCategory();
     await database.createOrUpdateCategory(
-      insert: widget.category == null,
+      insert: false,
       createdCategory,
     );
+    await setCategoryType(createdCategory.categoryPk, selectedCategoryType);
     if (canSelectIfSubCategoryOrMainCategory() &&
         mainCategoryPkForSubcategoryWhenCreating != null) {
       TransactionCategory categoryMain = await database
@@ -174,19 +176,16 @@ class _AddCategoryPageState extends State<AddCategoryPage>
   }
 
   Future<TransactionCategory> createTransactionCategory() async {
-    TransactionCategory? currentInstance;
-    if (widget.category != null) {
-      currentInstance =
-          await database.getCategoryInstance(widget.category!.categoryPk);
-    }
+    String categoryPk =
+        widget.category != null ? widget.category!.categoryPk : uuid.v4();
     return TransactionCategory(
-      categoryPk: widget.category != null ? widget.category!.categoryPk : "-1",
+      categoryPk: categoryPk,
       name: (selectedTitle ?? "").trim(),
       dateCreated: widget.category != null
           ? widget.category!.dateCreated
           : DateTime.now(),
       dateTimeModified: null,
-      income: selectedIncome,
+      income: selectedCategoryType == CategoryType.income,
       order: widget.category != null
           ? widget.category!.order
           : canSelectIfSubCategoryOrMainCategory() &&
@@ -248,6 +247,7 @@ class _AddCategoryPageState extends State<AddCategoryPage>
         selectedImage = widget.category?.iconName;
         selectedEmoji = widget.category?.emojiIconName;
         selectedIncome = widget.category!.income;
+        selectedCategoryType = getCategoryType(widget.category!);
         userAttemptedToChangeTitle = true;
       });
       Future.delayed(Duration.zero, () async {
@@ -324,6 +324,20 @@ class _AddCategoryPageState extends State<AddCategoryPage>
                   },
                   onChanged: (item) {
                     updateSettings("balanceTransferAmountColor", item,
+                        updateGlobalState: true);
+                  },
+                ),
+                SettingsContainerSwitch(
+                  title: "Count as expense/income in summary",
+                  description:
+                      "Count account balance correction adjustments as expense or income in total spending and summary",
+                  icon: appStateSettings["outlinedIcons"]
+                      ? Icons.account_balance_wallet_outlined
+                      : Icons.account_balance_wallet_rounded,
+                  initialValue:
+                      appStateSettings["countBalanceCorrectionInSummary"] == true,
+                  onSwitched: (value) {
+                    updateSettings("countBalanceCorrectionInSummary", value,
                         updateGlobalState: true);
                   },
                 ),
@@ -504,10 +518,63 @@ class _AddCategoryPageState extends State<AddCategoryPage>
                   Padding(
                     padding:
                         const EdgeInsetsDirectional.symmetric(horizontal: 13),
-                    child: IncomeExpenseTabSelector(
-                      onTabChanged: setSelectedIncome,
-                      initialTabIsIncome: selectedIncome,
-                      hasBorderRadius: true,
+                    child: SettingsContainerDropdown(
+                      icon: selectedCategoryType == CategoryType.income
+                          ? (appStateSettings["outlinedIcons"]
+                              ? Icons.arrow_upward_outlined
+                              : Icons.arrow_upward_rounded)
+                          : selectedCategoryType == CategoryType.expense
+                              ? (appStateSettings["outlinedIcons"]
+                                  ? Icons.arrow_downward_outlined
+                                  : Icons.arrow_downward_rounded)
+                              : selectedCategoryType == CategoryType.transfer
+                                  ? (appStateSettings["outlinedIcons"]
+                                      ? Icons.compare_arrows_outlined
+                                      : Icons.compare_arrows_rounded)
+                                  : selectedCategoryType ==
+                                          CategoryType.balanceCorrection
+                                      ? (appStateSettings["outlinedIcons"]
+                                          ? Icons
+                                              .account_balance_wallet_outlined
+                                          : Icons
+                                              .account_balance_wallet_rounded)
+                                      : (appStateSettings["outlinedIcons"]
+                                          ? Icons.swap_horiz_outlined
+                                          : Icons.swap_horiz_rounded),
+                      title: "Category Type",
+                      initial: selectedCategoryType.name,
+                      items: [
+                        CategoryType.both.name,
+                        CategoryType.expense.name,
+                        CategoryType.income.name,
+                        CategoryType.transfer.name,
+                        CategoryType.balanceCorrection.name,
+                      ],
+                      getLabel: (item) {
+                        if (item == CategoryType.both.name)
+                          return "Default (Expense & Income)";
+                        if (item == CategoryType.expense.name)
+                          return "Expense Only";
+                        if (item == CategoryType.income.name)
+                          return "Income Only";
+                        if (item == CategoryType.transfer.name)
+                          return "Transfer";
+                        if (item == CategoryType.balanceCorrection.name)
+                          return "Balance Correction";
+                        return item;
+                      },
+                      onChanged: (item) {
+                        setState(() {
+                          selectedCategoryType =
+                              CategoryType.values.byName(item);
+                          if (selectedCategoryType == CategoryType.income) {
+                            selectedIncome = true;
+                          } else {
+                            selectedIncome = false;
+                          }
+                          determineBottomButton();
+                        });
+                      },
                     ),
                   ),
                 Row(

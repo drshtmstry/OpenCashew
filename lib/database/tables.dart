@@ -22,6 +22,7 @@ import 'package:flutter/foundation.dart';
 import 'schema_versions.dart';
 import 'package:flutter/material.dart' show DateTimeRange;
 import 'package:budget/pages/activityPage.dart';
+import 'package:budget/struct/categoryTypes.dart';
 
 import 'package:flutter/material.dart' show RangeValues;
 part 'tables.g.dart';
@@ -4449,11 +4450,9 @@ class FinanceDatabase extends _$FinanceDatabase {
               (hideArchived == true
                   ? c.archived.equals(false)
                   : Constant(true)) &
-              (selectedIncome == true
-                  ? c.income.equals(true) & c.categoryPk.equals("0").not()
-                  : selectedIncome == false
-                      ? c.income.equals(false) & c.categoryPk.equals("0").not()
-                      : Constant(true)) &
+              (selectedIncome == null
+                  ? Constant(true)
+                  : c.categoryPk.equals("0").not()) &
               (searchFor == null
                   ? Constant(true)
                   : c.name
@@ -4465,7 +4464,13 @@ class FinanceDatabase extends _$FinanceDatabase {
             (c) => OrderingTerm.asc(c.order),
           ])
           ..limit(limit ?? DEFAULT_LIMIT, offset: offset ?? DEFAULT_OFFSET))
-        .watch();
+        .watch()
+        .map((list) {
+          if (selectedIncome == null) return list;
+          return list
+              .where((cat) => isCategoryAllowedForIncome(cat, selectedIncome))
+              .toList();
+        });
   }
 
   Stream<List<TransactionActivityLog>> watchAllTransactionActivityLog(
@@ -5905,9 +5910,10 @@ class FinanceDatabase extends _$FinanceDatabase {
         onlyShowBasedOnObjectiveLoanFks(tbl, searchFilters.objectiveLoanPks);
 
     Expression<bool> isBalanceCorrectionAnd =
-        searchFilters.categoryPks.contains("0")
-            ? Constant(true)
-            : tbl.categoryFk.equals("0").not();
+        searchFilters.categoryPks.contains("0") ||
+                appStateSettings["countBalanceCorrectionInSummary"] == true
+            ? tbl.pairedTransactionFk.isNull()
+            : tbl.categoryFk.equals("0").not() & tbl.pairedTransactionFk.isNull();
     Expression<bool> isNotLoan = tbl.objectiveLoanFk.isNull() &
         tbl.type.isNotInValues(
             [TransactionSpecialType.credit, TransactionSpecialType.debt]);
@@ -6366,9 +6372,13 @@ class FinanceDatabase extends _$FinanceDatabase {
 
   // Balance correction category has pk "0"
   // We also want to include these transactions if isIncome is null (total net spending)
+  // or if countBalanceCorrectionInSummary toggle is enabled
   Expression<bool> onlyShowIfNotBalanceCorrection(
       $TransactionsTable tbl, bool? isIncome) {
-    return ((tbl.categoryFk.equals("0").not()) |
+    if (appStateSettings["countBalanceCorrectionInSummary"] == true) {
+      return tbl.pairedTransactionFk.isNull();
+    }
+    return ((tbl.categoryFk.equals("0").not() & tbl.pairedTransactionFk.isNull()) |
         (isIncome == null ? Constant(true) : Constant(false)));
   }
 
@@ -6805,15 +6815,18 @@ class FinanceDatabase extends _$FinanceDatabase {
     // });
   }
 
-  // Remove balance correction and
-  // remove loans transactions here - we don't want loans to contribute to our other totals, only net
+  // Remove balance correction (unless toggled on) and
+  // remove loans and transfers here - we don't want loans or transfers to contribute to our other totals, only net
   Expression<bool> onlyShowIfOnlyExpenseAndIncome(
       $TransactionsTable tbl, bool enabled) {
     return (enabled == false ? Constant(true) : Constant(false)) |
         ((tbl.objectiveLoanFk.isNull() &
             tbl.type.isNotInValues(
                 [TransactionSpecialType.credit, TransactionSpecialType.debt]) &
-            tbl.categoryFk.equals("0").not()));
+            tbl.pairedTransactionFk.isNull() &
+            (appStateSettings["countBalanceCorrectionInSummary"] == true
+                ? Constant(true)
+                : tbl.categoryFk.equals("0").not())));
   }
 
   Stream<TotalWithCount?> watchTotalWithCountOfWallet({
