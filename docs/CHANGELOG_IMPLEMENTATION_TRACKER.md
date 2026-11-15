@@ -1,0 +1,274 @@
+# OpenCashew — 6.x Changelog Implementation Tracker
+
+> Tracks every single item from the production 6.x release notes (v6.0.0 through v6.7.5) against the OpenCashew codebase.
+> Status legend: `[x]` Implemented in OpenCashew | `[ ]` Pending implementation | `[-]` iOS-only / App Store specific
+
+## Version 6.7.0 (43 items)
+
+- [ ] Add new home page widgets (A)
+- [ ] Improve resizing and layout of existing home page widgets (A)
+- [ ] Improve generic page structure and app bar overscroll to be consistent across all pages
+- [ ] Improve popup button and content layout to fill space
+- [-] Improve popup style to better match system (i) *(iOS platform-specific)*
+- [ ] Long press "skip" or "pay" options in popup to specify to complete action at the current date/time or at the transaction's date and time
+- [ ] Fix skipped transactions contributing toward upcoming percentage in budget progress
+- [ ] Fix "added only" custom time period budgets line graph not including previously dated transactions
+- [ ] Fix custom time period budget line graph date ranges
+- [ ] Add spending per day and total day metrics when setting custom budget period
+- [ ] Add new hierachical visual representation of category to subcategories for budgets
+- [ ] Fix budget category saving/spending goal banner totals not adding up correctly
+- [ ] Fix repetitive transactions with end date at end of month overflowing to month after
+- [ ] Fix overlay hints triggering more than once
+- [ ] Improve performance of collapsing/expanding the sidebar when in full screen
+- [ ] Add ability to change the sidebar position when in full screen
+- [ ] Improve duplicate transaction flow to directly edit the duplicate made with any changes made to the previous entry
+- [ ] Improve message parser for messages with irregular spaces
+- [ ] Improve layout and design of message parser configuration containers
+- [ ] Add resulting account amount to transfer page
+- [ ] Setting to show totals of currencies on the account list page
+- [ ] Improve layout of account total row entry
+- [ ] Fix decimal places for correct total balance amount displayed
+- [ ] Add discard changes popup when editing titles
+- [ ] Improve numpad input, focus, and animations
+- [ ] Improve bottom sheet behavior with keyboard focus
+- [ ] Improve performance if All Spending Summary page opened in background
+- [ ] Enable scroll to top behavior when navigating to same page using sidebar
+- [ ] Improve app bar behavior when using landscape/full screen view with 2 column pages
+- [ ] Allow category order to be edited when editing add transaction prompt order
+- [ ] Fixed visual glitch when long-pressing date/time field when creating a transaction resetting to the current date/time
+- [ ] Fix total display values and colors for budget category entries when including income in a spending budget / including expense in a savings budget
+- [ ] Fix export local link for transactions on web app
+- [ ] Fix export local link for repetitive transactions
+- [ ] Fix and improve UI for custom HEX color picker
+- [ ] Allow the "About" shortcut to be disabled on the More page
+- [ ] Improve dropdown menu gestures and selection behavior
+- [ ] Pinned account filter selection on monthly transaction page now saves across app sessions
+- [ ] Improve edit budget page layout when in full screen
+- [ ] Filters are automatically expanded when using a large screen
+- [ ] Improvements to layouts on large screens
+- [ ] Update certain currency symbols
+- [ ] Improve external configuration export labels and info
+
+## Version 6.6.0 (20 items)
+
+- [ ] Improve home screen page layout and resizing (A)
+- [-] New "Get Accounts List" and "Get Categories List" shortcuts (i) *(iOS platform-specific)*
+- [-] Add new switch to follow system design (i) *(iOS platform-specific)*
+- [-] Apple Intelligence integration (beta) (i) *(iOS platform-specific)*
+- [ ] Improve sizing of category icons in grid layout based on screen zoom
+- [ ] Improve transaction type information popup
+- [ ] Improve layout spacing of long-term loan / goal summary container
+- [ ] Fix incorrect statistic totals when including income in a spending budget / including expense in a savings budget
+- [ ] Tap "Today" in the budget page progress bar to view more information about the current period
+- [ ] Add ability to export selected transaction references with app links
+- [ ] On first sync/login of a device, settings are now restored
+- [-] New parse message for transaction details shortcut (i) *(iOS platform-specific)*
+- [ ] Improve message parsing automation template save changes
+- [ ] Improve message parsing automation setup feedback on selected amount
+- [ ] Add ability to skip setting the time when bulk editing the date of selected transactions
+- [ ] Fix ordering of categories when setting category spending/saving goals
+- [ ] Fix issue with full screen sidebar navigation
+- [ ] Fix action button position too low when using full screen
+- [ ] System level preference for animations no longer overwrites Animations & Motion setting
+- [ ] Changelog now automatically displays only for major or minor versions, not patch versions
+
+## Version 6.5.0 (55 items)
+
+- [ ] Significant home page performance improvements
+- [ ] Unload heavy animations when not visible to increase performance
+- [ ] Improved performance of opening/closing navigation animations
+- [ ] Add subcategory selection for transfer and correct balance page
+- [ ] When in full screen (landscape), defaults to first enabled tab page if reordered
+- [ ] Improve row layout of transaction entry chips to fill remaining space
+- [ ] Fixed back button behavior before exiting app - now defaults to navigating to first enabled tab/page before exiting (instead of always home)
+- [x] Fix add transaction prompts: will now prompt for subcategory if only the main category is set by the title *(Verified in selectCategorySequence)*
+- [x] Fix add transaction prompts: properly skip the main category selection if set by the title *(Verified in SelectCategory skipIfSet)*
+- [ ] Fix category icons not properly rendering in change transfer transactions popup
+- [ ] Fix category/subcategory selection popup not fully expanding to full height initially
+- [ ] Improve keyboard autofocus when app initially launched (A)
+- [ ] Improve keyboard text input character detection when entering amounts/calculations
+- [ ] Improve general bottom sheet resizing and keyboard dismissal
+- [ ] Change opacity of exchange rate when creating a transfer depending on the relevance
+- [ ] Home screen widgets now always update when data changes
+- [ ] Force update home screen widgets when general settings changed
+- [ ] Add guide for configuring system home screen widgets when opening the app via a widget
+- [ ] When long-term loan is fully paid, show check mark icon in tag if percentage is visible
+- [ ] Improve default naming scheme for transactions when partially paying a one-time loan
+- [ ] Improve Bill Splitter UI layout and global multiplier
+- [ ] Auto switch loan tabs based on loan creation action
+- [ ] Fixed editing archived subcategories always defaulted to non-archived status
+- [ ] Fix homepage upcoming section filters to be "future days" rather than "previous days"
+- [ ] Fix line graph side labels overlapping
+- [ ] Fix grouped transfers and decimal precision for amounts
+- [ ] Fix certain onboarding hints appearing at incorrect times
+- [ ] Fix sorting long-term loans default selection
+- [ ] Fix subcategory selection contrast when certain category colors are used
+- [ ] Fix chip selector color contrast
+- [ ] Fix starting value of home page spending graph to match all time net worth
+- [ ] Fix default font sizing
+- [ ] Fix text span font sizing when scaled
+- [ ] Fix vertical layout text centering for inputs and headers
+- [ ] Fix currency selector layout
+- [ ] Fix default selected account when opening transfer page from edit account page
+- [ ] Fix upcoming notifications not properly getting scheduled after updating transaction details
+- [ ] Fix sync automatically after every change for web
+- [ ] Improve background with transaction entry note tooltip
+- [ ] Improve padding for note tooltip
+- [ ] Remove note tooltip viewing timeout in transaction entry
+- [ ] Add auto payment setting information in About Transaction Type
+- [ ] Improve animations when "Remove animations" operating system setting enabled
+- [ ] Increase contrast of some colors and upcoming spending progress bar
+- [ ] Increase contrast of flashing transaction background color after edit/creation
+- [ ] Improve 'Intelligence' settings layout and implementation
+- [ ] Automatic backup date check every time app is resumed, rather than just initial launch
+- [ ] Automatically apply filters after navigating to the All Spending Summary page through the total amounts banner
+- [ ] Improve bottom padding safe area and spacing for devices with reserved space
+- [ ] Fix bottom safe area layout when using system bottom navigation buttons
+- [ ] Remove bottom corner radius on bottom save buttons
+- [ ] Bottom buttons are now tertiary color if action is not the final one (i.e. Select Category vs. Add Transaction)
+- [ ] Improve preview demo banner UI spacing
+- [ ] Force delete all data when exiting preview demo (to avoid any later sync issues)
+- [ ] Update translations
+
+## Version 6.0.0 (140 items)
+
+- [ ] Significant UI and layout improvements
+- [ ] Many bug fixes
+- [ ] Improved data sync algorithm and reliability
+- [ ] Revamp and organize settings page
+- [ ] Date format setting
+- [ ] Date selector type setting
+- [ ] Improved and added new number format settings
+- [ ] Automatic decimal placement setting
+- [ ] Biometrics auto lock after app closed
+- [ ] Improved biometric unlocking flow
+- [ ] Amount totals colored style setting
+- [ ] Haptic feedback interaction settings
+- [ ] Edit navigation bar tab setting
+- [ ] Left-handed access setting
+- [x] Scroll behavior setting *(Implemented: ScrollBehaviorSetting with System, Bouncing, Clamping)*
+- [ ] Add gray theme color
+- [ ] Font scale setting
+- [ ] Support custom font files
+- [ ] Animated budget container setting (can significantly increase performance if disabled)
+- [ ] Prompt for upcoming transaction amount when paid setting
+- [ ] Improved app loading performance
+- [ ] Improved performance when interacting with transaction lists
+- [ ] Improved performance with keyboard resizing
+- [ ] Improved UI colors
+- [ ] Improved icon selection
+- [ ] Fixed default font vertical offset
+- [ ] Support default font for all languages
+- [ ] Improve font and text layout and vertical spacing
+- [ ] Add fallback font for missing currency symbols
+- [ ] Improved safe area calculations and performance
+- [ ] Improved scroll to bottom/top in large lists
+- [ ] Improved navigation bar layout rendering
+- [-] Support liquid glass navigation bar (i) *(iOS platform-specific)*
+- [ ] New floating navigation bar option (A)
+- [ ] Improved FAB rendering on all pages
+- [ ] Improved and recreated tab bar selection UI component
+- [ ] Improved and recreated dropdown menu action selection
+- [ ] Added animations for merge/convert into subcategory info popups
+- [x] Category icon packs *(Implemented: CategoryIconPackSetting with Default, Mono, Outlined)*
+- [ ] Category icon background shapes
+- [x] Custom transaction layouts - compact and large *(Implemented: NonCompactTransactionsSetting)*
+- [ ] Display transaction time in transaction entry setting
+- [ ] Use subcategory icon instead of primary in transaction entry setting
+- [ ] Group transfer transactions together
+- [ ] Transaction row entry interactions setting: action button / tap to expand
+- [ ] Custom add transaction flow and prompts - disable and reorder prompts when adding a transaction
+- [ ] Selectable items bottom sheet list in Add Transaction page when more than 3 items listed
+- [ ] Swipe between dates to quickly change when adding a transaction
+- [ ] Fixed scroll-to selected item when horizontal list loaded
+- [-] Improve popup bottom sheet with keyboard fluidity (i) *(iOS platform-specific)*
+- [-] Fix auto correct from removing a recommended title choice click (i) *(iOS platform-specific)*
+- [ ] Add bi-weekly and quarterly repeat options and tutorial for selecting reoccurrence
+- [ ] Excluded from totals transactions filter
+- [ ] Filter "Notes contains" and "Title contains" using "and" "&&" or "or" "||"
+- [ ] Sort transactions in Search transactions page and monthly list page
+- [ ] Export transactions directly in Search transactions page
+- [ ] Significantly improved search algorithm with multiple languages and latin character conversion
+- [ ] Added debug logging shortcut in about app page
+- [ ] Search titles by category name and title when editing
+- [ ] Improved editing selected transactions
+- [ ] Edit include/exclude toggle when editing the amount of selected transactions
+- [ ] Edit note on all selected transactions
+- [ ] Evaluate a partial calculation when entering amounts
+- [ ] Support copying and pasting calculations when entering amounts
+- [ ] Improved archiving/hiding of budgets, goals, long term loans
+- [ ] Completely removed from selectable lists
+- [ ] Improved UI when item is archived and editing full list
+- [ ] New balance transfer page
+- [ ] New correct total balance page
+- [ ] Improved Pages Framework to better support text overflow
+- [ ] Add Page Info section and page framework support
+- [ ] Add help and guide text throughout application
+- [ ] Improved overflow behavior for text
+- [ ] Improved auto scrolling when rearranging items
+- [ ] Improved bottom sheet interaction and flow
+- [ ] Onboarding UI guide and overlay hints
+- [ ] Add subscription page graph visual
+- [ ] New progress bar style
+- [ ] New date and time picker style
+- [ ] Net total style setting: colorful / simple
+- [ ] Custom currency number format: symbol / currency code
+- [ ] Subcategory filter support for all transaction budgets
+- [ ] Ability to archive accounts
+- [ ] Budget spending limit total type
+- [ ] Budget page sorting transactions
+- [ ] Custom exchange rate when creating a transfer
+- [ ] Pinned transactions (long press + button)
+- [ ] Pinned transactions UI layout list type
+- [ ] Pinned transactions home page section
+- [ ] Merged common/frequent transactions feature with pinned transactions
+- [ ] Transactions monthly list page custom total type setting
+- [ ] Calendar page daily total, monthly total banner, filter and search support
+- [ ] Calendar page add transaction on selected day with a double press
+- [ ] Calendar page net spending total / day total toggle
+- [ ] Improve calendar page performance and layouts
+- [ ] Custom filters of transactions to include in monthly total banners
+- [ ] Range filters can be set to 0
+- [ ] Improved subcategory filters
+- [ ] Expand all filters to see all without scrolling horizontally
+- [ ] Improve All Spending summary page and interactions
+- [ ] Add average spending statistics to All Spending summary page
+- [ ] Improve subcategory spending summary UI
+- [ ] Show amount remaining repetitive transactions when an end date is provided
+- [ ] Accounts list page
+- [ ] Improved editing decimal places flow for accounts
+- [ ] Account summary statistics page supports custom cycle for each account
+- [ ] Ability to group accounts by color and view grouped totals in the home page accounts list
+- [ ] Improve homepage banner settings
+- [ ] Add homepage overdue transactions warning banner if there are transactions past due
+- [ ] Improved the UI of home page statistic totals
+- [ ] Long pressing heatmap on homepage opens heatmap settings
+- [ ] Set primary account behavior setting for accounts list home page section
+- [ ] Improve line graph settings on homepage
+- [ ] Reorder and disable shortcuts on more page and full screen sidebar navigation
+- [x] Add page shortcuts to More page: FAQ, all transaction page, search transaction page, bill splitter *(Implemented: BillSplitterShortcutSetting)*
+- [ ] Moved edit page specific settings to separate popup in More page
+- [ ] Refactor category grid selection and drag and drop to rearrange grid
+- [ ] Added discard changes warning when importing a CSV
+- [ ] Improve column selection when importing a CSV
+- [ ] Allow CSV files to be imported through Google Drive
+- [ ] Improve custom date format when importing CSV
+- [ ] Auto detection and support for unstandardized CSV formats, such as semicolon separated entries
+- [ ] Improve dropdown settings UI component
+- [ ] New onboarding tutorial and feature highlight overlay
+- [ ] Add FAQ/Guide informational links throughout interface
+- [ ] New budget, accounts, income/expense home screen widget (A)
+- [x] New net worth widgets to reflect new layout *(Implemented: WidgetSettings in settingsPage.dart)*
+- [ ] Custom theme color for home screen widgets (A)
+- [-] Home screen widgets (i) *(iOS platform-specific)*
+- [-] iOS shortcuts support (i) *(iOS platform-specific)*
+- [-] Improve title recommendation auto correct on lost focus (i) *(iOS platform-specific)*
+- [x] Improve title recommendation algorithm *(Implemented: Show 3–4 title suggestions with multi-match chip/row list in SelectTitle & TitleInput)*
+- [x] Subcategories are now prioritized over main categories when automatically creating titles *(Implemented: Auto-creation links title to selectedSubCategory if present, and updates categoryFk to subcategory when existing title is reused with a subcategory)*
+- [x] Improve UI for titles with subcategory relationships *(Implemented: Multi-suggestion layout showing subcategory icon, name, and bolded search query matches)*
+- [ ] When tapping upcoming transaction notification, it will highlight in the upcoming transaction page list
+- [ ] Optimized notification scheduling
+- [ ] Improved automatically pay upcoming, repetitive, subscription transactions queries
+- [ ] App Link flow improvements
+- [ ] Experimental features section
+- [ ] Add transactions with AI (Cashew intelligence) experimental feature (disabled by default)
