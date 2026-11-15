@@ -755,6 +755,7 @@ class TransactionsSettingsPage extends StatelessWidget {
       listWidgets: [
         SettingsHeader(title: "transactions".tr()),
         const SelectTransactionTypeBeforeAddingSetting(),
+        const TransactionActionSetting(),
         const DefaultTransactionTypeSetting(),
         const UseSubcategoryIconSetting(),
         const ShowTransactionTimeSetting(),
@@ -2809,6 +2810,45 @@ class DatePickerTypeSetting extends StatelessWidget {
           return "scrollable-list".tr() != "scrollable-list"
               ? "scrollable-list".tr()
               : "Scrolling List";
+        }
+        return item.tr();
+      },
+    );
+  }
+}
+
+class TransactionActionSetting extends StatelessWidget {
+  const TransactionActionSetting({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SettingsContainerDropdown(
+      title: "transaction-actions".tr() != "transaction-actions"
+          ? "transaction-actions".tr()
+          : "Transaction Actions",
+      description: "tap-to-expand-help-description".tr() !=
+              "tap-to-expand-help-description"
+          ? "tap-to-expand-help-description".tr()
+          : "Tap a transaction to expand options or open directly",
+      icon: appStateSettings["outlinedIcons"]
+          ? Icons.touch_app_outlined
+          : Icons.touch_app_rounded,
+      initial: appStateSettings["transactionAction"] ?? "tapToExpand",
+      items: ["tapToExpand", "openEdit"],
+      onChanged: (value) async {
+        await updateSettings("transactionAction", value,
+            updateGlobalState: true);
+      },
+      getLabel: (item) {
+        if (item == "tapToExpand") {
+          return "tap-to-expand".tr() != "tap-to-expand"
+              ? "tap-to-expand".tr()
+              : "Tap To Expand";
+        }
+        if (item == "openEdit") {
+          return "edit-transaction".tr() != "edit-transaction"
+              ? "edit-transaction".tr()
+              : "Open Directly";
         }
         return item.tr();
       },

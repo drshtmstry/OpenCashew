@@ -216,6 +216,7 @@ Future<Map<String, dynamic>> getDefaultPreferences() async {
     "showTransactionsMonthlySpendingSummary": true,
     "showTransactionsBalanceTransferTab": true,
     "selectTransactionTypeBeforeAdding": false,
+    "transactionAction": "tapToExpand", // "tapToExpand", "openEdit"
     "animatedBudgetBackground": true,
     "useSubcategoryIcon": true,
     "showTransactionTime": false,

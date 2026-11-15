@@ -28,6 +28,10 @@ import 'package:budget/widgets/transactionEntry/swipeToSelectTransactions.dart';
 import 'package:budget/widgets/transactionEntry/transactionEntryAmount.dart';
 import 'package:budget/widgets/transactionEntry/transactionEntryNote.dart';
 import 'package:budget/widgets/transactionEntry/transactionEntryTag.dart';
+import 'package:budget/pages/addTransactionPage.dart';
+import 'package:budget/widgets/selectedTransactionsAppBar.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:budget/widgets/openPopup.dart';
 import 'package:budget/widgets/transactionEntry/balancedTagRow.dart';
 
 ValueNotifier<Map<String, List<String>>> globalSelectedID =
@@ -89,8 +93,8 @@ class TransactionEntryBox extends SingleChildRenderObjectWidget {
   }
 }
 
-class TransactionEntry extends StatelessWidget {
-  TransactionEntry({
+class TransactionEntry extends StatefulWidget {
+  const TransactionEntry({
     Key? key,
     required this.openPage,
     required this.transaction,
@@ -139,21 +143,54 @@ class TransactionEntry extends StatelessWidget {
   final bool enableFutureTransactionsDivider;
   final Widget? aboveWidget;
 
+  @override
+  State<TransactionEntry> createState() => _TransactionEntryState();
+}
+
+class _TransactionEntryState extends State<TransactionEntry> {
+  bool isExpanded = false;
+
   final double fabSize = 50;
+
+  Transaction get transaction => widget.transaction;
+  Widget get openPage => widget.openPage;
+  String? get listID => widget.listID;
+  TransactionCategory? get category => widget.category;
+  TransactionCategory? get subCategory => widget.subCategory;
+  Budget? get budget => widget.budget;
+  Objective? get objective => widget.objective;
+  Objective? get objectiveLoan => widget.objectiveLoan;
+  Color? get containerColor => widget.containerColor;
+  bool get useHorizontalPaddingConstrained =>
+      widget.useHorizontalPaddingConstrained;
+  Color? get categoryTintColor => widget.categoryTintColor;
+  Transaction? get transactionBefore => widget.transactionBefore;
+  Transaction? get transactionAfter => widget.transactionAfter;
+  bool? get allowSelect => widget.allowSelect;
+  bool get highlightActionButton => widget.highlightActionButton;
+  bool get showObjectivePercentage => widget.showObjectivePercentage;
+  EdgeInsetsDirectional? get customPadding => widget.customPadding;
+  bool get allowOpenIntoObjectiveLoanPage =>
+      widget.allowOpenIntoObjectiveLoanPage;
+  bool Function(Transaction transaction)? get showExcludedBudgetTag =>
+      widget.showExcludedBudgetTag;
+  bool get enableFutureTransactionsDivider =>
+      widget.enableFutureTransactionsDivider;
+  Widget? get aboveWidget => widget.aboveWidget;
 
   void selectTransaction(
       Transaction transaction, bool selected, bool isSwiping) {
-    if (allowSelect == false) return;
+    if (widget.allowSelect == false) return;
     if (!selected) {
-      globalSelectedID.value[listID ?? "0"]!.add(transaction.transactionPk);
+      globalSelectedID.value[widget.listID ?? "0"]!.add(transaction.transactionPk);
       if (isSwiping) selectingTransactionsActive = 1;
     } else {
-      globalSelectedID.value[listID ?? "0"]!.remove(transaction.transactionPk);
+      globalSelectedID.value[widget.listID ?? "0"]!.remove(transaction.transactionPk);
       if (isSwiping) selectingTransactionsActive = -1;
     }
     globalSelectedID.notifyListeners();
 
-    if (onSelected != null) onSelected!(transaction, selected);
+    if (widget.onSelected != null) widget.onSelected!(transaction, selected);
   }
 
   @override
@@ -696,7 +733,18 @@ class TransactionEntry extends StatelessWidget {
                               selectTransaction(transaction, selected, true);
                             },
                             onTap: () async {
-                              openContainer();
+                              if (areTransactionsBeingSelected == true) {
+                                selectTransaction(transaction, selected, false);
+                                return;
+                              }
+                              if (appStateSettings["transactionAction"] ==
+                                  "openEdit") {
+                                openContainer();
+                              } else {
+                                setState(() {
+                                  isExpanded = !isExpanded;
+                                });
+                              }
                             },
                             child: AnimatedContainer(
                               clipBehavior: Clip.none,
@@ -739,11 +787,107 @@ class TransactionEntry extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              child: transactionContents(
-                                openContainer: openContainer,
-                                selected: selected,
-                                areTransactionsBeingSelected:
-                                    areTransactionsBeingSelected,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  transactionContents(
+                                    openContainer: openContainer,
+                                    selected: selected,
+                                    areTransactionsBeingSelected:
+                                        areTransactionsBeingSelected,
+                                  ),
+                                  AnimatedExpanded(
+                                    expand: isExpanded &&
+                                        areTransactionsBeingSelected != true,
+                                    axis: Axis.vertical,
+                                    duration: const Duration(milliseconds: 250),
+                                    child: Padding(
+                                      padding: const EdgeInsetsDirectional.only(
+                                        top: 6,
+                                        bottom: 2,
+                                        start: 2,
+                                        end: 2,
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceEvenly,
+                                        children: [
+                                          Expanded(
+                                            child: TransactionActionButtonTile(
+                                              icon: appStateSettings[
+                                                      "outlinedIcons"]
+                                                  ? Icons.edit_outlined
+                                                  : Icons.edit_rounded,
+                                              label: "edit".tr(),
+                                              onTap: () {
+                                                openContainer();
+                                              },
+                                            ),
+                                          ),
+                                          const SizedBox(width: 6),
+                                          Expanded(
+                                            child: TransactionActionButtonTile(
+                                              icon: appStateSettings[
+                                                      "outlinedIcons"]
+                                                  ? Icons.file_copy_outlined
+                                                  : Icons.file_copy_rounded,
+                                              label: "duplicate".tr() !=
+                                                      "duplicate"
+                                                  ? "duplicate".tr()
+                                                  : "copy".tr(),
+                                              onTap: () async {
+                                                await duplicateTransaction(
+                                                  context,
+                                                  transaction.transactionPk,
+                                                  useCurrentDate: false,
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                          const SizedBox(width: 6),
+                                          Expanded(
+                                            child: TransactionActionButtonTile(
+                                              icon: appStateSettings[
+                                                      "outlinedIcons"]
+                                                  ? Icons.delete_outlined
+                                                  : Icons.delete_rounded,
+                                              label: "delete".tr(),
+                                              isDestructive: true,
+                                              onTap: () async {
+                                                deleteTransactionPopup(
+                                                  context,
+                                                  transaction: transaction,
+                                                  category: category,
+                                                  routesToPopAfterDelete:
+                                                      RoutesToPopAfterDelete
+                                                          .None,
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                          if (transaction.type != null) ...[
+                                            const SizedBox(width: 6),
+                                            Expanded(
+                                              child:
+                                                  TransactionActionButtonTile(
+                                                icon: getTransactionTypeIcon(
+                                                    transaction.type),
+                                                label:
+                                                    getTransactionActionNameFromType(
+                                                        transaction),
+                                                isPrimaryAction: true,
+                                                onTap: () async {
+                                                  await openTransactionActionFromType(
+                                                      context, transaction);
+                                                },
+                                              ),
+                                            ),
+                                          ],
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
@@ -998,6 +1142,66 @@ class TransactionSelectionCheck extends StatelessWidget {
               ),
             )
           : Container(width: 7 + 8),
+    );
+  }
+}
+
+class TransactionActionButtonTile extends StatelessWidget {
+  const TransactionActionButtonTile({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.isDestructive = false,
+    this.isPrimaryAction = false,
+    super.key,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  final bool isDestructive;
+  final bool isPrimaryAction;
+
+  @override
+  Widget build(BuildContext context) {
+    Color bg = isDestructive
+        ? Colors.red.withOpacity(0.12)
+        : isPrimaryAction
+            ? Theme.of(context).colorScheme.primary.withOpacity(0.15)
+            : Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.6);
+
+    Color fg = isDestructive
+        ? (getColor(context, "expenseAmount"))
+        : isPrimaryAction
+            ? Theme.of(context).colorScheme.primary
+            : Theme.of(context).colorScheme.secondary;
+
+    return Tappable(
+      color: bg,
+      borderRadius: 12,
+      onTap: onTap,
+      child: Padding(
+        padding:
+            const EdgeInsetsDirectional.symmetric(vertical: 7, horizontal: 4),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 16, color: fg),
+            const SizedBox(width: 5),
+            Flexible(
+              child: TextFont(
+                text: label,
+                fontSize: 12.5,
+                fontWeight: FontWeight.bold,
+                textColor: fg,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
