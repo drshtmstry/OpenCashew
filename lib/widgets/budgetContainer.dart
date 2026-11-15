@@ -522,7 +522,8 @@ class AnimatedGooBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (appStateSettings["batterySaver"] ||
+    if (appStateSettings["animatedBudgetBackground"] == false ||
+        appStateSettings["batterySaver"] ||
         kIsWeb ||
         (getPlatform() == PlatformOS.isIOS &&
             appStateSettings["iOSAnimatedGoo"] != true) ||

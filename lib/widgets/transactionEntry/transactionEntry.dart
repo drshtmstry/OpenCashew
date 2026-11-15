@@ -306,10 +306,15 @@ class TransactionEntry extends StatelessWidget {
               selectTransaction: selectTransaction,
             )
           : SizedBox.shrink();
+      TransactionCategory? effectiveCategory =
+          (appStateSettings["useSubcategoryIcon"] != false &&
+                  subCategory != null)
+              ? subCategory
+              : category;
       Widget categoryIcon = CategoryIcon(
         cacheImage: true,
-        category: category,
-        categoryPk: transaction.categoryFk,
+        category: effectiveCategory,
+        categoryPk: effectiveCategory?.categoryPk ?? transaction.categoryFk,
         size: 27,
         sizePadding: 20,
         margin: EdgeInsetsDirectional.zero,

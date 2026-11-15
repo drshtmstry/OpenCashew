@@ -1,12 +1,9 @@
-import 'dart:math';
 import 'dart:ui';
 import 'package:budget/colors.dart';
 import 'package:budget/functions.dart';
 import 'package:budget/pages/addTransactionPage.dart';
-import 'package:budget/pages/editBudgetPage.dart';
 import 'package:budget/pages/walletDetailsPage.dart';
 import 'package:budget/struct/settings.dart';
-import 'package:budget/widgets/animatedExpanded.dart';
 import 'package:budget/widgets/fab.dart';
 import 'package:budget/widgets/framework/popupFramework.dart';
 import 'package:budget/widgets/globalSnackbar.dart';
@@ -17,6 +14,8 @@ import 'package:budget/widgets/tappableTextEntry.dart';
 import 'package:budget/widgets/textInput.dart';
 import 'package:budget/widgets/textWidgets.dart';
 import 'package:budget/widgets/util/showTimePicker.dart';
+import 'package:budget/widgets/openBottomSheet.dart';
+import 'package:budget/widgets/button.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -32,6 +31,13 @@ Future<DateTime?> showCustomDatePicker(
   String? confirmText,
 }) async {
   minimizeKeyboard(context);
+  if (appStateSettings["datePickerType"] == 1 ||
+      appStateSettings["datePickerType"] == "wheel") {
+    return await openBottomSheet(
+      context,
+      CupertinoDatePickerPopup(initialDate: initialDate),
+    );
+  }
   return await showDatePicker(
     context: context,
     useRootNavigator: false,
@@ -473,6 +479,52 @@ class ApplyStartOfTheWeekSetting extends StatelessWidget {
       locale: Locale("en", "US"),
       delegates: [translations],
       child: child,
+    );
+  }
+}
+
+class CupertinoDatePickerPopup extends StatefulWidget {
+  const CupertinoDatePickerPopup({required this.initialDate, super.key});
+  final DateTime initialDate;
+
+  @override
+  State<CupertinoDatePickerPopup> createState() =>
+      _CupertinoDatePickerPopupState();
+}
+
+class _CupertinoDatePickerPopupState extends State<CupertinoDatePickerPopup> {
+  late DateTime selectedDate = widget.initialDate;
+
+  @override
+  Widget build(BuildContext context) {
+    return PopupFramework(
+      title: "select-date".tr() != "select-date"
+          ? "select-date".tr()
+          : "Select Date",
+      underTitleSpace: false,
+      child: Column(
+        children: [
+          SizedBox(
+            height: 200,
+            child: CupertinoDatePicker(
+              initialDateTime: widget.initialDate,
+              mode: CupertinoDatePickerMode.date,
+              onDateTimeChanged: (DateTime newDate) {
+                selectedDate = newDate;
+              },
+            ),
+          ),
+          const SizedBox(height: 10),
+          Button(
+            label: "set-date-time".tr() != "set-date-time"
+                ? "set-date-time".tr()
+                : "Set",
+            onTap: () {
+              popRoute(context, selectedDate);
+            },
+          ),
+        ],
+      ),
     );
   }
 }

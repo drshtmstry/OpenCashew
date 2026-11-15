@@ -756,6 +756,10 @@ class TransactionsSettingsPage extends StatelessWidget {
         SettingsHeader(title: "transactions".tr()),
         const SelectTransactionTypeBeforeAddingSetting(),
         const DefaultTransactionTypeSetting(),
+        const UseSubcategoryIconSetting(),
+        const ShowTransactionTimeSetting(),
+        const ConfirmUpcomingTransactionAmountSetting(),
+        const GroupTransfersSetting(),
         const TransactionsSettings(),
         const IncognitoKeyboardSetting(),
         const BatterySaverSetting(),
@@ -764,6 +768,7 @@ class TransactionsSettingsPage extends StatelessWidget {
         const WalletsSettings(),
         const LongTermLoansDifferenceSetting(),
         SettingsHeader(title: "budgets".tr()),
+        const AnimatedBudgetBackgroundSetting(),
         const BudgetSettings(),
         SettingsHeader(title: "goals".tr()),
         const ObjectiveSettings(),
@@ -812,6 +817,7 @@ class LocalizationSettingsPage extends StatelessWidget {
         const PercentagePrecisionSetting(),
         const Time24HourFormatSetting(),
         const DateFormatSetting(),
+        const DatePickerTypeSetting(),
         const FirstDayOfWeekSetting(updateHomePage: true),
         const NumberPadFormatSetting(),
         const ExtraZerosButtonSetting(),
@@ -2665,6 +2671,147 @@ class SelectTransactionTypeBeforeAddingSetting extends StatelessWidget {
       icon: appStateSettings["outlinedIcons"]
           ? Icons.unfold_more_outlined
           : Icons.unfold_more_rounded,
+    );
+  }
+}
+
+class AnimatedBudgetBackgroundSetting extends StatelessWidget {
+  const AnimatedBudgetBackgroundSetting({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SettingsContainerSwitch(
+      title: "animated-budget-background".tr(),
+      description: "disabling-can-increase-performance".tr(),
+      icon: appStateSettings["outlinedIcons"]
+          ? Icons.animation_outlined
+          : Icons.animation_rounded,
+      initialValue: appStateSettings["animatedBudgetBackground"] ?? true,
+      onSwitched: (value) {
+        updateSettings("animatedBudgetBackground", value,
+            updateGlobalState: true);
+      },
+    );
+  }
+}
+
+class UseSubcategoryIconSetting extends StatelessWidget {
+  const UseSubcategoryIconSetting({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SettingsContainerSwitch(
+      title: "use-subcategory-icon".tr(),
+      description: "use-subcategory-icon-description".tr(),
+      icon: appStateSettings["outlinedIcons"]
+          ? Icons.category_outlined
+          : Icons.category_rounded,
+      initialValue: appStateSettings["useSubcategoryIcon"] ?? true,
+      onSwitched: (value) {
+        updateSettings("useSubcategoryIcon", value,
+            updateGlobalState: true, pagesNeedingRefresh: [0, 1, 2, 3]);
+      },
+    );
+  }
+}
+
+class ShowTransactionTimeSetting extends StatelessWidget {
+  const ShowTransactionTimeSetting({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SettingsContainerSwitch(
+      title: "time".tr(),
+      description: "show-time-description".tr(),
+      icon: appStateSettings["outlinedIcons"]
+          ? Icons.schedule_outlined
+          : Icons.schedule_rounded,
+      initialValue: appStateSettings["showTransactionTime"] ?? false,
+      onSwitched: (value) {
+        updateSettings("showTransactionTime", value,
+            updateGlobalState: true, pagesNeedingRefresh: [0, 1, 2, 3]);
+      },
+    );
+  }
+}
+
+class ConfirmUpcomingTransactionAmountSetting extends StatelessWidget {
+  const ConfirmUpcomingTransactionAmountSetting({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SettingsContainerSwitch(
+      title: "confirm-amount".tr() != "confirm-amount"
+          ? "confirm-amount".tr()
+          : "Confirm Amount",
+      description: "confirm-amount-description".tr() !=
+              "confirm-amount-description"
+          ? "confirm-amount-description".tr()
+          : "When manually paying scheduled transactions, prompt to confirm amount.",
+      icon: appStateSettings["outlinedIcons"]
+          ? Icons.price_check_outlined
+          : Icons.price_check_rounded,
+      initialValue:
+          appStateSettings["confirmUpcomingTransactionAmount"] ?? false,
+      onSwitched: (value) {
+        updateSettings("confirmUpcomingTransactionAmount", value,
+            updateGlobalState: true);
+      },
+    );
+  }
+}
+
+class GroupTransfersSetting extends StatelessWidget {
+  const GroupTransfersSetting({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SettingsContainerSwitch(
+      title: "group-transfers".tr() != "group-transfers"
+          ? "group-transfers".tr()
+          : "Group Transfers",
+      icon: appStateSettings["outlinedIcons"]
+          ? Icons.compare_arrows_outlined
+          : Icons.compare_arrows_rounded,
+      initialValue: appStateSettings["groupTransfers"] ?? true,
+      onSwitched: (value) {
+        updateSettings("groupTransfers", value,
+            updateGlobalState: true, pagesNeedingRefresh: [0, 1, 2, 3]);
+      },
+    );
+  }
+}
+
+class DatePickerTypeSetting extends StatelessWidget {
+  const DatePickerTypeSetting({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SettingsContainerDropdown(
+      title: "date-picker".tr() != "date-picker"
+          ? "date-picker".tr()
+          : "Date Picker",
+      icon: appStateSettings["outlinedIcons"]
+          ? Icons.calendar_month_outlined
+          : Icons.calendar_month_rounded,
+      initial: (appStateSettings["datePickerType"] == 1 ||
+              appStateSettings["datePickerType"] == "wheel")
+          ? "wheel"
+          : "calendar",
+      items: ["calendar", "wheel"],
+      onChanged: (value) async {
+        await updateSettings("datePickerType", value == "wheel" ? 1 : 0,
+            updateGlobalState: true);
+      },
+      getLabel: (item) {
+        if (item == "calendar") return "calendar".tr();
+        if (item == "wheel") {
+          return "scrollable-list".tr() != "scrollable-list"
+              ? "scrollable-list".tr()
+              : "Scrolling List";
+        }
+        return item.tr();
+      },
     );
   }
 }

@@ -58,6 +58,7 @@ class TransactionEntryTag extends StatelessWidget {
             transaction.objectiveLoanFk != null, //3
             transaction.objectiveFk != null, //4
             showExcludedBudgetTagCheck, //5
+            appStateSettings["showTransactionTime"] == true, //6
           ];
           int tagCount = tagsToShow.where((element) => element == true).length;
           List<Widget> tags = [
@@ -172,6 +173,11 @@ class TransactionEntryTag extends StatelessWidget {
             TransactionTag(
               color: Colors.grey,
               name: "excluded".tr(),
+            ),
+            // 6
+            TransactionTag(
+              color: Theme.of(context).colorScheme.secondary.withOpacity(0.12),
+              name: getWordedTime(null, transaction.dateCreated),
             ),
           ];
           // work in preogress...

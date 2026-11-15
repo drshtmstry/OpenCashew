@@ -263,26 +263,33 @@ Future openPayPopup(
     onSubmitLabel: transaction.income ? "deposit".tr() : "pay".tr(),
     onSubmit: () async {
       if (runBefore != null) await runBefore();
-      //double amount = transaction.amount;
-      // if (transaction.amount == 0) {
-      //   amount = await openBottomSheet(
-      //     context,
-      //     fullSnap: true,
-      //     PopupFramework(
-      //       title: "enter-amount".tr(),
-      //       underTitleSpace: false,
-      //       child: SelectAmount(
-      //         setSelectedAmount: (_, __) {},
-      //         nextLabel: "set-amount".tr(),
-      //         popWithAmount: true,
-      //       ),
-      //     ),
-      //   );
-      //   amount = amount.abs() * (transaction.income ? 1 : -1);
-      // }
+      double? amount;
+      if (appStateSettings["confirmUpcomingTransactionAmount"] == true ||
+          transaction.amount == 0) {
+        amount = await openBottomSheet(
+          context,
+          fullSnap: true,
+          PopupFramework(
+            title: "confirm-amount".tr() != "confirm-amount"
+                ? "confirm-amount".tr()
+                : "enter-amount".tr(),
+            underTitleSpace: false,
+            child: SelectAmount(
+              amountPassed: transaction.amount.abs().toString(),
+              setSelectedAmount: (_, __) {},
+              nextLabel: "set-amount".tr(),
+              popWithAmount: true,
+            ),
+          ),
+        );
+        if (amount != null) {
+          amount = amount.abs() * (transaction.income ? 1 : -1);
+        }
+      }
       popRoute(context);
       await markAsPaid(
         transaction: transaction,
+        customAmount: amount,
       );
     },
   );
@@ -290,6 +297,7 @@ Future openPayPopup(
 
 Future markAsPaid({
   required Transaction transaction,
+  double? customAmount,
   // Avoid infinite recursion
   bool updatingCloselyRelated = false,
 }) async {
@@ -300,6 +308,7 @@ Future markAsPaid({
     if (closelyRelatedTransferCorrectionTransaction != null) {
       await markAsPaid(
         transaction: closelyRelatedTransferCorrectionTransaction,
+        customAmount: customAmount != null ? customAmount.abs() : null,
         updatingCloselyRelated: true,
       );
       closelyRelatedPairedTransactionFk =
@@ -307,6 +316,7 @@ Future markAsPaid({
     }
   }
   Transaction transactionNew = transaction.copyWith(
+    amount: customAmount ?? transaction.amount,
     paid: true,
     dateCreated:
         appStateSettings["markAsPaidOnOriginalDay"] ? null : DateTime.now(),

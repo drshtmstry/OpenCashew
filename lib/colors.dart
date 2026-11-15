@@ -310,6 +310,8 @@ List<Color> selectableAccentColors(context) {
     Theme.of(context).colorScheme.selectableColorRed,
     Theme.of(context).colorScheme.selectableColorOrange,
     Theme.of(context).colorScheme.selectableColorYellow,
+    Theme.of(context).colorScheme.selectableColorGrey,
+    Theme.of(context).colorScheme.selectableColorBlueGrey,
   ];
 }
 
