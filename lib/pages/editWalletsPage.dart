@@ -33,19 +33,25 @@ import 'package:provider/provider.dart';
 import 'exchangeRatesPage.dart';
 
 class EditWalletsPage extends StatefulWidget {
-  EditWalletsPage({Key? key, this.runWhenOpen}) : super(key: key);
+  EditWalletsPage({Key? key, this.runWhenOpen, this.title}) : super(key: key);
 
   final VoidCallback? runWhenOpen;
+  final String? title;
 
   @override
-  _EditWalletsPageState createState() => _EditWalletsPageState();
+  EditWalletsPageState createState() => EditWalletsPageState();
 }
 
-class _EditWalletsPageState extends State<EditWalletsPage> {
+class EditWalletsPageState extends State<EditWalletsPage> {
+  final GlobalKey<PageFrameworkState> _pageFrameworkKey = GlobalKey();
   bool dragDownToDismissEnabled = true;
   int currentReorder = -1;
   String searchValue = "";
   bool isFocused = false;
+
+  void scrollToTop() {
+    _pageFrameworkKey.currentState?.scrollToTop();
+  }
 
   @override
   void initState() {
@@ -72,11 +78,12 @@ class _EditWalletsPageState extends State<EditWalletsPage> {
         }
       },
       child: PageFramework(
+        key: _pageFrameworkKey,
         horizontalPaddingConstrained: true,
         dragDownToDismiss: true,
         dragDownToDismissEnabled: dragDownToDismissEnabled,
         scrollToTopButton: true,
-        title: "edit-accounts".tr(),
+        title: widget.title ?? "edit-accounts".tr(),
         floatingActionButton: AnimateFABDelayed(
           fab: AddFAB(
             tooltip: "add-account".tr(),

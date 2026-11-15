@@ -1,4 +1,5 @@
 import 'package:budget/functions.dart';
+import 'package:budget/pages/transactionsListPage.dart';
 import 'package:budget/struct/settings.dart';
 import 'package:budget/widgets/navigationFramework.dart';
 import 'package:budget/widgets/tappable.dart';
@@ -15,15 +16,21 @@ class ViewAllTransactionsButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return LowKeyButton(
       onTap: () {
-        if (onPress != null)
+        if (onPress != null) {
           onPress!();
-        else
-          PageNavigationFramework.changePage(
-            context,
-            1,
-            switchNavbar:
-                appStateSettings["customNavBarShortcut1"] == "transactions",
-          );
+        } else {
+          if (appStateSettings["customNavBarShortcut0"] == "transactions" ||
+              appStateSettings["customNavBarShortcut1"] == "transactions" ||
+              appStateSettings["customNavBarShortcut2"] == "transactions") {
+            PageNavigationFramework.changePage(
+              context,
+              1,
+              switchNavbar: true,
+            );
+          } else {
+            pushRoute(context, TransactionsListPage());
+          }
+        }
       },
       text: "view-all-transactions".tr(),
     );

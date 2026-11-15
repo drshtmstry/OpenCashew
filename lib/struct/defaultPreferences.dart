@@ -117,8 +117,8 @@ Future<Map<String, dynamic>> getDefaultPreferences() async {
     ],
     // Values for customNavBarShortcuts are the keys of navBarIconsData
     "customNavBarShortcut0": "home",
-    "customNavBarShortcut1": "transactions",
-    "customNavBarShortcut2": "budgets",
+    "customNavBarShortcut1": "allSpending",
+    "customNavBarShortcut2": "accountDetails",
     "showTotalSpentForBudget": false,
     "showTotalSpentForObjective": true,
     "showCumulativeSpending": true,
@@ -397,6 +397,27 @@ attemptToMigrateCustomNumberFormattingSettings() {
   } catch (e) {
     print(
         "Error migrating setting long term loans amounts to 0 " + e.toString());
+  }
+}
+
+attemptToMigrateDefaultNavBarShortcuts() {
+  try {
+    if (appStateSettings["customNavBarShortcutMigratedToSummaryAndAccounts"] !=
+        true) {
+      if (appStateSettings["customNavBarShortcut1"] == "transactions" &&
+          appStateSettings["customNavBarShortcut2"] == "budgets") {
+        appStateSettings["customNavBarShortcut1"] = "allSpending";
+        appStateSettings["customNavBarShortcut2"] = "accountDetails";
+        updateSettings("customNavBarShortcut1", "allSpending",
+            updateGlobalState: false);
+        updateSettings("customNavBarShortcut2", "accountDetails",
+            updateGlobalState: false);
+      }
+      updateSettings("customNavBarShortcutMigratedToSummaryAndAccounts", true,
+          updateGlobalState: false);
+    }
+  } catch (e) {
+    print("Error migrating default nav bar shortcuts: " + e.toString());
   }
 }
 

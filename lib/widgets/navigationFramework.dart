@@ -288,6 +288,7 @@ GlobalKey<UpcomingOverdueTransactionsState>
     upcomingOverdueTransactionsStateKey = GlobalKey();
 GlobalKey<CreditDebtTransactionsState> creditDebtTransactionsKey = GlobalKey();
 GlobalKey<AccountsPageState> accountsPageStateKey = GlobalKey();
+GlobalKey<EditWalletsPageState> editWalletsPageStateKey = GlobalKey();
 GlobalKey<GoogleAccountLoginButtonState> settingsGoogleAccountLoginButtonKey =
     GlobalKey();
 GlobalKey<NavigationSidebarState> sidebarStateKey = GlobalKey();
@@ -364,7 +365,7 @@ class PageNavigationFrameworkState extends State<PageNavigationFramework> {
     WalletDetailsPage(
         key: walletDetailsAllSpendingPageStateKey, wallet: null), //7
     AccountsPage(key: accountsPageStateKey), // 8
-    EditWalletsPage(), //9
+    EditWalletsPage(key: editWalletsPageStateKey, title: "accounts".tr()), //9
     EditBudgetPage(), //10
     EditCategoriesPage(), //11
     EditAssociatedTitlesPage(), //12

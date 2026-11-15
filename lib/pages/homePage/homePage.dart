@@ -17,6 +17,7 @@ import 'package:budget/pages/homePage/homePageAllSpendingSummary.dart';
 import 'package:budget/pages/editHomePage.dart';
 import 'package:budget/pages/settingsPage.dart';
 import 'package:budget/pages/homePage/homePageCreditDebts.dart';
+import 'package:budget/pages/transactionsListPage.dart';
 import 'package:budget/struct/settings.dart';
 import 'package:budget/widgets/animatedExpanded.dart';
 import 'package:budget/widgets/button.dart';
@@ -25,6 +26,7 @@ import 'package:budget/widgets/navigationFramework.dart';
 import 'package:budget/widgets/openBottomSheet.dart';
 import 'package:budget/widgets/ratingPopup.dart';
 import 'package:budget/widgets/selectedTransactionsAppBar.dart';
+import 'package:budget/widgets/tappable.dart';
 import 'package:budget/widgets/util/keepAliveClientMixin.dart';
 import 'package:budget/widgets/textWidgets.dart';
 import 'package:budget/widgets/transactionEntry/swipeToSelectTransactions.dart';
@@ -33,7 +35,6 @@ import 'package:budget/widgets/navigationSidebar.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:budget/widgets/scrollbarWrap.dart';
-import 'package:budget/widgets/slidingSelectorIncomeExpense.dart';
 import 'package:budget/widgets/linearGradientFadedEdges.dart';
 import 'package:budget/widgets/pullDownToRefreshSync.dart';
 import 'package:budget/widgets/util/rightSideClipper.dart';
@@ -122,27 +123,59 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     bool showUsername = appStateSettings["username"] != "";
     bool showGreeting = appStateSettings["enableGreetingMessage"] == true;
-    Widget slidingSelector = GestureDetector(
-      onLongPress: () async {
-        HapticFeedback.heavyImpact();
-        await openBottomSheet(
-          context,
-          TransactionsListHomePageBottomSheetSettings(),
-        );
-        homePageStateKey.currentState?.refreshState();
-      },
-      child: SlidingSelectorIncomeExpense(
-          options: appStateSettings[
-                      "homePageTransactionsListIncomeAndExpenseOnly"] ==
-                  true
-              ? null
-              : ["all", "outgoing", "incoming"],
-          useHorizontalPaddingConstrained: false,
-          onSelected: (index) {
-            setState(() {
-              selectedSlidingSelector = index;
-            });
-          }),
+    Widget transactionsHeader = Padding(
+      padding: const EdgeInsetsDirectional.symmetric(horizontal: 13),
+      child: Tappable(
+        color: Colors.transparent,
+        borderRadius: 15,
+        onTap: () {
+          if (appStateSettings["customNavBarShortcut0"] == "transactions" ||
+              appStateSettings["customNavBarShortcut1"] == "transactions" ||
+              appStateSettings["customNavBarShortcut2"] == "transactions") {
+            PageNavigationFramework.changePage(
+              context,
+              1,
+              switchNavbar: true,
+            );
+          } else {
+            pushRoute(context, TransactionsListPage());
+          }
+        },
+        onLongPress: () async {
+          HapticFeedback.heavyImpact();
+          await openBottomSheet(
+            context,
+            TransactionsListHomePageBottomSheetSettings(),
+          );
+          homePageStateKey.currentState?.refreshState();
+        },
+        child: Padding(
+          padding: const EdgeInsetsDirectional.only(
+            start: 8,
+            end: 6,
+            top: 4,
+            bottom: 4,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              TextFont(
+                text: "transactions".tr(),
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+              ),
+              Icon(
+                appStateSettings["outlinedIcons"]
+                    ? Icons.arrow_forward_outlined
+                    : Icons.arrow_forward_rounded,
+                size: 24,
+                color: getColor(context, "black").withOpacity(0.55),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
     Widget? homePageTransactionsList =
         isHomeScreenSectionEnabled(context, "showTransactionsList") == true
@@ -151,7 +184,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  slidingSelector,
+                  transactionsHeader,
                   SizedBox(height: 8),
                   HomeTransactions(
                       selectedSlidingSelector: selectedSlidingSelector),

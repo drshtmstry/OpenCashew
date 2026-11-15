@@ -3,6 +3,7 @@ import 'package:budget/functions.dart';
 import 'package:budget/pages/editBudgetPage.dart';
 import 'package:budget/pages/editHomePage.dart';
 import 'package:budget/pages/editObjectivesPage.dart';
+import 'package:budget/pages/editWalletsPage.dart';
 import 'package:budget/pages/subscriptionsPage.dart';
 import 'package:budget/pages/transactionsListPage.dart';
 import 'package:budget/pages/upcomingOverdueTransactionsPage.dart';
@@ -54,6 +55,8 @@ class BottomNavBarState extends State<BottomNavBar> {
         subscriptionsPageStateKey.currentState?.scrollToTop();
       if (navigationStackedIndex == 7)
         walletDetailsAllSpendingPageStateKey.currentState?.scrollToTop();
+      if (navigationStackedIndex == 9)
+        editWalletsPageStateKey.currentState?.scrollToTop();
       if (navigationStackedIndex == 14)
         objectivesListPageStateKey.currentState?.scrollToTop();
       if (navigationStackedIndex == 16)
@@ -443,6 +446,13 @@ class SelectNavBarShortcutPopup extends StatelessWidget {
         NavBarShortcutSelection(
           shortcutAppSettingKey: shortcutAppSettingKey,
           navBarIconDataKey: "allSpending",
+        ),
+        NavBarShortcutSelection(
+          shortcutAppSettingKey: shortcutAppSettingKey,
+          navBarIconDataKey: "accountDetails",
+          onSettings: () {
+            pushRoute(context, EditWalletsPage());
+          },
         ),
         NavBarShortcutSelection(
           shortcutAppSettingKey: shortcutAppSettingKey,

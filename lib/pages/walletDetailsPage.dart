@@ -1246,7 +1246,7 @@ class WalletDetailsPageState extends State<WalletDetailsPage>
           ),
         ),
         title:
-            widget.wallet == null ? "all-spending".tr() : widget.wallet!.name,
+            widget.wallet == null ? "summary".tr() : widget.wallet!.name,
         subtitle: widget.wallet == null
             ? null
             : StreamBuilder<TransactionWallet>(

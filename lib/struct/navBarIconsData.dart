@@ -90,7 +90,7 @@ Map<String, NavBarIconData> getNavBarIconsData() {
       // This icon is pretty cool, could suit it
       // ? Icons.data_thresholding_outlined
       // : Icons.data_thresholding_rounded,
-      label: "all-spending",
+      label: "summary",
       labelShort: "summary",
       labelLong: "all-spending-summary",
       navigationIndexedStackIndex: 7,
