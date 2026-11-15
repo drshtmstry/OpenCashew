@@ -726,8 +726,10 @@ class _TransactionEntryState extends State<TransactionEntry> {
                           ),
                           child: Tappable(
                             color: Colors.transparent,
-                            borderRadius:
-                                enableSelectionCheckmark ? 0 : borderRadius,
+                            borderRadius: (isExpanded &&
+                                    areTransactionsBeingSelected != true)
+                                ? 18
+                                : (enableSelectionCheckmark ? 0 : borderRadius),
                             onLongPress: () {
                               selectTransaction(transaction, selected, true);
                             },
@@ -747,44 +749,85 @@ class _TransactionEntryState extends State<TransactionEntry> {
                             },
                             child: AnimatedContainer(
                               clipBehavior: Clip.none,
-                              duration: const Duration(seconds: 1),
+                              duration: const Duration(milliseconds: 250),
                               curve: Curves.easeInOutCubicEmphasized,
+                              margin: (isExpanded &&
+                                      areTransactionsBeingSelected != true)
+                                  ? const EdgeInsets.symmetric(
+                                      vertical: 4, horizontal: 2)
+                                  : EdgeInsets.zero,
                               padding: EdgeInsetsDirectional.only(
-                                start: enableSelectionCheckmark
-                                    ? 0
-                                    : selected
-                                        ? 12 - 2
-                                        : 10 - 2,
-                                end: !enableSelectionCheckmark && selected
-                                    ? 12
-                                    : 10,
-                                top: !enableSelectionCheckmark &&
-                                        selected &&
-                                        isTransactionBeforeSelected == false
-                                    ? 6
-                                    : 4,
-                                bottom: !enableSelectionCheckmark &&
-                                        selected &&
-                                        isTransactionAfterSelected == false
-                                    ? 6
-                                    : 4,
+                                start: (isExpanded &&
+                                        areTransactionsBeingSelected != true)
+                                    ? 10
+                                    : (enableSelectionCheckmark
+                                        ? 0
+                                        : selected
+                                            ? 12 - 2
+                                            : 10 - 2),
+                                end: (isExpanded &&
+                                        areTransactionsBeingSelected != true)
+                                    ? 10
+                                    : (!enableSelectionCheckmark && selected
+                                        ? 12
+                                        : 10),
+                                top: (isExpanded &&
+                                        areTransactionsBeingSelected != true)
+                                    ? 8
+                                    : (!enableSelectionCheckmark &&
+                                            selected &&
+                                            isTransactionBeforeSelected == false
+                                        ? 6
+                                        : 4),
+                                bottom: (isExpanded &&
+                                        areTransactionsBeingSelected != true)
+                                    ? 8
+                                    : (!enableSelectionCheckmark &&
+                                            selected &&
+                                            isTransactionAfterSelected == false
+                                        ? 6
+                                        : 4),
                               ),
                               decoration: BoxDecoration(
                                 color: selected
                                     ? selectedColor
-                                    : Colors.transparent,
-                                borderRadius: BorderRadiusDirectional.vertical(
-                                  top: Radius.circular(
-                                    isTransactionBeforeSelected
-                                        ? 0
-                                        : borderRadius,
-                                  ),
-                                  bottom: Radius.circular(
-                                    isTransactionAfterSelected
-                                        ? 0
-                                        : borderRadius,
-                                  ),
-                                ),
+                                    : (isExpanded &&
+                                            areTransactionsBeingSelected != true)
+                                        ? (Theme.of(context).brightness ==
+                                                Brightness.light
+                                            ? const Color(0xFFF7F9FC)
+                                            : Theme.of(context)
+                                                .colorScheme
+                                                .surface)
+                                        : Colors.transparent,
+                                border: (isExpanded &&
+                                        areTransactionsBeingSelected != true)
+                                    ? Border.all(
+                                        color: Theme.of(context).brightness ==
+                                                Brightness.light
+                                            ? const Color(0xFFBAC7D5)
+                                            : Theme.of(context)
+                                                .colorScheme
+                                                .outline
+                                                .withOpacity(0.5),
+                                        width: 1.5,
+                                      )
+                                    : null,
+                                borderRadius: (isExpanded &&
+                                        areTransactionsBeingSelected != true)
+                                    ? BorderRadius.circular(18)
+                                    : BorderRadiusDirectional.vertical(
+                                        top: Radius.circular(
+                                          isTransactionBeforeSelected
+                                              ? 0
+                                              : borderRadius,
+                                        ),
+                                        bottom: Radius.circular(
+                                          isTransactionAfterSelected
+                                              ? 0
+                                              : borderRadius,
+                                        ),
+                                      ),
                               ),
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
