@@ -314,9 +314,15 @@ class _TransactionEntriesState extends State<TransactionEntries> {
                       isCategoryTypeBalanceCorrection(
                           transactionWithCategory.category);
 
+              List<dynamic> countedList =
+                  appStateSettings["countedBalanceCorrectionPks"] ?? [];
+              bool isCountedInSummary =
+                  appStateSettings["countBalanceCorrectionInSummary"] == true ||
+                      countedList.contains(
+                          transactionWithCategory.transaction.transactionPk);
+
               if (transactionWithCategory.transaction.paid && !isTransferTx) {
-                if (!isBalanceCorrectionTx ||
-                    appStateSettings["countBalanceCorrectionInSummary"] == true) {
+                if (!isBalanceCorrectionTx || isCountedInSummary) {
                   double amountForDay =
                       transactionWithCategory.transaction.amount *
                           (amountRatioToPrimaryCurrencyGivenPk(

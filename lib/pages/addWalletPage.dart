@@ -780,6 +780,8 @@ class CorrectBalancePopup extends StatefulWidget {
 class _CorrectBalancePopupState extends State<CorrectBalancePopup> {
   double enteredAmount = 0;
   bool isNegative = false;
+  late bool countInSummary =
+      appStateSettings["countBalanceCorrectionInSummary"] == true;
   TimeOfDay? selectedTime = null;
   DateTime? selectedDateTime = null;
   String selectedTitle = "";
@@ -924,24 +926,45 @@ class _CorrectBalancePopupState extends State<CorrectBalancePopup> {
                 // Also render if no data, because that means the wallet is empty
                 // We still want users to be able to correct the amount
                 key: ValueKey(snapshot.hasData == false),
-                extraWidgetAboveNumbers: SettingsContainerSwitch(
-                  title: "negative-amount".tr(),
-                  onSwitched: (value) {
-                    setState(() {
-                      isNegative = value;
-                      if (isNegative == true)
-                        enteredAmount = enteredAmount.abs() * -1;
-                      else
-                        enteredAmount = enteredAmount.abs();
-                    });
-                  },
-                  enableBorderRadius: true,
-                  initialValue: totalWalletAmount < 0,
-                  syncWithInitialValue: false,
-                  runOnSwitchedInitially: true,
-                  icon: appStateSettings["outlinedIcons"]
-                      ? Icons.exposure_outlined
-                      : Icons.exposure_rounded,
+                extraWidgetAboveNumbers: Column(
+                  children: [
+                    SettingsContainerSwitch(
+                      title: "negative-amount".tr(),
+                      onSwitched: (value) {
+                        setState(() {
+                          isNegative = value;
+                          if (isNegative == true)
+                            enteredAmount = enteredAmount.abs() * -1;
+                          else
+                            enteredAmount = enteredAmount.abs();
+                        });
+                      },
+                      enableBorderRadius: true,
+                      initialValue: totalWalletAmount < 0,
+                      syncWithInitialValue: false,
+                      runOnSwitchedInitially: true,
+                      icon: appStateSettings["outlinedIcons"]
+                          ? Icons.exposure_outlined
+                          : Icons.exposure_rounded,
+                    ),
+                    SizedBox(height: 5),
+                    SettingsContainerSwitch(
+                      title: "Count as Expense/Income in Summary",
+                      description:
+                          "Count this balance correction in total spending and income summary calculations",
+                      onSwitched: (value) {
+                        setState(() {
+                          countInSummary = value;
+                        });
+                      },
+                      enableBorderRadius: true,
+                      initialValue: countInSummary,
+                      syncWithInitialValue: false,
+                      icon: appStateSettings["outlinedIcons"]
+                          ? Icons.calculate_outlined
+                          : Icons.calculate_rounded,
+                    ),
+                  ],
                 ),
                 showEnteredNumber: false,
                 amountPassed: "0",
@@ -962,6 +985,7 @@ class _CorrectBalancePopupState extends State<CorrectBalancePopup> {
                     widget.wallet,
                     selectedDateTime,
                     selectedTitle,
+                    countInSummary: countInSummary,
                   );
                   savingHapticFeedback();
                   popRoute(context);
@@ -982,7 +1006,8 @@ Future<bool> correctWalletBalance(
     double newAmount,
     TransactionWallet wallet,
     DateTime? dateTime,
-    String title) async {
+    String title,
+    {bool countInSummary = false}) async {
   String transferString = wallet.name +
       ": " +
       convertToMoney(
@@ -994,13 +1019,24 @@ Future<bool> correctWalletBalance(
 
   String note = "updated-total-balance".tr() + "\n" + transferString;
 
-  await createCorrectionTransaction(
+  String? createdPk = await createCorrectionTransaction(
     differenceAmount,
     wallet,
     note: note,
     dateTime: dateTime,
     title: title,
   );
+
+  if (createdPk != null && countInSummary) {
+    List<dynamic> countedList =
+        appStateSettings["countedBalanceCorrectionPks"] ?? [];
+    List<String> counted = countedList.map((e) => e.toString()).toList();
+    if (!counted.contains(createdPk)) {
+      counted.add(createdPk);
+      await updateSettings("countedBalanceCorrectionPks", counted,
+          updateGlobalState: true, pagesNeedingRefresh: [0, 1, 2, 3]);
+    }
+  }
 
   openSnackbar(
     SnackbarMessage(

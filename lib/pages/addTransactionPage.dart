@@ -1667,6 +1667,60 @@ class _AddTransactionPageState extends State<AddTransactionPage>
                                       },
                                     ),
                                   ),
+                                if (widget.transaction != null &&
+                                    (selectedCategory?.categoryPk == "0" ||
+                                        isCategoryTypeBalanceCorrection(
+                                            selectedCategory)))
+                                  Padding(
+                                    padding: const EdgeInsetsDirectional.only(
+                                      start: 22,
+                                      end: 22,
+                                      bottom: 8,
+                                      top: 5,
+                                    ),
+                                    child: SettingsContainerSwitch(
+                                      title:
+                                          "Count as Expense/Income in Summary",
+                                      description:
+                                          "Count this balance correction in total spending and income summary calculations",
+                                      initialValue: appStateSettings[
+                                                  "countBalanceCorrectionInSummary"] ==
+                                              true ||
+                                          (appStateSettings[
+                                                      "countedBalanceCorrectionPks"]
+                                                  as List? ??
+                                              [])
+                                              .contains(widget
+                                                  .transaction?.transactionPk),
+                                      onSwitched: (value) async {
+                                        List<dynamic> countedList =
+                                            appStateSettings[
+                                                    "countedBalanceCorrectionPks"] ??
+                                                [];
+                                        List<String> counted = countedList
+                                            .map((e) => e.toString())
+                                            .toList();
+                                        if (value) {
+                                          if (!counted.contains(widget
+                                              .transaction!.transactionPk)) {
+                                            counted.add(widget
+                                                .transaction!.transactionPk);
+                                          }
+                                        } else {
+                                          counted.remove(widget
+                                              .transaction!.transactionPk);
+                                        }
+                                        await updateSettings(
+                                            "countedBalanceCorrectionPks",
+                                            counted,
+                                            updateGlobalState: true,
+                                            pagesNeedingRefresh: [0, 1, 2, 3]);
+                                      },
+                                      icon: appStateSettings["outlinedIcons"]
+                                          ? Icons.calculate_outlined
+                                          : Icons.calculate_rounded,
+                                    ),
+                                  ),
                                 if (widget.transaction != null)
                                   Padding(
                                     padding: const EdgeInsetsDirectional.only(

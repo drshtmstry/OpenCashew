@@ -5909,11 +5909,18 @@ class FinanceDatabase extends _$FinanceDatabase {
     Expression<bool> isInObjectiveLoanPks =
         onlyShowBasedOnObjectiveLoanFks(tbl, searchFilters.objectiveLoanPks);
 
+    List<dynamic> countedList =
+        appStateSettings["countedBalanceCorrectionPks"] ?? [];
+    List<String> countedPks = countedList.map((e) => e.toString()).toList();
+
     Expression<bool> isBalanceCorrectionAnd =
         searchFilters.categoryPks.contains("0") ||
                 appStateSettings["countBalanceCorrectionInSummary"] == true
             ? tbl.pairedTransactionFk.isNull()
-            : tbl.categoryFk.equals("0").not() & tbl.pairedTransactionFk.isNull();
+            : countedPks.isNotEmpty
+                ? ((tbl.categoryFk.equals("0").not() & tbl.pairedTransactionFk.isNull()) |
+                    tbl.transactionPk.isIn(countedPks))
+                : tbl.categoryFk.equals("0").not() & tbl.pairedTransactionFk.isNull();
     Expression<bool> isNotLoan = tbl.objectiveLoanFk.isNull() &
         tbl.type.isNotInValues(
             [TransactionSpecialType.credit, TransactionSpecialType.debt]);
@@ -6378,6 +6385,14 @@ class FinanceDatabase extends _$FinanceDatabase {
     if (appStateSettings["countBalanceCorrectionInSummary"] == true) {
       return tbl.pairedTransactionFk.isNull();
     }
+    List<dynamic> countedList =
+        appStateSettings["countedBalanceCorrectionPks"] ?? [];
+    List<String> countedPks = countedList.map((e) => e.toString()).toList();
+    if (countedPks.isNotEmpty) {
+      return ((tbl.categoryFk.equals("0").not() & tbl.pairedTransactionFk.isNull()) |
+          tbl.transactionPk.isIn(countedPks) |
+          (isIncome == null ? Constant(true) : Constant(false)));
+    }
     return ((tbl.categoryFk.equals("0").not() & tbl.pairedTransactionFk.isNull()) |
         (isIncome == null ? Constant(true) : Constant(false)));
   }
@@ -6819,14 +6834,23 @@ class FinanceDatabase extends _$FinanceDatabase {
   // remove loans and transfers here - we don't want loans or transfers to contribute to our other totals, only net
   Expression<bool> onlyShowIfOnlyExpenseAndIncome(
       $TransactionsTable tbl, bool enabled) {
+    List<dynamic> countedList =
+        appStateSettings["countedBalanceCorrectionPks"] ?? [];
+    List<String> countedPks = countedList.map((e) => e.toString()).toList();
+    Expression<bool> balanceCorrectionAllowed =
+        appStateSettings["countBalanceCorrectionInSummary"] == true
+            ? Constant(true)
+            : countedPks.isNotEmpty
+                ? (tbl.categoryFk.equals("0").not() |
+                    tbl.transactionPk.isIn(countedPks))
+                : tbl.categoryFk.equals("0").not();
+
     return (enabled == false ? Constant(true) : Constant(false)) |
         ((tbl.objectiveLoanFk.isNull() &
             tbl.type.isNotInValues(
                 [TransactionSpecialType.credit, TransactionSpecialType.debt]) &
             tbl.pairedTransactionFk.isNull() &
-            (appStateSettings["countBalanceCorrectionInSummary"] == true
-                ? Constant(true)
-                : tbl.categoryFk.equals("0").not())));
+            balanceCorrectionAllowed));
   }
 
   Stream<TotalWithCount?> watchTotalWithCountOfWallet({
