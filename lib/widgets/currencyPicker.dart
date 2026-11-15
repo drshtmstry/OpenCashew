@@ -22,12 +22,14 @@ class CurrencyPicker extends StatefulWidget {
     this.initialCurrency,
     this.unSelectedColor,
     required this.showExchangeRateInfoNotice,
+    this.listLayout = false,
   });
   final Function(String) onSelected;
   final Function? onHasFocus;
   final String? initialCurrency;
   final Color? unSelectedColor;
   final bool showExchangeRateInfoNotice;
+  final bool listLayout;
 
   @override
   State<CurrencyPicker> createState() => _CurrencyPickerState();
@@ -185,43 +187,78 @@ class _CurrencyPickerState extends State<CurrencyPicker> {
               ],
             ),
           ),
-          SliverGrid(
-            gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-              maxCrossAxisExtent: 125,
-              crossAxisSpacing: 7,
-              mainAxisSpacing: 7,
+          if (widget.listLayout)
+            SliverList(
+              delegate: SliverChildListDelegate(
+                (searchText != "" || viewAll == true)
+                    ? [
+                        for (String key in currencies.keys)
+                          CurrencyItem(
+                            currencyKey: key,
+                            selected: selectedCurrency == key,
+                            onSelected: onSelected,
+                            unSelectedColor: widget.unSelectedColor,
+                            listLayout: true,
+                          ),
+                      ]
+                    : [
+                        for (dynamic key in appStateSettings["customCurrencies"])
+                          CurrencyItem(
+                            customCurrency: true,
+                            currencyKey: key.toString(),
+                            selected: selectedCurrency == key,
+                            onSelected: onSelected,
+                            unSelectedColor: widget.unSelectedColor,
+                            listLayout: true,
+                          ),
+                        for (String key in popularCurrenciesLocal)
+                          CurrencyItem(
+                            currencyKey: key,
+                            selected: selectedCurrency == key,
+                            onSelected: onSelected,
+                            unSelectedColor: widget.unSelectedColor,
+                            listLayout: true,
+                          ),
+                      ],
+              ),
+            )
+          else
+            SliverGrid(
+              gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                maxCrossAxisExtent: 125,
+                crossAxisSpacing: 7,
+                mainAxisSpacing: 7,
+              ),
+              delegate: SliverChildListDelegate(
+                (searchText != "" || viewAll == true)
+                    ? [
+                        for (String key in currencies.keys)
+                          CurrencyItem(
+                            currencyKey: key,
+                            selected: selectedCurrency == key,
+                            onSelected: onSelected,
+                            unSelectedColor: widget.unSelectedColor,
+                          ),
+                      ]
+                    : [
+                        for (dynamic key in appStateSettings["customCurrencies"])
+                          CurrencyItem(
+                            customCurrency: true,
+                            currencyKey: key.toString(),
+                            selected: selectedCurrency == key,
+                            onSelected: onSelected,
+                            unSelectedColor: widget.unSelectedColor,
+                          ),
+                        for (String key in popularCurrenciesLocal)
+                          CurrencyItem(
+                            currencyKey: key,
+                            selected: selectedCurrency == key,
+                            onSelected: onSelected,
+                            unSelectedColor: widget.unSelectedColor,
+                          ),
+                      ],
+              ),
             ),
-            delegate: SliverChildListDelegate(
-              (searchText != "" || viewAll == true)
-                  ? [
-                      for (String currencyKey in currencies.keys)
-                        CurrencyItem(
-                          currencyKey: currencyKey,
-                          selected: selectedCurrency == currencyKey,
-                          onSelected: onSelected,
-                          unSelectedColor: widget.unSelectedColor,
-                        )
-                    ]
-                  : [
-                      for (dynamic currencyKey
-                          in appStateSettings["customCurrencies"])
-                        CurrencyItem(
-                          customCurrency: true,
-                          currencyKey: currencyKey.toString(),
-                          selected: selectedCurrency == currencyKey,
-                          onSelected: onSelected,
-                          unSelectedColor: widget.unSelectedColor,
-                        ),
-                      for (String currencyKey in popularCurrenciesLocal)
-                        CurrencyItem(
-                          currencyKey: currencyKey.toString(),
-                          selected: selectedCurrency == currencyKey,
-                          onSelected: onSelected,
-                          unSelectedColor: widget.unSelectedColor,
-                        )
-                    ],
-            ),
-          ),
           SliverToBoxAdapter(
             child: Column(
               children: [
@@ -271,12 +308,14 @@ class CurrencyItem extends StatelessWidget {
     required this.onSelected,
     this.customCurrency = false,
     this.unSelectedColor,
+    this.listLayout = false,
   });
   final String currencyKey;
   final bool selected;
   final Function(String) onSelected;
   final bool customCurrency;
   final Color? unSelectedColor;
+  final bool listLayout;
 
   @override
   Widget build(BuildContext context) {
@@ -308,7 +347,54 @@ class CurrencyItem extends StatelessWidget {
             ),
           ),
           duration: Duration(milliseconds: 450),
-          child: ConstrainedBox(
+          child: listLayout
+              ? Padding(
+                  padding: const EdgeInsetsDirectional.symmetric(
+                      horizontal: 14, vertical: 10),
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        width: 42,
+                        child: TextFont(
+                          text: customCurrency
+                              ? currencyKey.toUpperCase()
+                              : (currenciesJSON[currencyKey]?['Symbol'] ??
+                                  currencyKey.toUpperCase()),
+                          textAlign: TextAlign.center,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            TextFont(
+                              text: currencyKey.toUpperCase(),
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            TextFont(
+                              text: customCurrency
+                                  ? 'custom-currency'.tr()
+                                  : (currenciesJSON[currencyKey]?['Currency'] ??
+                                      currenciesJSON[currencyKey]?['CountryName'] ??
+                                      ''),
+                              fontSize: 12,
+                              textColor: getColor(context, 'textLight'),
+                              maxLines: 1,
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (selected)
+                        Icon(Icons.check_circle_rounded,
+                            color: Theme.of(context).colorScheme.primary),
+                    ],
+                  ),
+                )
+              : ConstrainedBox(
             constraints: BoxConstraints(minWidth: 500, minHeight: 500),
             child: Padding(
               padding: const EdgeInsetsDirectional.symmetric(

@@ -25,6 +25,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:budget/struct/settings.dart';
 import 'package:budget/struct/currencyFunctions.dart';
 import 'package:budget/struct/randomConstants.dart';
+import 'package:intl/intl.dart';
 
 extension CapExtension on String {
   String get capitalizeFirst =>
@@ -1184,9 +1185,17 @@ List<String> popularCurrencies = [
 
 String getDevicesDefaultCurrencyCode() {
   try {
-    String? currentCountryCode =
-        WidgetsBinding.instance.platformDispatcher.locale.countryCode;
-    // print(currentCountryCode);
+    final locale = WidgetsBinding.instance.platformDispatcher.locale;
+    // Prefer the locale's currency convention (for example, en_IN -> INR).
+    final localeCurrency = NumberFormat.simpleCurrency(
+      locale: locale.toString(),
+    ).currencyName?.toLowerCase();
+    if (localeCurrency != null && currenciesJSON.containsKey(localeCurrency)) {
+      return localeCurrency;
+    }
+
+    // Fallback to the country metadata if Intl has no matching currency.
+    final String? currentCountryCode = locale.countryCode;
     for (String currencyKey in currenciesJSON.keys) {
       if (currenciesJSON[currencyKey] != null &&
           currenciesJSON[currencyKey]["CountryCode"] != null &&

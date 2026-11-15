@@ -2,6 +2,8 @@ import 'package:budget/database/tables.dart';
 import 'package:budget/functions.dart';
 import 'package:budget/pages/addTransactionPage.dart';
 import 'package:budget/pages/editWalletsPage.dart';
+import 'package:budget/pages/transactionFilters.dart';
+import 'package:budget/pages/transactionsSearchPage.dart';
 import 'package:budget/pages/settingsPage.dart';
 import 'package:budget/struct/accountTypes.dart';
 import 'package:budget/struct/currencyFunctions.dart';
@@ -665,6 +667,33 @@ class _AddWalletPageState extends State<AddWalletPage> {
                 }),
               ),
             ),
+          if (widget.wallet != null)
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsetsDirectional.only(
+                    start: 20, end: 20, bottom: 10),
+                child: SettingsContainer(
+                  isOutlined: true,
+                  onTap: () async {
+                    await addWallet(popContext: false);
+                    pushRoute(
+                      context,
+                      TransactionsSearchPage(
+                        initialFilters: SearchFilters().copyWith(
+                          walletPks: [widget.wallet!.walletPk],
+                        ),
+                      ),
+                    );
+                  },
+                  title: "View transactions".tr(),
+                  icon: appStateSettings["outlinedIcons"]
+                      ? Icons.receipt_long_outlined
+                      : Icons.receipt_long_rounded,
+                  isWideOutlined: true,
+                  horizontalPadding: 15,
+                ),
+              ),
+            ),
           if (widget.wallet == null)
             SliverToBoxAdapter(
               child: Padding(
@@ -745,6 +774,7 @@ class _AddWalletPageState extends State<AddWalletPage> {
           SliverToBoxAdapter(child: SizedBox(height: 10)),
           CurrencyPicker(
             showExchangeRateInfoNotice: true,
+            listLayout: widget.wallet != null,
             onSelected: setSelectedCurrency,
             initialCurrency: selectedCurrency,
             onHasFocus: () {

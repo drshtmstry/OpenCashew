@@ -144,8 +144,8 @@
 - [ ] **Savings Budget vs Expense Budget** type — _web app audit_
 
 ### Accounts & Import
-- [ ] **Account Details Options List (replace currency tiles)** — in account details/info section, replace the currency breakdown tiles with an options list.
-- [x] **View Transactions with Account Filter** — account details menu opens Search with that account filter applied.
+- [x] **Account Currency Options List** — the Edit Account screen presents currency choices as a searchable list instead of tiles.
+- [x] **View Transactions with Account Filter** — Edit Account screen opens Search with that wallet filter applied.
 - [ ] **Accounts List Page** (dedicated accounts overview) — _changelog 6.0.0_
 - [ ] **Account Spending Summary Table** — _changelog 5.2.6_
 - [ ] **Ability to Archive Accounts** — _changelog 6.0.0_

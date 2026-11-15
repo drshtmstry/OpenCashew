@@ -646,6 +646,8 @@ class WalletDetailsPageState extends State<WalletDetailsPage>
           },
           label:
               widget.wallet != null ? "account-total".tr() : "net-total".tr(),
+          actionLabel:
+              widget.wallet == null ? null : "View transactions".tr(),
           getTextColor: appStateSettings["netTotalsColorful"] != true
               ? null
               : (double amount) {

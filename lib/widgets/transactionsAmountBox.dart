@@ -26,6 +26,7 @@ class TransactionsAmountBox extends StatelessWidget {
     this.invertSign = false,
     this.getTextColor,
     this.currencyKey,
+    this.actionLabel,
     super.key,
   });
   final Widget? openPage;
@@ -37,6 +38,7 @@ class TransactionsAmountBox extends StatelessWidget {
   final bool absolute;
   final bool invertSign;
   final String? currencyKey;
+  final String? actionLabel;
   final Function(double)? getTextColor;
 
   @override
@@ -127,6 +129,29 @@ class TransactionsAmountBox extends StatelessWidget {
                         );
                       },
                     ),
+                    if (actionLabel != null)
+                      Padding(
+                        padding: const EdgeInsetsDirectional.only(top: 10),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            TextFont(
+                              text: actionLabel!,
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              textColor: Theme.of(context).colorScheme.primary,
+                            ),
+                            const SizedBox(width: 4),
+                            Icon(
+                              Directionality.of(context) == TextDirection.rtl
+                                  ? Icons.arrow_back_rounded
+                                  : Icons.arrow_forward_rounded,
+                              size: 16,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ],
+                        ),
+                      ),
                   ],
                 ),
               ),
