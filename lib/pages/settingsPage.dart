@@ -787,6 +787,7 @@ class MoreOptionsPagePreferences extends StatelessWidget {
         LeftHandedSetting(),
         SettingsHeader(title: "transactions".tr()),
         TransactionsSettings(),
+        SelectTransactionTypeBeforeAddingSetting(),
         DefaultTransactionTypeSetting(),
         IncognitoKeyboardSetting(),
         BatterySaverSetting(),
@@ -2263,6 +2264,28 @@ class CountBalanceCorrectionInSummarySetting extends StatelessWidget {
       icon: appStateSettings["outlinedIcons"]
           ? Icons.account_balance_wallet_outlined
           : Icons.account_balance_wallet_rounded,
+    );
+  }
+}
+
+class SelectTransactionTypeBeforeAddingSetting extends StatelessWidget {
+  const SelectTransactionTypeBeforeAddingSetting({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SettingsContainerSwitch(
+      title: "Select Type Before Adding",
+      description:
+          "Show Expense, Income, and Transfer options when pressing the add button",
+      onSwitched: (value) {
+        updateSettings("selectTransactionTypeBeforeAdding", value,
+            updateGlobalState: true);
+      },
+      initialValue:
+          appStateSettings["selectTransactionTypeBeforeAdding"] != false,
+      icon: appStateSettings["outlinedIcons"]
+          ? Icons.call_split_outlined
+          : Icons.call_split_rounded,
     );
   }
 }

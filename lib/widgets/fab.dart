@@ -1,11 +1,14 @@
+import 'package:budget/pages/addTransactionPage.dart';
 import 'package:budget/struct/settings.dart';
 import 'package:budget/widgets/framework/popupFramework.dart';
 import 'package:budget/widgets/navigationFramework.dart';
 import 'package:budget/widgets/openBottomSheet.dart';
 import 'package:budget/widgets/openContainerNavigation.dart';
 import 'package:budget/widgets/outlinedButtonStacked.dart';
+import 'package:budget/widgets/selectTransactionTypeModal.dart';
 import 'package:budget/widgets/tappable.dart';
 import 'package:budget/widgets/textWidgets.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 class AddFAB extends StatelessWidget {
@@ -27,6 +30,21 @@ class AddFAB extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    VoidCallback? effectiveOnTap = onTap;
+    if (effectiveOnTap == null &&
+        openPage is AddTransactionPage &&
+        appStateSettings["selectTransactionTypeBeforeAdding"] != false) {
+      effectiveOnTap = () {
+        openBottomSheet(
+          context,
+          PopupFramework(
+            title: "add-transaction".tr(),
+            child: SelectTransactionTypeModal(openPage: openPage),
+          ),
+        );
+      };
+    }
+
     return FAB(
       colorIcon: colorIcon,
       color: color,
@@ -35,7 +53,7 @@ class AddFAB extends StatelessWidget {
           ? Icons.add_outlined
           : Icons.add_rounded,
       openPage: openPage,
-      onTap: onTap,
+      onTap: effectiveOnTap,
       fabSize: getIsFullScreen(context) == false ? 60 : 70,
       borderRadius: getIsFullScreen(context) == false ? 18 : 22,
       onLongPress: () {

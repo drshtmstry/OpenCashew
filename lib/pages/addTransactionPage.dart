@@ -1034,6 +1034,28 @@ class _AddTransactionPageState extends State<AddTransactionPage>
   // }
 
   Future openTransferBalancePopup() async {
+    AllWallets allWallets = Provider.of<AllWallets>(context, listen: false);
+    if (allWallets.indexedByPk.keys.length < 2) {
+      openPopup(
+        context,
+        icon: appStateSettings["outlinedIcons"]
+            ? Icons.compare_arrows_outlined
+            : Icons.compare_arrows_rounded,
+        title: "transfer".tr(),
+        description: "select-2-different-accounts".tr(),
+        onSubmit: () {
+          popRoute(context);
+          pushRoute(
+            context,
+            AddWalletPage(
+              routesToPopAfterDelete: RoutesToPopAfterDelete.None,
+            ),
+          );
+        },
+        onSubmitLabel: "add-account".tr(),
+      );
+      return;
+    }
     bool? initialIsNegative;
     if (selectedObjectiveLoanPk != null) {
       initialIsNegative = selectedIncome;
@@ -1043,8 +1065,8 @@ class _AddTransactionPageState extends State<AddTransactionPage>
       fullSnap: true,
       TransferBalancePopup(
         allowEditWallet: true,
-        wallet: Provider.of<AllWallets>(context, listen: false)
-            .indexedByPk[appStateSettings["selectedWalletPk"]]!,
+        wallet: allWallets.indexedByPk[appStateSettings["selectedWalletPk"]] ??
+            allWallets.list.firstOrNull,
         showAllEditDetails: true,
         initialAmount: selectedAmount,
         initialDate: selectedDate,
@@ -1763,8 +1785,7 @@ class _AddTransactionPageState extends State<AddTransactionPage>
       ),
     );
 
-    bool enableBalanceTransferTab = widget.transaction == null &&
-        Provider.of<AllWallets>(context).indexedByPk.keys.length > 1;
+    bool enableBalanceTransferTab = widget.transaction == null;
 
     Widget transactionAmountAndCategoryHeader = AnimatedContainer(
       curve: Curves.easeInOut,
