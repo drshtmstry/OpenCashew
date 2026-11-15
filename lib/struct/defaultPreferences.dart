@@ -33,8 +33,19 @@ Future<Map<String, dynamic>> getDefaultPreferences() async {
     "accentSystemColor": await systemColorByDefault(),
     "widgetOpacity": 1,
     "widgetTheme": "system", //system, light, dark
+    "categoryIconPack": 0, //0: default/color, 1: mono, 2: outlined
+    "fontScale": 1.0, //0.8 to 1.4
+    "leftHandedNavbar": false,
+    "leftHandedTabBar": false,
+    "leftHandedFAB": false,
+    "dateFormat": "full", //full, ddmmyyyy, mmddyyyy, yyyymmdd
+    "datePickerType": 0, //0: calendar, 1: wheel
+    "timePickerType": 0, //0: clock, 1: wheel
+    "defaultTransactionType": "expense", //expense, income
+    "linearProgressBarStyle": 0, //0: simple/flat, 1: wavy
+    "scrollBehavior": "default", //default, bouncing, clamping
     "nonCompactTransactions":
-        false, //still in testing, declares a new transaction layout to show more information in lists
+        false, //declares a new transaction layout to show more information in lists
     "fadeTransactionNameOverflows":
         false, //still in testing, overflow transaction titles use fade instead of "..."
     "circularProgressRotation":
@@ -49,15 +60,15 @@ Future<Map<String, dynamic>> getDefaultPreferences() async {
     "showWalletListFullScreen": false,
     "showPinnedBudgets": true,
     "showPinnedBudgetsFullScreen": true,
-    "showObjectives": false,
+    "showObjectives": true,
     "showObjectivesFullScreen": true,
-    "showAllSpendingSummary": false,
+    "showAllSpendingSummary": true,
     "showAllSpendingSummaryFullScreen": false,
-    "showNetWorth": false,
+    "showNetWorth": true,
     "showNetWorthFullScreen": false,
-    "showOverdueUpcoming": false,
+    "showOverdueUpcoming": true,
     "showOverdueUpcomingFullScreen": true,
-    "showObjectiveLoans": false,
+    "showObjectiveLoans": true,
     "showObjectiveLoansFullScreen": true,
     "showCreditDebt": false,
     "showCreditDebtFullScreen": true,

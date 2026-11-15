@@ -170,185 +170,259 @@ class MorePages extends StatelessWidget {
                 ),
               ],
             ),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Expanded(
-              //   child: Padding(
-              //     padding: EdgeInsetsDirectional.symmetric(vertical: 5, horizontal: 4),
-              //     child: SettingsContainer(
-              //       onTap: () {
-              //         openUrl("https://github.com/jameskokoska/Cashew");
-              //       },
-              //       title: "open-source".tr(),
-              //       icon: MoreIcons.github,
-              //       isOutlined: true,
-              //     ),
-              //   ),
-              // ),
-              Expanded(
-                child: SettingsContainerOpenPage(
-                  openPage: AboutPage(),
-                  title: "about-app".tr(namedArgs: {"app": globalAppName}),
-                  icon: navBarIconsData["about"]!.iconData,
-                  isOutlined: true,
-                ),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: EdgeInsetsDirectional.symmetric(
-                      vertical: 5, horizontal: 4),
-                  child: SettingsContainer(
-                    onTap: () {
-                      openBottomSheet(context, RatingPopup(), fullSnap: true);
-                    },
-                    title: "feedback".tr(),
-                    icon: appStateSettings["outlinedIcons"]
-                        ? Icons.rate_review_outlined
-                        : Icons.rate_review_rounded,
-                    isOutlined: true,
+            if (hasSideNavigation == false) ...[
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Expanded(
+                    child: SettingsContainerOpenPage(
+                      openPage: AboutPage(),
+                      title: "about-app".tr(namedArgs: {"app": globalAppName}),
+                      icon: navBarIconsData["about"]!.iconData,
+                      isOutlined: true,
+                    ),
                   ),
-                ),
-              ),
-            ],
-          ),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              appStateSettings["showBillSplitterShortcut"] == true &&
-                      hasSideNavigation == false
-                  ? Expanded(
-                      child: SettingsContainerOpenPage(
-                        openPage: BillSplitter(),
-                        title: "bill-splitter".tr(),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsetsDirectional.symmetric(
+                          vertical: 5, horizontal: 4),
+                      child: SettingsContainer(
+                        onTap: () {
+                          openBottomSheet(context, RatingPopup(), fullSnap: true);
+                        },
+                        title: "feedback".tr(),
                         icon: appStateSettings["outlinedIcons"]
-                            ? Icons.summarize_outlined
-                            : Icons.summarize_rounded,
+                            ? Icons.rate_review_outlined
+                            : Icons.rate_review_rounded,
                         isOutlined: true,
                       ),
-                    )
-                  : notificationsGlobalEnabled
-                      ? Expanded(
-                          child: SettingsContainerOpenPage(
-                            openPage: NotificationsPage(),
-                            title: navBarIconsData["notifications"]!.label.tr(),
-                            icon: navBarIconsData["notifications"]!.iconData,
-                            isOutlined: true,
-                          ),
-                        )
-                      : SizedBox.shrink(),
-              if (hasSideNavigation == false)
-                Expanded(
-                    child: GoogleAccountLoginButton(
-                  key: settingsGoogleAccountLoginButtonKey,
-                )),
-            ],
-          ),
-          if (hasSideNavigation == false)
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Expanded(
-                  child: SettingsContainerOpenPage(
-                    openPage: SubscriptionsPage(),
-                    title: navBarIconsData["subscriptions"]!.label.tr(),
-                    icon: navBarIconsData["subscriptions"]!.iconData,
-                    isOutlined: true,
-                  ),
-                ),
-                Expanded(
-                  child: SettingsContainerOpenPage(
-                    openPage:
-                        UpcomingOverdueTransactions(overdueTransactions: null),
-                    title: navBarIconsData["scheduled"]!.label.tr(),
-                    icon: navBarIconsData["scheduled"]!.iconData,
-                    isOutlined: true,
-                  ),
-                ),
-              ],
-            ),
-          if (hasSideNavigation == false)
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Expanded(
-                  child: SettingsContainerOpenPage(
-                    openPage: ObjectivesListPage(
-                      backButton: true,
                     ),
-                    title: navBarIconsData["goals"]!.label.tr(),
-                    icon: navBarIconsData["goals"]!.iconData,
-                    isOutlined: true,
                   ),
-                ),
-                Expanded(
-                  child: SettingsContainerOpenPage(
-                    openPage: CreditDebtTransactions(isCredit: null),
-                    title: navBarIconsData["loans"]!.label.tr(),
-                    icon: navBarIconsData["loans"]!.iconData,
-                    isOutlined: true,
+                ],
+              ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsetsDirectional.symmetric(
+                          vertical: 5, horizontal: 4),
+                      child: SettingsContainer(
+                        onTap: () {
+                          openUrl("https://cashewapp.web.app/faq.html");
+                        },
+                        title: "faq".tr() != "faq" ? "faq".tr() : "Guide / FAQ",
+                        icon: appStateSettings["outlinedIcons"]
+                            ? Icons.live_help_outlined
+                            : Icons.live_help_rounded,
+                        isOutlined: true,
+                      ),
+                    ),
                   ),
-                ),
-              ],
-            ),
-          if (hasSideNavigation == false)
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Expanded(
-                  flex: 1,
-                  child: SettingsContainerOpenPage(
-                    isOutlinedColumn: true,
-                    openPage: EditWalletsPage(),
-                    title: navBarIconsData["accountDetails"]!.label.tr(),
-                    icon: navBarIconsData["accountDetails"]!.iconData,
-                    isOutlined: true,
+                  Expanded(
+                    child: GoogleAccountLoginButton(
+                      key: settingsGoogleAccountLoginButtonKey,
+                    ),
                   ),
-                ),
-                Expanded(
-                  flex: 1,
-                  child: SettingsContainerOpenPage(
-                    isOutlinedColumn: true,
-                    // If budget page not pinned to home, open budget list page
-                    openPage: appStateSettings["customNavBarShortcut0"] !=
-                                "budgets" &&
-                            appStateSettings["customNavBarShortcut1"] !=
-                                "budgets" &&
-                            appStateSettings["customNavBarShortcut2"] !=
-                                "budgets"
-                        ? BudgetsListPage(enableBackButton: true)
-                        : EditBudgetPage(),
-                    title: navBarIconsData["budgetDetails"]!.label.tr(),
-                    icon: navBarIconsData["budgetDetails"]!.iconData,
-                    iconScale: navBarIconsData["budgetDetails"]!.iconScale,
-                    isOutlined: true,
+                ],
+              ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Expanded(
+                    child: SettingsContainerOpenPage(
+                      openPage: SubscriptionsPage(),
+                      title: navBarIconsData["subscriptions"]!.label.tr(),
+                      icon: navBarIconsData["subscriptions"]!.iconData,
+                      isOutlined: true,
+                    ),
                   ),
-                ),
-                Expanded(
-                  flex: 1,
-                  child: SettingsContainerOpenPage(
-                    isOutlinedColumn: true,
-                    openPage: EditCategoriesPage(),
-                    title: navBarIconsData["categoriesDetails"]!.label.tr(),
-                    icon: navBarIconsData["categoriesDetails"]!.iconData,
-                    isOutlined: true,
+                  Expanded(
+                    child: SettingsContainerOpenPage(
+                      openPage:
+                          UpcomingOverdueTransactions(overdueTransactions: null),
+                      title: navBarIconsData["scheduled"]!.label.tr(),
+                      icon: navBarIconsData["scheduled"]!.iconData,
+                      isOutlined: true,
+                    ),
                   ),
-                ),
-                Expanded(
-                  flex: 1,
-                  child: SettingsContainerOpenPage(
-                    isOutlinedColumn: true,
-                    openPage: EditAssociatedTitlesPage(),
-                    title: navBarIconsData["titlesDetails"]!.label.tr(),
-                    icon: navBarIconsData["titlesDetails"]!.iconData,
-                    isOutlined: true,
+                ],
+              ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Expanded(
+                    child: SettingsContainerOpenPage(
+                      openPage: ObjectivesListPage(
+                        backButton: true,
+                      ),
+                      title: navBarIconsData["goals"]!.label.tr(),
+                      icon: navBarIconsData["goals"]!.iconData,
+                      isOutlined: true,
+                    ),
                   ),
-                )
-              ],
-            ),
-          if (hasSideNavigation) SettingsPageContent(),
+                  Expanded(
+                    child: SettingsContainerOpenPage(
+                      openPage: CreditDebtTransactions(isCredit: null),
+                      title: navBarIconsData["loans"]!.label.tr(),
+                      icon: navBarIconsData["loans"]!.iconData,
+                      isOutlined: true,
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Expanded(
+                    child: SettingsContainerOpenPage(
+                      openPage: ActivityPage(),
+                      title: "activity-log".tr() != "activity-log"
+                          ? "activity-log".tr()
+                          : "Activity Log",
+                      icon: appStateSettings["outlinedIcons"]
+                          ? Icons.ballot_outlined
+                          : Icons.ballot_rounded,
+                      isOutlined: true,
+                    ),
+                  ),
+                  Expanded(
+                    child: SettingsContainerOpenPage(
+                      openPage: BillSplitter(),
+                      title: "bill-splitter".tr(),
+                      icon: appStateSettings["outlinedIcons"]
+                          ? Icons.summarize_outlined
+                          : Icons.summarize_rounded,
+                      isOutlined: true,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 5),
+              const EditDataGrid(),
+            ],
+            if (hasSideNavigation) SettingsPageContent(),
         ],
       ),
+    );
+  }
+}
+
+class EditDataGrid extends StatelessWidget {
+  const EditDataGrid({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsetsDirectional.only(
+            start: 14,
+            end: 14,
+            top: 14,
+            bottom: 6,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextFont(
+                text: "edit-delete-and-reorder-data".tr() !=
+                        "edit-delete-and-reorder-data"
+                    ? "edit-delete-and-reorder-data".tr()
+                    : "Edit, Delete, and Reorder Data",
+                fontSize: 17,
+                fontWeight: FontWeight.bold,
+              ),
+              const SizedBox(height: 2),
+              TextFont(
+                text: "edit-delete-and-reorder-data-description".tr() !=
+                        "edit-delete-and-reorder-data-description"
+                    ? "edit-delete-and-reorder-data-description".tr()
+                    : "For accounts, categories, titles, budgets, goals, loans",
+                fontSize: 13,
+                maxLines: 2,
+                textColor:
+                    Theme.of(context).colorScheme.secondary.withOpacity(0.6),
+              ),
+            ],
+          ),
+        ),
+        Row(
+          children: [
+            Expanded(
+              child: SettingsContainerOpenPage(
+                isOutlinedColumn: true,
+                openPage: EditWalletsPage(),
+                title: navBarIconsData["accountDetails"]!.label.tr(),
+                icon: navBarIconsData["accountDetails"]!.iconData,
+                isOutlined: true,
+              ),
+            ),
+            Expanded(
+              child: SettingsContainerOpenPage(
+                isOutlinedColumn: true,
+                openPage: EditCategoriesPage(),
+                title: navBarIconsData["categoriesDetails"]!.label.tr(),
+                icon: navBarIconsData["categoriesDetails"]!.iconData,
+                isOutlined: true,
+              ),
+            ),
+            Expanded(
+              child: SettingsContainerOpenPage(
+                isOutlinedColumn: true,
+                openPage: EditAssociatedTitlesPage(),
+                title: navBarIconsData["titlesDetails"]!.label.tr(),
+                icon: navBarIconsData["titlesDetails"]!.iconData,
+                isOutlined: true,
+              ),
+            ),
+          ],
+        ),
+        Row(
+          children: [
+            Expanded(
+              child: SettingsContainerOpenPage(
+                isOutlinedColumn: true,
+                openPage: appStateSettings["customNavBarShortcut0"] !=
+                            "budgets" &&
+                        appStateSettings["customNavBarShortcut1"] !=
+                            "budgets" &&
+                        appStateSettings["customNavBarShortcut2"] !=
+                            "budgets"
+                    ? BudgetsListPage(enableBackButton: true)
+                    : EditBudgetPage(),
+                title: navBarIconsData["budgetDetails"]!.label.tr(),
+                icon: navBarIconsData["budgetDetails"]!.iconData,
+                iconScale: navBarIconsData["budgetDetails"]!.iconScale,
+                isOutlined: true,
+              ),
+            ),
+            Expanded(
+              child: SettingsContainerOpenPage(
+                isOutlinedColumn: true,
+                openPage: EditObjectivesPage(
+                  objectiveType: ObjectiveType.goal,
+                ),
+                title: navBarIconsData["goals"]!.label.tr(),
+                icon: navBarIconsData["goals"]!.iconData,
+                isOutlined: true,
+              ),
+            ),
+            Expanded(
+              child: SettingsContainerOpenPage(
+                isOutlinedColumn: true,
+                openPage: EditObjectivesPage(
+                  objectiveType: ObjectiveType.loan,
+                ),
+                title: navBarIconsData["loans"]!.label.tr(),
+                icon: navBarIconsData["loans"]!.iconData,
+                isOutlined: true,
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }
@@ -594,6 +668,8 @@ class SettingsPageContent extends StatelessWidget {
               : Icons.summarize_rounded,
         ),
 
+        BillSplitterShortcutSetting(),
+
         SettingsContainerOpenPage(
           openPage: EditTagsPage(),
           title:
@@ -699,15 +775,25 @@ class MoreOptionsPagePreferences extends StatelessWidget {
         SettingsHeader(title: "style".tr()),
         HeaderHeightSetting(),
         OutlinedIconsSetting(),
+        CategoryIconPackSetting(),
         FontPickerSetting(),
+        FontScaleSetting(),
+        LinearProgressBarStyleSetting(),
         AppAnimationSetting(),
         CountingNumberAnimationSetting(),
         IncreaseTextContrastSetting(),
+        NonCompactTransactionsSetting(),
+        ScrollBehaviorSetting(),
+        LeftHandedSetting(),
         SettingsHeader(title: "transactions".tr()),
         TransactionsSettings(),
+        DefaultTransactionTypeSetting(),
+        IncognitoKeyboardSetting(),
+        BatterySaverSetting(),
         SettingsHeader(title: "accounts".tr()),
         WalletsSettings(),
         PrimaryCurrencySetting(),
+        LongTermLoansDifferenceSetting(),
         SettingsHeader(title: "budgets".tr()),
         BudgetSettings(),
         SettingsHeader(title: "goals".tr()),
@@ -720,6 +806,7 @@ class MoreOptionsPagePreferences extends StatelessWidget {
         NumberFormattingSetting(),
         PercentagePrecisionSetting(),
         Time24HourFormatSetting(),
+        DateFormatSetting(),
         FirstDayOfWeekSetting(updateHomePage: true),
         NumberPadFormatSetting(),
       ],
@@ -1823,4 +1910,337 @@ List<String> getWeekdayNames() {
   }
 
   return localizedWeekdayNames;
+}
+
+class CategoryIconPackSetting extends StatelessWidget {
+  const CategoryIconPackSetting({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SettingsContainerDropdown(
+      title: "category-icon-pack".tr() != "category-icon-pack"
+          ? "category-icon-pack".tr()
+          : "Category Icon Pack",
+      icon: appStateSettings["outlinedIcons"]
+          ? Icons.collections_outlined
+          : Icons.collections_rounded,
+      initial: (appStateSettings["categoryIconPack"] ?? 0).toString(),
+      items: ["0", "1", "2"],
+      onChanged: (value) async {
+        int intValue = int.tryParse(value) ?? 0;
+        await updateSettings(
+          "categoryIconPack",
+          intValue,
+          updateGlobalState: true,
+          pagesNeedingRefresh: [0, 1, 2, 3],
+        );
+      },
+      getLabel: (item) {
+        if (item == "0") return "Default (Color)";
+        if (item == "1") return "Monochrome";
+        if (item == "2") return "Outlined";
+        return item;
+      },
+    );
+  }
+}
+
+class FontScaleSetting extends StatelessWidget {
+  const FontScaleSetting({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    double currentScale = (appStateSettings["fontScale"] ?? 1.0).toDouble();
+    return SettingsContainer(
+      title: "font-scale".tr() != "font-scale"
+          ? "font-scale".tr()
+          : "Font Scale",
+      description: "${(currentScale * 100).toInt()}%",
+      icon: appStateSettings["outlinedIcons"]
+          ? Icons.format_size_outlined
+          : Icons.format_size_rounded,
+      afterWidget: SizedBox(
+        width: 150,
+        child: Slider(
+          value: currentScale.clamp(0.8, 1.4),
+          min: 0.8,
+          max: 1.4,
+          divisions: 6,
+          label: "${(currentScale * 100).toInt()}%",
+          onChanged: (value) async {
+            await updateSettings(
+              "fontScale",
+              double.parse(value.toStringAsFixed(2)),
+              updateGlobalState: true,
+              pagesNeedingRefresh: [0, 1, 2, 3],
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class LeftHandedSetting extends StatelessWidget {
+  const LeftHandedSetting({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SettingsContainerSwitch(
+      title: "left-handed-access".tr() != "left-handed-access"
+          ? "left-handed-access".tr()
+          : "Left-Handed Access",
+      description: "left-handed-access-description".tr() !=
+              "left-handed-access-description"
+          ? "left-handed-access-description".tr()
+          : "Position action buttons for left-hand thumb reach",
+      onSwitched: (value) async {
+        await updateSettings("leftHandedFAB", value, updateGlobalState: true);
+        await updateSettings("leftHandedNavbar", value,
+            updateGlobalState: true, pagesNeedingRefresh: [0, 1, 2, 3]);
+      },
+      initialValue: appStateSettings["leftHandedFAB"] == true,
+      icon: appStateSettings["outlinedIcons"]
+          ? Icons.front_hand_outlined
+          : Icons.front_hand_rounded,
+    );
+  }
+}
+
+class DateFormatSetting extends StatelessWidget {
+  const DateFormatSetting({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SettingsContainerDropdown(
+      title: "date-format".tr() != "date-format"
+          ? "date-format".tr()
+          : "Date Format",
+      icon: appStateSettings["outlinedIcons"]
+          ? Icons.event_outlined
+          : Icons.event_rounded,
+      initial: appStateSettings["dateFormat"]?.toString() ?? "full",
+      items: ["full", "ddmmyyyy", "mmddyyyy", "yyyymmdd"],
+      onChanged: (value) async {
+        await updateSettings("dateFormat", value,
+            updateGlobalState: true, pagesNeedingRefresh: [0, 1, 2, 3]);
+      },
+      getLabel: (item) {
+        if (item == "full") return "System Default (Locale)";
+        if (item == "ddmmyyyy") return "DD/MM/YYYY (31/12/2026)";
+        if (item == "mmddyyyy") return "MM/DD/YYYY (12/31/2026)";
+        if (item == "yyyymmdd") return "YYYY-MM-DD (2026-12-31)";
+        return item;
+      },
+    );
+  }
+}
+
+class DefaultTransactionTypeSetting extends StatelessWidget {
+  const DefaultTransactionTypeSetting({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SettingsContainerDropdown(
+      title: "default-transaction-type".tr() != "default-transaction-type"
+          ? "default-transaction-type".tr()
+          : "Default Transaction Type",
+      icon: appStateSettings["outlinedIcons"]
+          ? Icons.swap_horiz_outlined
+          : Icons.swap_horiz_rounded,
+      initial:
+          appStateSettings["defaultTransactionType"]?.toString() ?? "expense",
+      items: ["expense", "income"],
+      onChanged: (value) async {
+        await updateSettings("defaultTransactionType", value,
+            updateGlobalState: true);
+      },
+      getLabel: (item) {
+        if (item == "expense") return "expense".tr().capitalizeFirst;
+        if (item == "income") return "income".tr().capitalizeFirst;
+        return item;
+      },
+    );
+  }
+}
+
+class LinearProgressBarStyleSetting extends StatelessWidget {
+  const LinearProgressBarStyleSetting({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SettingsContainerDropdown(
+      title: "progress-bar-style".tr() != "progress-bar-style"
+          ? "progress-bar-style".tr()
+          : "Progress Bar Style",
+      icon: appStateSettings["outlinedIcons"]
+          ? Icons.linear_scale_outlined
+          : Icons.linear_scale_rounded,
+      initial: (appStateSettings["linearProgressBarStyle"] ?? 0).toString(),
+      items: ["0", "1"],
+      onChanged: (value) async {
+        int intValue = int.tryParse(value) ?? 0;
+        await updateSettings("linearProgressBarStyle", intValue,
+            updateGlobalState: true, pagesNeedingRefresh: [0, 1, 2, 3]);
+      },
+      getLabel: (item) {
+        if (item == "0") return "Simple (Flat)";
+        if (item == "1") return "Wavy (Modern)";
+        return item;
+      },
+    );
+  }
+}
+
+class NonCompactTransactionsSetting extends StatelessWidget {
+  const NonCompactTransactionsSetting({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SettingsContainerSwitch(
+      title: "large-transaction-entry".tr() != "large-transaction-entry"
+          ? "large-transaction-entry".tr()
+          : "Large Transaction Entry",
+      description: "show-more-info-transaction-entry".tr() !=
+              "show-more-info-transaction-entry"
+          ? "show-more-info-transaction-entry".tr()
+          : "Show more information in a transaction entry",
+      onSwitched: (value) {
+        updateSettings("nonCompactTransactions", value,
+            updateGlobalState: true, pagesNeedingRefresh: [0, 1, 2, 3]);
+      },
+      initialValue: appStateSettings["nonCompactTransactions"] == true,
+      icon: appStateSettings["outlinedIcons"]
+          ? Icons.view_agenda_outlined
+          : Icons.view_agenda_rounded,
+    );
+  }
+}
+
+class ScrollBehaviorSetting extends StatelessWidget {
+  const ScrollBehaviorSetting({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SettingsContainerDropdown(
+      title: "scroll-behavior".tr() != "scroll-behavior"
+          ? "scroll-behavior".tr()
+          : "Scroll Behavior",
+      icon: appStateSettings["outlinedIcons"]
+          ? Icons.swap_vert_outlined
+          : Icons.swap_vert_rounded,
+      initial: appStateSettings["scrollBehavior"]?.toString() ?? "default",
+      items: ["default", "bouncing", "clamping"],
+      onChanged: (value) async {
+        await updateSettings("scrollBehavior", value,
+            updateGlobalState: true, pagesNeedingRefresh: [0, 1, 2, 3]);
+      },
+      getLabel: (item) {
+        if (item == "default") return "System Default";
+        if (item == "bouncing") return "Bouncing (iOS Style)";
+        if (item == "clamping") return "Clamping (Android Style)";
+        return item;
+      },
+    );
+  }
+}
+
+class BatterySaverSetting extends StatelessWidget {
+  const BatterySaverSetting({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SettingsContainerSwitch(
+      title: "battery-saver".tr() != "battery-saver"
+          ? "battery-saver".tr()
+          : "Battery Saver",
+      description: "battery-saver-description".tr() !=
+              "battery-saver-description"
+          ? "battery-saver-description".tr()
+          : "Reduce animations and shadows to save battery",
+      onSwitched: (value) {
+        updateSettings("batterySaver", value,
+            updateGlobalState: true, pagesNeedingRefresh: [0, 1, 2, 3]);
+      },
+      initialValue: appStateSettings["batterySaver"] == true,
+      icon: appStateSettings["outlinedIcons"]
+          ? Icons.battery_saver_outlined
+          : Icons.battery_saver_rounded,
+    );
+  }
+}
+
+class IncognitoKeyboardSetting extends StatelessWidget {
+  const IncognitoKeyboardSetting({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SettingsContainerSwitch(
+      title: "incognito-keyboard".tr() != "incognito-keyboard"
+          ? "incognito-keyboard".tr()
+          : "Incognito Keyboard",
+      description: "incognito-keyboard-description".tr() !=
+              "incognito-keyboard-description"
+          ? "incognito-keyboard-description".tr()
+          : "Request keyboard to disable personalized learning",
+      onSwitched: (value) {
+        updateSettings("incognitoKeyboard", value,
+            updateGlobalState: true);
+      },
+      initialValue: appStateSettings["incognitoKeyboard"] == true,
+      icon: appStateSettings["outlinedIcons"]
+          ? Icons.keyboard_hide_outlined
+          : Icons.keyboard_hide_rounded,
+    );
+  }
+}
+
+class BillSplitterShortcutSetting extends StatelessWidget {
+  const BillSplitterShortcutSetting({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SettingsContainerSwitch(
+      title: "bill-splitter-shortcut".tr() != "bill-splitter-shortcut"
+          ? "bill-splitter-shortcut".tr()
+          : "Bill Splitter Shortcut",
+      description: "show-bill-splitter-shortcut-description".tr() !=
+              "show-bill-splitter-shortcut-description"
+          ? "show-bill-splitter-shortcut-description".tr()
+          : "Show Bill Splitter in the quick actions menu",
+      onSwitched: (value) {
+        updateSettings("showBillSplitterShortcut", value,
+            updateGlobalState: true, pagesNeedingRefresh: [0, 1, 2, 3]);
+      },
+      initialValue: appStateSettings["showBillSplitterShortcut"] == true,
+      icon: appStateSettings["outlinedIcons"]
+          ? Icons.summarize_outlined
+          : Icons.summarize_rounded,
+    );
+  }
+}
+
+class LongTermLoansDifferenceSetting extends StatelessWidget {
+  const LongTermLoansDifferenceSetting({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SettingsContainerSwitch(
+      title: "loan-difference-tracking".tr() != "loan-difference-tracking"
+          ? "loan-difference-tracking".tr()
+          : "Loan Difference Tracking",
+      description: "loan-difference-tracking-description".tr() !=
+              "loan-difference-tracking-description"
+          ? "loan-difference-tracking-description".tr()
+          : "Track offset and difference between lent and borrowed totals",
+      onSwitched: (value) {
+        updateSettings("longTermLoansDifferenceFeature", value,
+            updateGlobalState: true, pagesNeedingRefresh: [0, 1, 2, 3]);
+      },
+      initialValue: appStateSettings["longTermLoansDifferenceFeature"] == true,
+      icon: appStateSettings["outlinedIcons"]
+          ? Icons.compare_arrows_outlined
+          : Icons.compare_arrows_rounded,
+    );
+  }
 }

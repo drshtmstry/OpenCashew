@@ -723,14 +723,18 @@ class PageFrameworkState extends State<PageFramework>
         children: [
           dragDownToDismissScaffold ?? scaffold,
           Align(
-            alignment: AlignmentDirectional.bottomEnd,
+            alignment: appStateSettings["leftHandedFAB"] == true
+                ? AlignmentDirectional.bottomStart
+                : AlignmentDirectional.bottomEnd,
             child: Padding(
               padding: EdgeInsetsDirectional.only(
                   bottom: getBottomInsetOfFAB(context), end: 15, start: 15),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.end,
-                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisAlignment: appStateSettings["leftHandedFAB"] == true
+                    ? MainAxisAlignment.start
+                    : MainAxisAlignment.end,
                 children: [
                   widget.scrollToBottomButton && widget.scrollToTopButton
                       ? scrollToTopBottomButton

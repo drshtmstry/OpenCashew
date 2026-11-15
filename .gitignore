@@ -9,6 +9,7 @@ Thumbs.db
 .buildlog/
 .history
 .svn/
+refs/
 
 # IntelliJ related
 *.iml

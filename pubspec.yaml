@@ -135,11 +135,14 @@ flutter:
   assets:
     - assets/fonts/
     - assets/categories/
+    - assets/categories-mono/
+    - assets/categories-outlined/
     - assets/icon/
     - assets/landing/
     - assets/images/
     - assets/static/
     - assets/icons/fun/
+    - assets/icons/intelligence/
     - assets/translations/generated/
     - assets/static/generated/
     - assets/static/generated/currencies.json

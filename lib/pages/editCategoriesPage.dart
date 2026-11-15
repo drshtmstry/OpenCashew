@@ -5,6 +5,7 @@ import 'package:budget/colors.dart';
 import 'package:budget/database/tables.dart';
 import 'package:budget/functions.dart';
 import 'package:budget/pages/addCategoryPage.dart';
+import 'package:budget/pages/settingsPage.dart';
 import 'package:budget/struct/databaseGlobal.dart';
 import 'package:budget/struct/settings.dart';
 import 'package:budget/widgets/categoryIcon.dart';
@@ -95,17 +96,17 @@ class _EditCategoriesPageState extends State<EditCategoriesPage> {
                   ),
                 ),
               ),
-              // DropdownItemMenu(
-              //   id: "settings",
-              //   label: "settings".tr(),
-              //   icon: appStateSettings["outlinedIcons"]
-              //       ? Icons.more_vert_outlined
-              //       : Icons.more_vert_rounded,
-              //   action: () => openBottomSheet(
-              //     context,
-              //     PopupFramework(hasPadding: false, child: CategorySettings()),
-              //   ),
-              // ),
+              DropdownItemMenu(
+                id: "settings",
+                label: "settings".tr(),
+                icon: appStateSettings["outlinedIcons"]
+                    ? Icons.more_vert_outlined
+                    : Icons.more_vert_rounded,
+                action: () => openBottomSheet(
+                  context,
+                  PopupFramework(hasPadding: false, child: CategorySettings()),
+                ),
+              ),
             ],
           ),
         ],
@@ -850,7 +851,9 @@ class CategorySettings extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //return CategoryIconPackSelection();
-    return SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsetsDirectional.all(12.0),
+      child: CategoryIconPackSetting(),
+    );
   }
 }

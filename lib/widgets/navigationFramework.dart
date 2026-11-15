@@ -505,11 +505,14 @@ class PageNavigationFrameworkState extends State<PageNavigationFramework> {
         ),
       ),
       Align(
-        alignment: AlignmentDirectional.bottomEnd,
+        alignment: appStateSettings["leftHandedFAB"] == true
+            ? AlignmentDirectional.bottomStart
+            : AlignmentDirectional.bottomEnd,
         child: Padding(
           padding: EdgeInsetsDirectional.only(
             bottom: getHeightNavigationSidebar(context) + 15,
-            end: 15,
+            end: appStateSettings["leftHandedFAB"] == true ? 0 : 15,
+            start: appStateSettings["leftHandedFAB"] == true ? 15 : 0,
           ),
           child: AnimateFAB(
             key: ValueKey(1),

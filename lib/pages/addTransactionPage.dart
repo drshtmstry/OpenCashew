@@ -458,12 +458,11 @@ class _AddTransactionPageState extends State<AddTransactionPage>
       if (selectedTitle != null &&
           selectedCategory != null &&
           selectedTitle != "") {
-        // if (selectedSubCategory != null) {
-        //   await addAssociatedTitles(selectedTitle!, selectedSubCategory!);
-        // } else {
-        //   await addAssociatedTitles(selectedTitle!, selectedCategory!);
-        // }
-        await addAssociatedTitles(selectedTitle!, selectedCategory!);
+        if (selectedSubCategory != null) {
+          await addAssociatedTitles(selectedTitle!, selectedSubCategory!);
+        } else {
+          await addAssociatedTitles(selectedTitle!, selectedCategory!);
+        }
       }
 
       Transaction createdTransaction = await createTransaction();
@@ -792,6 +791,11 @@ class _AddTransactionPageState extends State<AddTransactionPage>
         updateInitial();
       });
     } else {
+      if (widget.selectedIncome != null) {
+        selectedIncome = widget.selectedIncome!;
+      } else if (appStateSettings["defaultTransactionType"] == "income") {
+        selectedIncome = true;
+      }
       if (widget.selectedType != null) {
         setSelectedType(transactionTypeDisplayToEnum[widget.selectedType]);
       }
@@ -2493,13 +2497,16 @@ class SelectTitle extends StatefulWidget {
 class _SelectTitleState extends State<SelectTitle> {
   int selectedIndex = 0;
   String selectedText = "";
-  TransactionAssociatedTitleWithCategory? selectedAssociatedTitle;
+  List<TransactionAssociatedTitleWithCategory> selectedAssociatedTitles = [];
+  TransactionAssociatedTitleWithCategory? get selectedAssociatedTitle =>
+      selectedAssociatedTitles.firstOrNull;
   DateTime selectedDateTime = DateTime.now();
   bool customDateTimeSelected = false;
-  bool get foundFromCategory {
-    return selectedAssociatedTitle?.type == TitleType.CategoryName ||
-        selectedAssociatedTitle?.type == TitleType.SubCategoryName;
+  bool isFoundFromCategory(TransactionAssociatedTitleWithCategory? item) {
+    return item?.type == TitleType.CategoryName ||
+        item?.type == TitleType.SubCategoryName;
   }
+  bool get foundFromCategory => isFoundFromCategory(selectedAssociatedTitle);
 
   FocusNode enterTitleFocus = FocusNode();
 
@@ -2519,21 +2526,23 @@ class _SelectTitleState extends State<SelectTitle> {
     super.initState();
   }
 
-  void selectTitle() async {
-    if (selectedAssociatedTitle?.category != null) {
-      if (selectedAssociatedTitle?.type == TitleType.SubCategoryName ||
-          selectedAssociatedTitle?.category.mainCategoryPk != null) {
-        if (selectedAssociatedTitle!.category.mainCategoryPk != null) {
+  void selectTitle([TransactionAssociatedTitleWithCategory? chosenTitle]) async {
+    TransactionAssociatedTitleWithCategory? item =
+        chosenTitle ?? selectedAssociatedTitle;
+    if (item?.category != null) {
+      if (item?.type == TitleType.SubCategoryName ||
+          item?.category.mainCategoryPk != null) {
+        if (item!.category.mainCategoryPk != null) {
           widget.setSelectedCategory(await database.getCategoryInstance(
-              selectedAssociatedTitle!.category.mainCategoryPk!));
-          widget.setSelectedSubCategory(selectedAssociatedTitle!.category);
+              item.category.mainCategoryPk!));
+          widget.setSelectedSubCategory(item.category);
         }
       } else {
-        widget.setSelectedCategory(selectedAssociatedTitle!.category);
+        widget.setSelectedCategory(item!.category);
       }
 
-      if (foundFromCategory == false)
-        widget.setSelectedTitle(selectedAssociatedTitle?.title.title ?? "");
+      if (!isFoundFromCategory(item))
+        widget.setSelectedTitle(item.title.title);
       else
         widget.setSelectedTitle("");
     }
@@ -2546,7 +2555,7 @@ class _SelectTitleState extends State<SelectTitle> {
 
   void resetTitleSearch() {
     setState(() {
-      selectedAssociatedTitle = null;
+      selectedAssociatedTitles = [];
     });
     // Update the size of the bottom sheet
     Future.delayed(Duration(milliseconds: 300), () {
@@ -2630,7 +2639,9 @@ class _SelectTitleState extends State<SelectTitle> {
                     initialValue: widget.selectedTitle,
                     autoFocus: true,
                     focusNode: enterTitleFocus,
-                    onEditingComplete: selectTitle,
+                    onEditingComplete: () {
+                      selectTitle();
+                    },
                     onChanged: (text) async {
                       selectedText = text;
                       widget.setSelectedTitle(text.trim());
@@ -2640,19 +2651,20 @@ class _SelectTitleState extends State<SelectTitle> {
                         return;
                       }
 
-                      TransactionAssociatedTitleWithCategory?
-                          selectedTitleLocal =
-                          (await database.getSimilarAssociatedTitles(
-                                  title: text, limit: 1))
-                              .firstOrNull;
+                      List<TransactionAssociatedTitleWithCategory>
+                          selectedTitlesLocal =
+                          await database.getSimilarAssociatedTitles(
+                        title: text,
+                        limit: 4,
+                      );
 
-                      if (selectedTitleLocal != null) {
+                      if (selectedTitlesLocal.isNotEmpty) {
                         // Update the size of the bottom sheet
                         Future.delayed(Duration(milliseconds: 100), () {
                           bottomSheetControllerGlobal.snapToExtent(0);
                         });
                         setState(() {
-                          selectedAssociatedTitle = selectedTitleLocal;
+                          selectedAssociatedTitles = selectedTitlesLocal;
                         });
                       } else {
                         resetTitleSearch();
@@ -2664,65 +2676,92 @@ class _SelectTitleState extends State<SelectTitle> {
                   AnimatedSizeSwitcher(
                     sizeDuration: Duration(milliseconds: 400),
                     sizeCurve: Curves.easeInOut,
-                    child: selectedAssociatedTitle == null
+                    child: selectedAssociatedTitles.isEmpty
                         ? Container(
                             key: ValueKey(0),
                           )
                         : Container(
-                            key: ValueKey(
-                                selectedAssociatedTitle?.category.categoryPk),
-                            padding: EdgeInsetsDirectional.only(top: 13),
-                            child: Tappable(
-                              borderRadius: 15,
-                              color: Colors.transparent,
-                              onTap: () {
-                                selectTitle();
-                              },
-                              child: Row(
-                                children: [
-                                  CategoryIcon(
-                                    categoryPk: "-1",
-                                    size: 40,
-                                    category: selectedAssociatedTitle?.category,
-                                    margin: EdgeInsetsDirectional.zero,
-                                    onTap: () {
-                                      selectTitle();
-                                    },
-                                  ),
-                                  SizedBox(width: 10),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        TextFont(
-                                          text: selectedAssociatedTitle
-                                                  ?.category.name ??
-                                              "",
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
+                            key: ValueKey(selectedAssociatedTitles
+                                .map((e) =>
+                                    e.title.associatedTitlePk +
+                                    e.category.categoryPk)
+                                .join()),
+                            padding: EdgeInsetsDirectional.only(top: 8),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                for (int i = 0;
+                                    i < selectedAssociatedTitles.length;
+                                    i++)
+                                  Padding(
+                                    padding: EdgeInsetsDirectional.only(
+                                        top: i == 0 ? 5 : 6),
+                                    child: Tappable(
+                                      borderRadius: 15,
+                                      color: Colors.transparent,
+                                      onTap: () {
+                                        selectTitle(
+                                            selectedAssociatedTitles[i]);
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 4),
+                                        child: Row(
+                                          children: [
+                                            CategoryIcon(
+                                              categoryPk: "-1",
+                                              size: 36,
+                                              category:
+                                                  selectedAssociatedTitles[i]
+                                                      .category,
+                                              margin:
+                                                  EdgeInsetsDirectional.zero,
+                                              onTap: () {
+                                                selectTitle(
+                                                    selectedAssociatedTitles[i]);
+                                              },
+                                            ),
+                                            SizedBox(width: 10),
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  TextFont(
+                                                    text:
+                                                        selectedAssociatedTitles[i]
+                                                            .category
+                                                            .name,
+                                                    fontSize: 16,
+                                                    fontWeight:
+                                                        FontWeight.bold,
+                                                  ),
+                                                  if (!isFoundFromCategory(
+                                                      selectedAssociatedTitles[i]))
+                                                    TextFont(
+                                                      text: "",
+                                                      richTextSpan:
+                                                          generateSpans(
+                                                        context: context,
+                                                        fontSize: 14,
+                                                        mainText:
+                                                            selectedAssociatedTitles[i]
+                                                                .title
+                                                                .title,
+                                                        boldedText:
+                                                            selectedAssociatedTitles[i]
+                                                                .partialTitleString,
+                                                      ),
+                                                    ),
+                                                ],
+                                              ),
+                                            )
+                                          ],
                                         ),
-                                        !foundFromCategory
-                                            ? TextFont(
-                                                text: "",
-                                                richTextSpan: generateSpans(
-                                                  context: context,
-                                                  fontSize: 16,
-                                                  mainText:
-                                                      selectedAssociatedTitle
-                                                              ?.title.title ??
-                                                          "",
-                                                  boldedText:
-                                                      selectedAssociatedTitle
-                                                          ?.partialTitleString,
-                                                ),
-                                              )
-                                            : Container(),
-                                      ],
+                                      ),
                                     ),
-                                  )
-                                ],
-                              ),
+                                  ),
+                              ],
                             ),
                           ),
                   ),
@@ -3039,26 +3078,32 @@ Future<bool> addAssociatedTitles(
 
       print("Found associated title: " + foundTitle.toString());
 
-      if (foundTitle != null &&
-          (foundTitle.category.categoryPk == selectedCategory.categoryPk ||
-              foundTitle.category.mainCategoryPk ==
-                  selectedCategory.categoryPk) &&
-          (foundTitle.partialTitleString?.trim() == selectedTitle.trim() ||
+      bool isSameTitle = foundTitle != null &&
+          (foundTitle.partialTitleString?.trim().toLowerCase() ==
+                  selectedTitle.trim().toLowerCase() ||
               (foundTitle.partialTitleString == null &&
-                  foundTitle.title.title.trim() == selectedTitle.trim()))) {
-        // If there is an existing title, move to top
-        print("Already has this title, moving to top");
+                  foundTitle.title.title.trim().toLowerCase() ==
+                      selectedTitle.trim().toLowerCase()));
+
+      if (isSameTitle && foundTitle != null) {
+        // If there is an existing title, update category to selected (subcategory or category) and move to top
+        print(
+            "Already has this title, moving to top with category: ${selectedCategory.categoryPk}");
 
         // This is more efficient than shifting the associated title since this uses batching
         await database.deleteAssociatedTitle(
             foundTitle.title.associatedTitlePk, foundTitle.title.order);
         int length = await database.getAmountOfAssociatedTitles();
         await database.createOrUpdateAssociatedTitle(
-            foundTitle.title.copyWith(order: length));
+            foundTitle.title.copyWith(
+              categoryFk: selectedCategory.categoryPk,
+              order: length,
+            ));
         return true;
       } else {
         // If there is no existing title, create one
-        print("Creating new associated title");
+        print(
+            "Creating new associated title with category: ${selectedCategory.categoryPk}");
         int length = await database.getAmountOfAssociatedTitles();
         await database.createOrUpdateAssociatedTitle(
           insert: true,
@@ -5031,7 +5076,7 @@ class _TitleInputState extends State<TitleInput> {
                       excludeTitles: widget.getTextToExclude != null
                           ? widget.getTextToExclude!(text)
                           : [],
-                      limit: enableDoubleColumn(context) ? 5 : 3,
+                      limit: enableDoubleColumn(context) ? 5 : 4,
                       alsoSearchCategories: widget.alsoSearchCategories,
                       tryToCompleteSearch: widget.tryToCompleteSearch,
                     );

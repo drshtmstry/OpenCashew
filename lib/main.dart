@@ -166,11 +166,21 @@ class App extends StatelessWidget {
           ),
         );
 
+        double fontScale = (appStateSettings["fontScale"] ?? 1.0).toDouble();
+        Widget scaledWidget = MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            textScaler: TextScaler.linear(
+              MediaQuery.of(context).textScaler.scale(1.0) * fontScale,
+            ),
+          ),
+          child: mainWidget,
+        );
+
         if (kIsWeb) {
           return FadeIn(
-              duration: Duration(milliseconds: 1000), child: mainWidget);
+              duration: Duration(milliseconds: 1000), child: scaledWidget);
         } else {
-          return mainWidget;
+          return scaledWidget;
         }
       },
       // ),

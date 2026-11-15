@@ -237,6 +237,13 @@ class CategoryIcon extends StatelessWidget {
   }
 }
 
+String getCategoryIconFolder() {
+  int pack = appStateSettings["categoryIconPack"] ?? 0;
+  if (pack == 1) return "assets/categories-mono/";
+  if (pack == 2) return "assets/categories-outlined/";
+  return "assets/categories/";
+}
+
 class CacheCategoryIcon extends StatefulWidget {
   const CacheCategoryIcon({
     required this.iconName,
@@ -256,7 +263,7 @@ class _CacheCategoryIconState extends State<CacheCategoryIcon> {
   void initState() {
     super.initState();
     image = Image.asset(
-      "assets/categories/" + widget.iconName,
+      getCategoryIconFolder() + widget.iconName,
       width: widget.size,
     );
   }
@@ -267,7 +274,7 @@ class _CacheCategoryIconState extends State<CacheCategoryIcon> {
         widget.size != oldWidget.size) {
       setState(() {
         image = Image.asset(
-          "assets/categories/" + widget.iconName,
+          getCategoryIconFolder() + widget.iconName,
           width: widget.size,
         );
       });
