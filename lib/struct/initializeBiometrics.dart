@@ -68,7 +68,7 @@ class InitializeBiometrics extends StatefulWidget {
   const InitializeBiometrics({required this.child, super.key});
 
   @override
-  State<InitializeBiometrics> createState() => _InitializeBiometricsState();
+  State<InitializeBiometrics> createState() => InitializeBiometricsState();
 }
 
 final GlobalKey<InitializeBiometricsState> initializeBiometricsKey =

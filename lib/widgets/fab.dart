@@ -1,3 +1,4 @@
+import 'package:budget/functions.dart';
 import 'package:budget/pages/addTransactionPage.dart';
 import 'package:budget/pages/managePinnedTransactionsPage.dart';
 import 'package:budget/struct/settings.dart';

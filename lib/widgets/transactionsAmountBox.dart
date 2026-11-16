@@ -1,3 +1,4 @@
+import 'dart:ui' as ui;
 import 'package:budget/colors.dart';
 import 'package:budget/database/tables.dart';
 import 'package:budget/functions.dart';
@@ -143,7 +144,7 @@ class TransactionsAmountBox extends StatelessWidget {
                             ),
                             const SizedBox(width: 4),
                             Icon(
-                              Directionality.of(context) == TextDirection.rtl
+                              Directionality.of(context) == ui.TextDirection.rtl
                                   ? Icons.arrow_back_rounded
                                   : Icons.arrow_forward_rounded,
                               size: 16,

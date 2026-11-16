@@ -32,6 +32,54 @@ import 'package:budget/widgets/framework/popupFramework.dart';
 import 'package:budget/widgets/exportCSV.dart';
 import 'package:csv/csv.dart';
 
+Future<void> exportSelectedTransactions(
+    BuildContext context, List<String> selectedTransactionPks,
+    {String? pageID}) async {
+  List<TransactionWithCategory> transactions = await database
+      .getAllTransactionsWithCategoryWalletBudgetObjectiveSubCategory(
+    (tbl) => tbl.transactionPk.isIn(selectedTransactionPks),
+  );
+  if (transactions.isEmpty) return;
+
+  List<String> headers = [
+    "account", "amount", "currency", "title", "note", "date", "income",
+    "type", "category name", "subcategory name", "color", "icon", "emoji",
+    "budget", "objective"
+  ];
+  List<List<dynamic>> rows = [headers];
+  for (final item in transactions) {
+    rows.add([
+      item.wallet?.name ?? "",
+      item.transaction.amount,
+      (item.wallet?.currency ?? "").toUpperCase(),
+      item.transaction.name,
+      item.transaction.note,
+      item.transaction.dateCreated.toString(),
+      item.transaction.income,
+      item.transaction.type,
+      item.category.name,
+      item.subCategory?.name ?? "",
+      item.category.colour ?? "",
+      item.category.iconName ?? "",
+      item.category.emojiIconName ?? "",
+      item.budget?.name ?? "",
+      item.objective?.name ?? "",
+    ]);
+  }
+
+  final csv = ListToCsvConverter().convert(rows);
+  await saveCSV(
+    boxContext: context,
+    csv: csv,
+    fileName:
+        "opencashew-selected-${DateTime.now().millisecondsSinceEpoch}.csv",
+  );
+  if (pageID != null) {
+    globalSelectedID.value[pageID] = [];
+    globalSelectedID.notifyListeners();
+  }
+}
+
 class SelectedTransactionsAppBar extends StatelessWidget {
   const SelectedTransactionsAppBar(
       {Key? key, required this.pageID, this.enableSettleAllButton = false})
@@ -74,51 +122,6 @@ class SelectedTransactionsAppBar extends StatelessWidget {
 
   final String pageID;
   final bool enableSettleAllButton;
-
-  Future<void> exportSelectedTransactions(
-      BuildContext context, List<String> selectedTransactionPks) async {
-    List<TransactionWithCategory> transactions = await database
-        .getAllTransactionsWithCategoryWalletBudgetObjectiveSubCategory(
-      (tbl) => tbl.transactionPk.isIn(selectedTransactionPks),
-    );
-    if (transactions.isEmpty) return;
-
-    List<String> headers = [
-      "account", "amount", "currency", "title", "note", "date", "income",
-      "type", "category name", "subcategory name", "color", "icon", "emoji",
-      "budget", "objective"
-    ];
-    List<List<dynamic>> rows = [headers];
-    for (final item in transactions) {
-      rows.add([
-        item.wallet?.name ?? "",
-        item.transaction.amount,
-        (item.wallet?.currency ?? "").toUpperCase(),
-        item.transaction.name,
-        item.transaction.note,
-        item.transaction.dateCreated.toString(),
-        item.transaction.income,
-        item.transaction.type,
-        item.category.name,
-        item.subCategory?.name ?? "",
-        item.category.colour ?? "",
-        item.category.iconName ?? "",
-        item.category.emojiIconName ?? "",
-        item.budget?.name ?? "",
-        item.objective?.name ?? "",
-      ]);
-    }
-
-    final csv = ListToCsvConverter().convert(rows);
-    await saveCSV(
-      boxContext: context,
-      csv: csv,
-      fileName:
-          "opencashew-selected-${DateTime.now().millisecondsSinceEpoch}.csv",
-    );
-    globalSelectedID.value[pageID] = [];
-    globalSelectedID.notifyListeners();
-  }
 
   @override
   Widget build(BuildContext context) {
