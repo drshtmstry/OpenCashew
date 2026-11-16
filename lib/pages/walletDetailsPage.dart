@@ -1273,7 +1273,7 @@ class WalletDetailsPageState extends State<WalletDetailsPage>
                 if (widget.wallet != null)
                   CustomPopupMenuButton(
                     showButtons: enableDoubleColumn(context),
-                    keepOutFirst: true,
+                    keepOutFirst: false,
                     items: [
                       DropdownItemMenu(
                         id: "edit-account",
@@ -1293,19 +1293,17 @@ class WalletDetailsPageState extends State<WalletDetailsPage>
                         },
                       ),
                       DropdownItemMenu(
-                        id: "view-account-transactions",
-                        label: "transactions".tr(),
+                        id: "transfer-balance",
+                        label: "transfer-balance".tr(),
                         icon: appStateSettings["outlinedIcons"]
-                            ? Icons.receipt_long_outlined
-                            : Icons.receipt_long_rounded,
+                            ? Icons.compare_arrows_outlined
+                            : Icons.compare_arrows_rounded,
                         action: () {
-                          pushRoute(
+                          openBottomSheet(
                             context,
-                            TransactionsSearchPage(
-                              initialFilters: SearchFilters().copyWith(
-                                walletPks: [widget.wallet!.walletPk],
-                              ),
-                            ),
+                            fullSnap: true,
+                            TransferBalancePopup(
+                                wallet: widget.wallet!, allowEditWallet: false),
                           );
                         },
                       ),
@@ -1320,21 +1318,6 @@ class WalletDetailsPageState extends State<WalletDetailsPage>
                             context,
                             fullSnap: true,
                             CorrectBalancePopup(wallet: widget.wallet!),
-                          );
-                        },
-                      ),
-                      DropdownItemMenu(
-                        id: "transfer-balance",
-                        label: "transfer-balance".tr(),
-                        icon: appStateSettings["outlinedIcons"]
-                            ? Icons.compare_arrows_outlined
-                            : Icons.compare_arrows_rounded,
-                        action: () {
-                          openBottomSheet(
-                            context,
-                            fullSnap: true,
-                            TransferBalancePopup(
-                                wallet: widget.wallet!, allowEditWallet: false),
                           );
                         },
                       ),

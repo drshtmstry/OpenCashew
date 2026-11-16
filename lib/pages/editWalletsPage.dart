@@ -307,8 +307,10 @@ class EditWalletsPageState extends State<EditWalletsPage> {
                             ).toString(),
                             fontSize: 15,
                           ),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
+                          Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            spacing: 5,
+                            runSpacing: 3,
                             children: [
                               AnimatedSizeSwitcher(
                                 child: Provider.of<SelectedWalletPk>(context)
@@ -317,7 +319,7 @@ class EditWalletsPageState extends State<EditWalletsPage> {
                                     ? Padding(
                                         padding:
                                             const EdgeInsetsDirectional.only(
-                                                top: 1, end: 5),
+                                                top: 1),
                                         child: TransactionTag(
                                           padding: const EdgeInsetsDirectional
                                               .symmetric(
@@ -333,7 +335,7 @@ class EditWalletsPageState extends State<EditWalletsPage> {
                               ),
                               Padding(
                                 padding: const EdgeInsetsDirectional.only(
-                                    top: 1, end: 5),
+                                    top: 1),
                                 child: TransactionTag(
                                   padding: const EdgeInsetsDirectional.symmetric(
                                       horizontal: 7, vertical: 1.1),
