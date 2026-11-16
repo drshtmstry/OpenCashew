@@ -8,6 +8,7 @@ import 'package:budget/pages/homePage/homePageLineGraph.dart';
 import 'package:budget/pages/homePage/homePageNetWorth.dart';
 import 'package:budget/pages/pastBudgetsPage.dart';
 import 'package:budget/pages/transactionFilters.dart';
+import 'package:budget/pages/transactionsListPage.dart';
 import 'package:budget/pages/transactionsSearchPage.dart';
 import 'package:budget/pages/upcomingOverdueTransactionsPage.dart';
 import 'package:budget/struct/accountTypes.dart';
@@ -679,18 +680,22 @@ class WalletDetailsPageState extends State<WalletDetailsPage>
             forcedDateTimeRange: selectedDateTimeRange,
           ),
           textColor: getColor(context, "black"),
-          openPage: TransactionsSearchPage(
-            initialFilters: widget.wallet != null
-                ? SearchFilters().copyWith(walletPks: walletPks)
-                : (searchFilters == null ? SearchFilters() : searchFilters)
-                    ?.copyWith(
+          openPage: widget.wallet != null
+              ? TransactionsListPage(
+                  initialFilters: SearchFilters().copyWith(walletPks: walletPks),
+                )
+              : TransactionsSearchPage(
+                  initialFilters: (searchFilters == null
+                          ? SearchFilters()
+                          : searchFilters)
+                      ?.copyWith(
                     dateTimeRange: getDateTimeRangeForPassedSearchFilters(
                       cycleSettingsExtension: "",
                       selectedDateTimeRange: selectedDateTimeRange,
                     ),
                     walletPks: walletPks,
                   ),
-          ),
+                ),
         ),
       ),
     );

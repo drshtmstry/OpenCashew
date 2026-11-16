@@ -5,6 +5,7 @@ import 'package:budget/struct/currencyFunctions.dart';
 import 'package:budget/struct/settings.dart';
 import 'package:budget/widgets/button.dart';
 import 'package:budget/widgets/noResults.dart';
+import 'package:budget/widgets/framework/popupFramework.dart';
 import 'package:budget/widgets/openPopup.dart';
 import 'package:budget/widgets/tappable.dart';
 import 'package:budget/widgets/textInput.dart';
@@ -460,6 +461,151 @@ class CurrencyItem extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class SelectCurrencyBottomSheet extends StatefulWidget {
+  final String? selectedCurrency;
+  final Function(String) onSelected;
+
+  const SelectCurrencyBottomSheet({
+    required this.selectedCurrency,
+    required this.onSelected,
+    super.key,
+  });
+
+  @override
+  State<SelectCurrencyBottomSheet> createState() =>
+      _SelectCurrencyBottomSheetState();
+}
+
+class _SelectCurrencyBottomSheetState extends State<SelectCurrencyBottomSheet> {
+  String searchText = "";
+  late String? selected = widget.selectedCurrency;
+
+  @override
+  Widget build(BuildContext context) {
+    Map<String, dynamic> filteredCurrencies = {};
+    if (searchText.isEmpty) {
+      filteredCurrencies = currenciesJSON;
+    } else {
+      String q = searchText.toLowerCase();
+      for (String code in currenciesJSON.keys) {
+        dynamic curr = currenciesJSON[code];
+        if (code.toLowerCase().contains(q) ||
+            (curr["CountryName"] != null &&
+                curr["CountryName"].toString().toLowerCase().contains(q)) ||
+            (curr["Currency"] != null &&
+                curr["Currency"].toString().toLowerCase().contains(q))) {
+          filteredCurrencies[code] = curr;
+        }
+      }
+    }
+
+    return PopupFramework(
+      title: "currency".tr().capitalizeFirst,
+      hasPadding: false,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: TextInput(
+              labelText: "search-currencies-placeholder".tr(),
+              icon: appStateSettings["outlinedIcons"]
+                  ? Icons.search_outlined
+                  : Icons.search_rounded,
+              onChanged: (text) {
+                setState(() => searchText = text);
+              },
+              padding: EdgeInsetsDirectional.zero,
+            ),
+          ),
+          ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.6,
+            ),
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: filteredCurrencies.length,
+              itemBuilder: (context, index) {
+                String code = filteredCurrencies.keys.elementAt(index);
+                dynamic curr = filteredCurrencies[code];
+                String symbol = curr?["Symbol"] ?? code.toUpperCase();
+                String name = curr?["Currency"] ??
+                    curr?["CountryName"] ??
+                    code.toUpperCase();
+                bool isSelected = selected?.toLowerCase() == code.toLowerCase();
+
+                return Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 3),
+                  child: Tappable(
+                    color: isSelected
+                        ? Theme.of(context).colorScheme.secondaryContainer
+                        : Colors.transparent,
+                    borderRadius: 14,
+                    onTap: () {
+                      widget.onSelected(code);
+                      popRoute(context);
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 10),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 44,
+                            height: 44,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .secondaryContainer
+                                  .withOpacity(0.4),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: TextFont(
+                              text: symbol,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                TextFont(
+                                  text: code.toUpperCase(),
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                TextFont(
+                                  text: name,
+                                  fontSize: 12.5,
+                                  textColor: getColor(context, "textLight"),
+                                  maxLines: 1,
+                                ),
+                              ],
+                            ),
+                          ),
+                          if (isSelected)
+                            Icon(
+                              Icons.check_circle_rounded,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

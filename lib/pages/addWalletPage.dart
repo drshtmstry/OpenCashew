@@ -2,6 +2,7 @@ import 'package:budget/database/tables.dart';
 import 'package:budget/functions.dart';
 import 'package:budget/pages/addTransactionPage.dart';
 import 'package:budget/pages/editWalletsPage.dart';
+import 'package:budget/pages/transactionsListPage.dart';
 import 'package:budget/pages/transactionFilters.dart';
 import 'package:budget/pages/transactionsSearchPage.dart';
 import 'package:budget/pages/settingsPage.dart';
@@ -531,6 +532,34 @@ class _AddWalletPageState extends State<AddWalletPage> {
               ),
             ),
           ),
+          if (widget.wallet != null)
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsetsDirectional.only(
+                  start: 20,
+                  end: 20,
+                  bottom: 12,
+                ),
+                child: SettingsContainer(
+                  icon: appStateSettings["outlinedIcons"]
+                      ? Icons.card_membership_outlined
+                      : Icons.card_membership_rounded,
+                  title: "currency".tr().capitalizeFirst,
+                  description: selectedCurrency != null
+                      ? "${selectedCurrency!.toUpperCase()} - ${currenciesJSON[selectedCurrency]?['Currency'] ?? currenciesJSON[selectedCurrency]?['CountryName'] ?? ''}"
+                      : null,
+                  onTap: () {
+                    openBottomSheet(
+                      context,
+                      SelectCurrencyBottomSheet(
+                        selectedCurrency: selectedCurrency,
+                        onSelected: setSelectedCurrency,
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
           SliverToBoxAdapter(
             child: widget.wallet == null ||
                     widget.routesToPopAfterDelete ==
@@ -678,7 +707,7 @@ class _AddWalletPageState extends State<AddWalletPage> {
                     await addWallet(popContext: false);
                     pushRoute(
                       context,
-                      TransactionsSearchPage(
+                      TransactionsListPage(
                         initialFilters: SearchFilters().copyWith(
                           walletPks: [widget.wallet!.walletPk],
                         ),
@@ -771,19 +800,21 @@ class _AddWalletPageState extends State<AddWalletPage> {
                 ),
               ),
             ),
-          SliverToBoxAdapter(child: SizedBox(height: 10)),
-          CurrencyPicker(
-            showExchangeRateInfoNotice: true,
-            listLayout: widget.wallet != null,
-            onSelected: setSelectedCurrency,
-            initialCurrency: selectedCurrency,
-            onHasFocus: () {
-              // Disable scroll when focus - because iOS header height is different than that of Android.
-              // Future.delayed(Duration(milliseconds: 500), () {
-              //   addWalletPageKey.currentState?.scrollTo(250);
-              // });
-            },
-          ),
+          if (widget.wallet == null) ...[
+            SliverToBoxAdapter(child: SizedBox(height: 10)),
+            CurrencyPicker(
+              showExchangeRateInfoNotice: true,
+              listLayout: false,
+              onSelected: setSelectedCurrency,
+              initialCurrency: selectedCurrency,
+              onHasFocus: () {
+                // Disable scroll when focus - because iOS header height is different than that of Android.
+                // Future.delayed(Duration(milliseconds: 500), () {
+                //   addWalletPageKey.currentState?.scrollTo(250);
+                // });
+              },
+            ),
+          ],
           SliverToBoxAdapter(child: SizedBox(height: 65)),
           // SliverToBoxAdapter(
           //   child: KeyboardHeightAreaAnimated(),

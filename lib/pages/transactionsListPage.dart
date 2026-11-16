@@ -24,7 +24,8 @@ import 'package:budget/widgets/sliverStickyHeaderIfTall.dart';
 import 'package:budget/widgets/changePagesArrows.dart';
 
 class TransactionsListPage extends StatefulWidget {
-  const TransactionsListPage({Key? key}) : super(key: key);
+  final SearchFilters? initialFilters;
+  const TransactionsListPage({this.initialFilters, Key? key}) : super(key: key);
 
   @override
   State<TransactionsListPage> createState() => TransactionsListPageState();
@@ -37,7 +38,7 @@ class TransactionsListPageState extends State<TransactionsListPage>
   PageController _pageController = PageController(initialPage: 1000000);
   List<int> selectedTransactionIDs = [];
   GlobalKey<MonthSelectorState> monthSelectorStateKey = GlobalKey();
-  SearchFilters searchFilters = SearchFilters();
+  late SearchFilters searchFilters = widget.initialFilters?.copyWith() ?? SearchFilters();
 
   void refreshState() {
     setState(() {});
@@ -62,11 +63,13 @@ class TransactionsListPageState extends State<TransactionsListPage>
   @override
   void initState() {
     super.initState();
-    searchFilters.loadFilterString(
-      appStateSettings["transactionsListPageSetFiltersString"],
-      skipDateTimeRange: true,
-      skipSearchQuery: true,
-    );
+    if (widget.initialFilters == null) {
+      searchFilters.loadFilterString(
+        appStateSettings["transactionsListPageSetFiltersString"],
+        skipDateTimeRange: true,
+        skipSearchQuery: true,
+      );
+    }
   }
 
   @override

@@ -2,6 +2,7 @@ import 'package:budget/colors.dart';
 import 'package:budget/database/tables.dart' hide TransactionTag;
 import 'package:budget/functions.dart';
 import 'package:budget/pages/addWalletPage.dart';
+import 'package:budget/pages/walletDetailsPage.dart';
 import 'package:budget/struct/accountTypes.dart';
 import 'package:budget/struct/databaseGlobal.dart';
 import 'package:budget/struct/settings.dart';
@@ -370,9 +371,9 @@ class EditWalletsPageState extends State<EditWalletsPage> {
                             )) ==
                             DeletePopupAction.Delete;
                       },
-                      openPage: AddWalletPage(
-                          wallet: wallet,
-                          routesToPopAfterDelete: RoutesToPopAfterDelete.One),
+                      openPage: WatchedWalletDetailsPage(
+                        walletPk: wallet.walletPk,
+                      ),
                       key: ValueKey(wallet.walletPk),
                     );
                   },
