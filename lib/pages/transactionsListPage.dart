@@ -74,7 +74,8 @@ class TransactionsListPageState extends State<TransactionsListPage>
 
   @override
   void dispose() {
-    _scrollController.dispose();
+    // PageFramework / NestedScrollView manages the lifecycle of passed scrollController
+    // Calling _scrollController.dispose() manually triggers "ScrollController used after being disposed"
     _pageController.dispose();
     super.dispose();
   }
