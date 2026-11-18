@@ -1,6 +1,7 @@
 import 'package:budget/colors.dart';
 import 'package:budget/database/tables.dart';
 import 'package:budget/pages/addTransactionPage.dart';
+import 'package:budget/pages/managePinnedTransactionsPage.dart';
 import 'package:budget/pages/homePage/homePageAllSpendingSummary.dart';
 import 'package:budget/pages/homePage/homePageBudgets.dart';
 import 'package:budget/pages/homePage/homePageCreditDebts.dart';
@@ -114,6 +115,23 @@ class _EditHomePageState extends State<EditHomePage> {
                 ),
                 useCustomController: true,
               );
+            },
+          ),
+          "pinnedTransactions": EditHomePageItem(
+            icon: appStateSettings["outlinedIcons"]
+                ? Icons.push_pin_outlined
+                : Icons.push_pin_rounded,
+            name: "pinned-transactions".tr() != "pinned-transactions"
+                ? "pinned-transactions".tr()
+                : "Pinned Transactions",
+            isEnabled: isHomeScreenSectionEnabled(
+                context, "showPinnedTransactions"),
+            onSwitched: (value) {
+              switchHomeScreenSection(
+                  context, "showPinnedTransactions", value);
+            },
+            onTap: () {
+              pushRoute(context, const ManagePinnedTransactionsPage());
             },
           ),
           "budgets": EditHomePageItem(
@@ -357,6 +375,18 @@ class _EditHomePageState extends State<EditHomePage> {
                   ),
                 ),
               );
+            },
+          ),
+          "stackedBar": EditHomePageItem(
+            icon: appStateSettings["outlinedIcons"]
+                ? Icons.bar_chart_outlined
+                : Icons.bar_chart_rounded,
+            name: "comparative-spending".tr() != "comparative-spending"
+                ? "comparative-spending".tr()
+                : "Spending Breakdown",
+            isEnabled: isHomeScreenSectionEnabled(context, "showStackedBar"),
+            onSwitched: (value) {
+              switchHomeScreenSection(context, "showStackedBar", value);
             },
           ),
           "pieChart": EditHomePageItem(

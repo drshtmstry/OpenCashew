@@ -512,7 +512,29 @@ class SubCategoriesContainer extends StatelessWidget {
           child: mainCategory,
         ),
         separatorBanner ?? SizedBox.shrink(),
-        subCategoryEntries,
+        Padding(
+          padding: const EdgeInsetsDirectional.only(start: 6),
+          child: IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Container(
+                  width: 2.5,
+                  margin: const EdgeInsetsDirectional.only(
+                      start: 14, end: 4, top: 4, bottom: 8),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .primary
+                        .withOpacity(0.35),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+                Expanded(child: subCategoryEntries),
+              ],
+            ),
+          ),
+        ),
         SizedBox(height: 5),
         extraButtonEnd ?? SizedBox.shrink(),
       ],

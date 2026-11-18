@@ -31,7 +31,10 @@ import 'package:budget/widgets/transactionEntry/transactionEntryTag.dart';
 import 'package:budget/pages/addTransactionPage.dart';
 import 'package:budget/widgets/selectedTransactionsAppBar.dart';
 import 'package:budget/widgets/openPopup.dart';
+import 'package:budget/widgets/openSnackbar.dart';
+import 'package:budget/widgets/globalSnackbar.dart';
 import 'package:budget/widgets/transactionEntry/balancedTagRow.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 ValueNotifier<Map<String, List<String>>> globalSelectedID =
     ValueNotifier<Map<String, List<String>>>({});
@@ -863,6 +866,82 @@ class _TransactionEntryState extends State<TransactionEntry> {
                                             ),
                                             const SizedBox(width: 8),
                                           ],
+                                          Builder(
+                                            builder: (context) {
+                                              List<dynamic> pinnedList =
+                                                  appStateSettings[
+                                                          "pinnedTransactions"] ??
+                                                      [];
+                                              bool isPinned = pinnedList.contains(
+                                                  transaction.transactionPk);
+                                              return TransactionActionButtonTile(
+                                                icon: isPinned
+                                                    ? (appStateSettings[
+                                                            "outlinedIcons"]
+                                                        ? Icons.push_pin
+                                                        : Icons.push_pin_rounded)
+                                                    : (appStateSettings[
+                                                            "outlinedIcons"]
+                                                        ? Icons.push_pin_outlined
+                                                        : Icons
+                                                            .push_pin_rounded),
+                                                customColor: isPinned
+                                                    ? Theme.of(context)
+                                                        .colorScheme
+                                                        .primary
+                                                    : null,
+                                                onTap: () async {
+                                                  List<String> updated =
+                                                      List<String>.from(pinnedList
+                                                          .map((e) =>
+                                                              e.toString()));
+                                                  if (isPinned) {
+                                                    updated.remove(transaction
+                                                        .transactionPk);
+                                                    openSnackbar(
+                                                      SnackbarMessage(
+                                                        title: "unpinned-transaction"
+                                                                    .tr() !=
+                                                                "unpinned-transaction"
+                                                            ? "unpinned-transaction"
+                                                                .tr()
+                                                            : "Unpinned transaction",
+                                                        icon: appStateSettings[
+                                                                "outlinedIcons"]
+                                                            ? Icons
+                                                                .push_pin_outlined
+                                                            : Icons
+                                                                .push_pin_rounded,
+                                                      ),
+                                                    );
+                                                  } else {
+                                                    updated.add(transaction
+                                                        .transactionPk);
+                                                    openSnackbar(
+                                                      SnackbarMessage(
+                                                        title: "pinned-transaction"
+                                                                    .tr() !=
+                                                                "pinned-transaction"
+                                                            ? "pinned-transaction"
+                                                                .tr()
+                                                            : "Pinned transaction to home",
+                                                        icon: appStateSettings[
+                                                                "outlinedIcons"]
+                                                            ? Icons.push_pin
+                                                            : Icons
+                                                                .push_pin_rounded,
+                                                      ),
+                                                    );
+                                                  }
+                                                  updateSettings(
+                                                      "pinnedTransactions",
+                                                      updated,
+                                                      updateGlobalState: true);
+                                                },
+                                              );
+                                            },
+                                          ),
+                                          const SizedBox(width: 8),
                                           TransactionActionButtonTile(
                                             icon: appStateSettings[
                                                     "outlinedIcons"]
@@ -1171,12 +1250,14 @@ class TransactionActionButtonTile extends StatelessWidget {
     required this.icon,
     required this.onTap,
     this.iconSize = 18,
+    this.customColor,
     super.key,
   });
 
   final IconData icon;
   final VoidCallback onTap;
   final double iconSize;
+  final Color? customColor;
 
   @override
   Widget build(BuildContext context) {
@@ -1197,7 +1278,7 @@ class TransactionActionButtonTile extends StatelessWidget {
         onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 8),
-          child: Icon(icon, size: iconSize, color: fg),
+          child: Icon(icon, size: iconSize, color: customColor ?? fg),
         ),
       ),
     );

@@ -12,6 +12,8 @@ import 'package:budget/pages/homePage/homePageWalletSwitcher.dart';
 import 'package:budget/pages/homePage/homeTransactions.dart';
 import 'package:budget/pages/homePage/homePageUsername.dart';
 import 'package:budget/pages/homePage/homePageBudgets.dart';
+import 'package:budget/pages/homePage/homePagePinnedTransactions.dart';
+import 'package:budget/pages/homePage/homePageStackedBar.dart';
 import 'package:budget/pages/homePage/homePageUpcomingTransactions.dart';
 import 'package:budget/pages/homePage/homePageAllSpendingSummary.dart';
 import 'package:budget/pages/editHomePage.dart';
@@ -215,6 +217,10 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
       "walletsList": isHomeScreenSectionEnabled(context, "showWalletList")
           ? HomePageWalletList()
           : null,
+      "pinnedTransactions":
+          isHomeScreenSectionEnabled(context, "showPinnedTransactions")
+              ? const HomePagePinnedTransactions()
+              : null,
       "budgets": isHomeScreenSectionEnabled(context, "showPinnedBudgets")
           ? HomePageBudgets()
           : null,
@@ -241,6 +247,9 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
               : null,
       "spendingGraph": isHomeScreenSectionEnabled(context, "showSpendingGraph")
           ? HomePageLineGraph(selectedSlidingSelector: selectedSlidingSelector)
+          : null,
+      "stackedBar": isHomeScreenSectionEnabled(context, "showStackedBar")
+          ? const HomePageStackedBar()
           : null,
       "pieChart": isHomeScreenSectionEnabled(context, "showPieChart")
           ? HomePagePieChart()

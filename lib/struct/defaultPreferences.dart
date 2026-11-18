@@ -80,12 +80,19 @@ Future<Map<String, dynamic>> getDefaultPreferences() async {
     "showHeatMapFullScreen": true,
     "showTransactionsList": true,
     "showTransactionsListFullScreen": true,
+    "showPinnedTransactions": true,
+    "showPinnedTransactionsFullScreen": true,
+    "showStackedBar": true,
+    "showStackedBarFullScreen": true,
+    "stackedBarTimeframe": 0, // 0: 7D, 1: 4W, 2: 6M
+    "stackedBarMode": 0, // 0: Categories, 1: Income/Expense
     "showUsernameWelcomeBanner": true,
     "showUsernameWelcomeBannerFullScreen": true,
     "enableGreetingMessage": true,
     "homePageOrder": [
       "wallets",
       "walletsList",
+      "pinnedTransactions",
       "budgets",
       "objectives",
       "allSpendingSummary",
@@ -94,6 +101,7 @@ Future<Map<String, dynamic>> getDefaultPreferences() async {
       "creditDebts",
       "objectiveLoans",
       "spendingGraph",
+      "stackedBar",
       "pieChart",
       "heatMap",
       "transactionsList",
@@ -101,6 +109,7 @@ Future<Map<String, dynamic>> getDefaultPreferences() async {
     "homePageOrderFullScreen": [
       "wallets",
       "walletsList",
+      "pinnedTransactions",
       "budgets",
       "ORDER:LEFT",
       "objectives",
@@ -110,6 +119,7 @@ Future<Map<String, dynamic>> getDefaultPreferences() async {
       "creditDebts",
       "objectiveLoans",
       "spendingGraph",
+      "stackedBar",
       "pieChart",
       "heatMap",
       "ORDER:RIGHT",

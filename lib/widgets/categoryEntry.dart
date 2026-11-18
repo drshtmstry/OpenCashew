@@ -144,9 +144,28 @@ class CategoryEntry extends StatelessWidget {
             padding: hasSubCategories
                 ? EdgeInsetsDirectional.zero
                 : EdgeInsetsDirectional.only(
-                    start: 20, end: 25, top: 8, bottom: 8),
+                    start: isSubcategory ? 14 : 20,
+                    end: 25,
+                    top: 8,
+                    bottom: 8),
             child: Row(
               children: [
+                if (isSubcategory)
+                  Padding(
+                    padding: const EdgeInsetsDirectional.only(end: 8),
+                    child: Icon(
+                      Icons.subdirectory_arrow_right_rounded,
+                      size: 16,
+                      color: dynamicPastel(
+                        context,
+                        HexColor(category.colour,
+                            defaultColor:
+                                Theme.of(context).colorScheme.primary),
+                        amountLight: 0.3,
+                        amountDark: 0.3,
+                      ),
+                    ),
+                  ),
                 CategoryIconPercent(
                   category: category,
                   percent: percentSpentWithCategoryLimit * 100,
