@@ -109,11 +109,11 @@
 ## 🔴 Missing Features (need new code)
 
 ### Homepage Sections
-- [ ] **Stacked Bar Graph** homepage section — periodic comparative spending visualization (_web app audit_)
+- [x] **Stacked Bar Graph** homepage section — periodic comparative spending visualization (_web app audit_)
   - New file: `lib/pages/homePage/homePageStackedBar.dart`
   - Add `stackedBar` key to `homePageOrder` in `defaultPreferences.dart`
   - Register in `homePage.dart` and `editHomePage.dart`
-- [ ] **Pinned Transactions** homepage section — _changelog 6.0.0 "Pinned transactions home page section"_
+- [x] **Pinned Transactions** homepage section — _changelog 6.0.0 "Pinned transactions home page section"_
   - New file: `lib/pages/homePage/homePagePinnedTransactions.dart`
   - Includes: long-press `+` button to pin, pinned transactions list UI, merged with common/frequent transactions
   - Add `pinnedTransactions` key to `homePageOrder`
@@ -139,7 +139,7 @@
 - [ ] **Add Page Info Section** / guide text throughout app — _changelog 6.0.0_
 
 ### Budgets
-- [ ] **Hierarchical Visual Representation** of category → subcategories for budgets — _changelog 6.7.0_
+- [x] **Hierarchical Visual Representation** of category → subcategories for budgets — _changelog 6.7.0_
 - [ ] **Spending Per Day and Total Day Metrics** when setting custom budget period — _changelog 6.7.0_
 - [ ] **Subcategory Filter Support** for all transaction budgets — _changelog 6.0.0_
 - [ ] **Budget Spending Limit Total Type** setting — _changelog 6.0.0_
