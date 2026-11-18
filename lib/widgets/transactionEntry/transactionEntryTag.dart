@@ -4,6 +4,7 @@ import 'package:budget/pages/objectivesListPage.dart';
 import 'package:budget/struct/databaseGlobal.dart';
 import 'package:budget/struct/settings.dart';
 import 'package:budget/widgets/categoryIcon.dart';
+import 'package:budget/widgets/walletIcon.dart';
 import 'package:budget/widgets/textWidgets.dart';
 import 'package:budget/widgets/util/infiniteRotationAnimation.dart';
 import 'package:easy_localization/easy_localization.dart' hide TextDirection;
@@ -63,16 +64,9 @@ class TransactionEntryTag extends StatelessWidget {
           int tagCount = tagsToShow.where((element) => element == true).length;
           List<Widget> tags = [
             // 0
-            TransactionTag(
-              color: HexColor(
-                  Provider.of<AllWallets>(context)
-                      .indexedByPk[transaction.walletFk]
-                      ?.colour,
-                  defaultColor: Theme.of(context).colorScheme.primary),
-              name: getWalletStringName(
-                  Provider.of<AllWallets>(context),
-                  Provider.of<AllWallets>(context)
-                      .indexedByPk[transaction.walletFk]),
+            WalletTag(
+              wallet: Provider.of<AllWallets>(context)
+                  .indexedByPk[transaction.walletFk],
             ),
             // 1
             Builder(builder: (context) {
@@ -199,6 +193,41 @@ class TransactionEntryTag extends StatelessWidget {
           );
         }),
       ),
+    );
+  }
+}
+
+class WalletTag extends StatelessWidget {
+  const WalletTag({required this.wallet, super.key});
+  final TransactionWallet? wallet;
+
+  @override
+  Widget build(BuildContext context) {
+    if (wallet == null) return const SizedBox.shrink();
+
+    final bool hasEmoji = wallet!.emojiIconName != null &&
+        wallet!.emojiIconName!.trim().isNotEmpty;
+
+    return TransactionTag(
+      color: HexColor(wallet!.colour,
+          defaultColor: Theme.of(context).colorScheme.primary),
+      name: (hasEmoji ? ("${wallet!.emojiIconName!} ") : "") +
+          getWalletStringName(
+            Provider.of<AllWallets>(context),
+            wallet,
+          ),
+      leading: hasEmoji
+          ? null
+          : Padding(
+              padding: const EdgeInsetsDirectional.only(end: 3),
+              child: WalletIcon(
+                wallet: wallet,
+                size: 13,
+                sizePadding: 0,
+                noBackground: true,
+                iconColor: getColor(context, "black").withOpacity(0.7),
+              ),
+            ),
     );
   }
 }

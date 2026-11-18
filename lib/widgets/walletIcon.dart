@@ -104,6 +104,7 @@ class WalletIcon extends StatelessWidget {
     this.emojiIconName,
     this.accountType,
     this.color,
+    this.iconColor,
     this.size = 24,
     this.sizePadding = 12,
     this.borderRadius,
@@ -119,6 +120,7 @@ class WalletIcon extends StatelessWidget {
   final String? emojiIconName;
   final AccountType? accountType;
   final Color? color;
+  final Color? iconColor;
   final double size;
   final double sizePadding;
   final double? borderRadius;
@@ -231,7 +233,7 @@ class WalletIcon extends StatelessWidget {
         outlined: appStateSettings["outlinedIcons"],
       ),
       size: size,
-      color: getColor(context, "black").withOpacity(0.85),
+      color: iconColor ?? getColor(context, "black").withOpacity(0.85),
     );
   }
 }
