@@ -1,4 +1,5 @@
 import 'package:budget/pages/transactionFilters.dart';
+import 'package:budget/pages/calendarPage.dart';
 import 'package:budget/pages/upcomingOverdueTransactionsPage.dart';
 import 'package:budget/struct/defaultPreferences.dart';
 import 'package:budget/struct/settings.dart';
@@ -132,6 +133,18 @@ class TransactionsListPageState extends State<TransactionsListPage>
       selectedTransactionsAppBar: SelectedTransactionsAppBar(pageID: pageId),
       scrollbar: false,
       actions: [
+        IconButton(
+          padding: EdgeInsetsDirectional.all(15 - 8),
+          tooltip: "calendar".tr(),
+          onPressed: () {
+            pushRoute(context, const CalendarPage());
+          },
+          icon: Icon(
+            appStateSettings["outlinedIcons"]
+                ? Icons.calendar_month_outlined
+                : Icons.calendar_month_rounded,
+          ),
+        ),
         IconButton(
           tooltip: "filters".tr(),
           onPressed: () {

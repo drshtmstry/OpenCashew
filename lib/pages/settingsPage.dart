@@ -3,6 +3,7 @@ import 'package:budget/database/tables.dart' hide AppSettings;
 import 'package:budget/pages/aboutPage.dart';
 import 'package:budget/pages/addTransactionPage.dart';
 import 'package:budget/pages/billSplitter.dart';
+import 'package:budget/pages/calendarPage.dart';
 import 'package:budget/pages/budgetsListPage.dart';
 import 'package:budget/pages/creditDebtTransactionsPage.dart';
 import 'package:budget/pages/editHomePage.dart';
@@ -232,6 +233,21 @@ class MorePages extends StatelessWidget {
                       icon: appStateSettings["outlinedIcons"]
                           ? Icons.summarize_outlined
                           : Icons.summarize_rounded,
+                      isOutlined: true,
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Expanded(
+                    child: SettingsContainerOpenPage(
+                      openPage: const CalendarPage(),
+                      title: "calendar".tr(),
+                      icon: appStateSettings["outlinedIcons"]
+                          ? Icons.calendar_month_outlined
+                          : Icons.calendar_month_rounded,
                       isOutlined: true,
                     ),
                   ),

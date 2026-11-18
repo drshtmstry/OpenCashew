@@ -6555,25 +6555,32 @@ Expression<bool> buildBooleanTextFilter(
     return categoryFks == null && categoryFksExclude == null
         ? tbl.categoryFk.isNotNull()
         : categoryFks != null && categoryFksExclude == null
-            ? tbl.categoryFk.isIn(categoryFks)
+            ? (tbl.categoryFk.isIn(categoryFks) |
+                (tbl.subCategoryFk.isNotNull() &
+                    tbl.subCategoryFk.isIn(categoryFks)))
             : categoryFks == null && categoryFksExclude != null
-                ? tbl.categoryFk.isNotIn(categoryFksExclude)
-                : tbl.categoryFk.isIn(categoryFks ?? []) &
-                    tbl.categoryFk.isNotIn(categoryFksExclude ?? []);
+                ? (tbl.categoryFk.isNotIn(categoryFksExclude) &
+                    (tbl.subCategoryFk.isNull() |
+                        tbl.subCategoryFk.isNotIn(categoryFksExclude)))
+                : (tbl.categoryFk.isIn(categoryFks ?? []) |
+                        (tbl.subCategoryFk.isNotNull() &
+                            tbl.subCategoryFk.isIn(categoryFks ?? []))) &
+                    (tbl.categoryFk.isNotIn(categoryFksExclude ?? []) &
+                        (tbl.subCategoryFk.isNull() |
+                            tbl.subCategoryFk.isNotIn(categoryFksExclude ?? [])));
   }
 
   bool isInCategoryCheck(String categoryFk, List<String>? categoryFks,
-      List<String>? categoryFksExclude) {
+      List<String>? categoryFksExclude, {String? subCategoryFk}) {
     if ((categoryFks ?? []).length <= 0) categoryFks = null;
     if ((categoryFksExclude ?? []).length <= 0) categoryFksExclude = null;
-    return categoryFks == null && categoryFksExclude == null
-        ? true
-        : categoryFks != null && categoryFksExclude == null
-            ? categoryFks.contains(categoryFk)
-            : categoryFks == null && categoryFksExclude != null
-                ? categoryFksExclude.contains(categoryFk) == false
-                : (categoryFks ?? []).contains(categoryFk) &&
-                    (categoryFksExclude ?? []).contains(categoryFk) == false;
+    bool inIncluded = categoryFks == null ||
+        categoryFks.contains(categoryFk) ||
+        (subCategoryFk != null && categoryFks.contains(subCategoryFk));
+    bool inExcluded = categoryFksExclude != null &&
+        (categoryFksExclude.contains(categoryFk) ||
+            (subCategoryFk != null && categoryFksExclude.contains(subCategoryFk)));
+    return inIncluded && !inExcluded;
   }
 
   Expression<bool> onlyShowIfMember($TransactionsTable tbl, String? member) {

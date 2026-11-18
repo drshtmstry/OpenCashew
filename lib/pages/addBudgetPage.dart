@@ -1223,6 +1223,68 @@ class _AddBudgetPageState extends State<AddBudgetPage> {
               ),
             ),
           ),
+          if (selectedCategoryPks != null && selectedCategoryPks!.isNotEmpty)
+            SliverToBoxAdapter(
+              child: StreamBuilder<List<TransactionCategory>>(
+                stream: database.watchAllCategories(
+                  mainCategoryPks: selectedCategoryPks,
+                ),
+                builder: (context, snapshot) {
+                  final List<TransactionCategory> subCats = snapshot.data ?? [];
+                  if (subCats.isEmpty) return const SizedBox.shrink();
+
+                  return Padding(
+                    padding: const EdgeInsetsDirectional.only(
+                      start: 22,
+                      end: 22,
+                      bottom: 12,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        TextFont(
+                          text: "Subcategory Filters",
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          textColor: getColor(context, "textLight"),
+                        ),
+                        const SizedBox(height: 6),
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 6,
+                          children: subCats.map((subCat) {
+                            final bool isIncluded =
+                                selectedCategoryPks!.contains(subCat.categoryPk);
+                            return FilterChip(
+                              label: TextFont(
+                                text: (subCat.emojiIconName != null
+                                        ? "${subCat.emojiIconName!} "
+                                        : "") +
+                                    subCat.name,
+                                fontSize: 12,
+                              ),
+                              selected: isIncluded,
+                              onSelected: (selected) {
+                                final List<String> current =
+                                    List.from(selectedCategoryPks!);
+                                if (selected) {
+                                  if (!current.contains(subCat.categoryPk)) {
+                                    current.add(subCat.categoryPk);
+                                  }
+                                } else {
+                                  current.remove(subCat.categoryPk);
+                                }
+                                setSelectedCategories(current);
+                              },
+                            );
+                          }).toList(),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
           SliverStickyLabelDivider(
             info: "select-exclude-categories".tr(),
             extraInfo: getSelectedCategoriesText(selectedCategoryPksExclude,
@@ -1261,6 +1323,69 @@ class _AddBudgetPageState extends State<AddBudgetPage> {
               ),
             ),
           ),
+          if (selectedCategoryPks != null && selectedCategoryPks!.isNotEmpty)
+            SliverToBoxAdapter(
+              child: StreamBuilder<List<TransactionCategory>>(
+                stream: database.watchAllCategories(
+                  mainCategoryPks: selectedCategoryPks,
+                ),
+                builder: (context, snapshot) {
+                  final List<TransactionCategory> subCats = snapshot.data ?? [];
+                  if (subCats.isEmpty) return const SizedBox.shrink();
+
+                  return Padding(
+                    padding: const EdgeInsetsDirectional.only(
+                      start: 22,
+                      end: 22,
+                      bottom: 12,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        TextFont(
+                          text: "Exclude Subcategories",
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          textColor: getColor(context, "textLight"),
+                        ),
+                        const SizedBox(height: 6),
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 6,
+                          children: subCats.map((subCat) {
+                            final bool isExcluded =
+                                (selectedCategoryPksExclude ?? [])
+                                    .contains(subCat.categoryPk);
+                            return FilterChip(
+                              label: TextFont(
+                                text: (subCat.emojiIconName != null
+                                        ? "${subCat.emojiIconName!} "
+                                        : "") +
+                                    subCat.name,
+                                fontSize: 12,
+                              ),
+                              selected: isExcluded,
+                              onSelected: (selected) {
+                                final List<String> current = List.from(
+                                    selectedCategoryPksExclude ?? []);
+                                if (selected) {
+                                  if (!current.contains(subCat.categoryPk)) {
+                                    current.add(subCat.categoryPk);
+                                  }
+                                } else {
+                                  current.remove(subCat.categoryPk);
+                                }
+                                setSelectedCategoriesExclude(current);
+                              },
+                            );
+                          }).toList(),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
         ],
         listWidgets: [
           widget.budget != null && widget.budget!.sharedKey != null
@@ -1891,6 +2016,80 @@ class _BudgetDetailsState extends State<BudgetDetails> {
               );
             }),
           ),
+        if (enumRecurrence[selectedRecurrence] == BudgetReoccurence.custom &&
+            selectedEndDate != null)
+          Builder(builder: (context) {
+            final int totalDays =
+                selectedEndDate!.difference(selectedStartDate).inDays + 1;
+            final double amount = selectedAmount ?? 0;
+            final double perDay = totalDays > 0 ? (amount / totalDays) : 0;
+            final int daysRemaining =
+                selectedEndDate!.difference(DateTime.now()).inDays + 1;
+
+            return Padding(
+              padding: const EdgeInsetsDirectional.only(
+                top: 4,
+                bottom: 12,
+                start: 20,
+                end: 20,
+              ),
+              child: Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 8,
+                runSpacing: 6,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 4.5),
+                    decoration: BoxDecoration(
+                      color: getColor(context, "lightDarkAccentHeavy"),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: TextFont(
+                      text: "$totalDays " +
+                          (totalDays == 1 ? "day".tr() : "days".tr()),
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                      textColor: getColor(context, "black"),
+                    ),
+                  ),
+                  if (amount > 0)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 4.5),
+                      decoration: BoxDecoration(
+                        color: getColor(context, "lightDarkAccentHeavy"),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: TextFont(
+                        text: "${convertToMoney(Provider.of<AllWallets>(context), perDay)} / " +
+                            "day".tr().toLowerCase(),
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        textColor: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 4.5),
+                    decoration: BoxDecoration(
+                      color: getColor(context, "lightDarkAccentHeavy"),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: TextFont(
+                      text: (daysRemaining > 0 ? "$daysRemaining " : "0 ") +
+                          (daysRemaining == 1
+                              ? "day remaining"
+                              : "days remaining"),
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                      textColor: getColor(context, "textLight"),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }),
       ],
     );
   }
