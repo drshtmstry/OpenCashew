@@ -744,7 +744,7 @@ class _TransactionEntryState extends State<TransactionEntry> {
                               if (appStateSettings["transactionAction"] ==
                                       "openEdit" ||
                                   appStateSettings["transactionAction"] == 1) {
-                                openContainer();
+                                pushRoute(context, openPage);
                               } else {
                                 setState(() {
                                   isExpanded = !isExpanded;
@@ -979,7 +979,7 @@ class _TransactionEntryState extends State<TransactionEntry> {
                                                 ? Icons.edit_outlined
                                                 : Icons.edit_rounded,
                                             onTap: () {
-                                              openContainer();
+                                              pushRoute(context, openPage);
                                             },
                                           ),
                                         ],
