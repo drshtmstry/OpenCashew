@@ -120,16 +120,18 @@
   - Register in `homePage.dart` and `editHomePage.dart`
 
 ### Transaction Features
+- [x] **Payee / Payer Management** — mapped per Category and Subcategory with quick-add chips in transaction entry, category-centric management in `AddCategoryPage`, and automatic labeling — _changelog 6.0.0_
 - [x] **Pinned Transactions** manager shortcut from the `+` long-press menu — manager already supports adding, ordering, and unpinning; direct pinning from a transaction's `+` action remains a follow-up — _changelog 6.0.0_
 - [x] **Bi-weekly and Quarterly** repeat options for scheduled transactions — _changelog 6.0.0_
-- [ ] **Excluded from Totals** transactions filter — _changelog 6.0.0 "Excluded from totals transactions filter"_
-- [ ] **Filter "Notes contains" and "Title contains" with AND (`&&`) / OR (`||`)** logic — _changelog 6.0.0_
-- [ ] **Sort Transactions** in Search page and monthly list — _changelog 6.0.0_
+- [x] **Excluded from Totals** transactions filter — _changelog 6.0.0 "Excluded from totals transactions filter"_
+- [x] **Filter "Notes contains" and "Title contains" with AND (`&&`) / OR (`||`)** logic — _changelog 6.0.0_
+- [x] **Sort Transactions** in Search page and monthly list (Date, Amount, Alphabetical) — _changelog 6.0.0_
 - [x] **Export Selected Transactions** from Search page as CSV — reuses transaction selection and CSV encoding/file saving — _changelog 6.0.0_
 - [ ] **Evaluate Partial Calculation** when entering amounts (e.g., `50+30`) — _changelog 6.0.0_
 - [ ] **Copy/Paste Calculations** when entering amounts — _changelog 6.0.0_
-- [ ] **Edit Note on All Selected Transactions** (bulk edit) — _changelog 6.0.0_
-- [ ] **Edit Include/Exclude Toggle** when bulk editing selected transaction amounts — _changelog 6.0.0_
+- [x] **Edit Note on All Selected Transactions** (bulk edit) — _changelog 6.0.0_
+- [x] **Edit Include/Exclude Toggle** when bulk editing selected transaction amounts — _changelog 6.0.0_
+- [x] **Account Archiving** — in `AddWalletPage`, toggle "Archive Account"; in `EditWalletsPage`, active accounts and archived accounts are separated with a dedicated archived section — _changelog 6.0.0_
 
 ### Pages & Navigation
 - [ ] **Calendar Page** — daily totals, monthly total banner, filter/search, double-press day to add transaction, net/day total toggle — _changelog 5.3.5 "New calendar page"_
