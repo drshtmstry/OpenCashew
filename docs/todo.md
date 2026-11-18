@@ -146,11 +146,12 @@
 - [ ] **Savings Budget vs Expense Budget** type — _web app audit_
 
 ### Accounts & Import
+- [x] **Account Icons & Custom Image Logo Support** — default icons per account type (bank, cash, card, prepaid, savings, other) with support for selecting and saving custom image/logo files locally in app storage and app-wide UI rendering.
 - [x] **Account Currency Options List** — the Edit Account screen presents currency choices as a searchable list instead of tiles.
 - [x] **View Transactions with Account Filter** — Edit Account screen opens Search with that wallet filter applied.
 - [ ] **Accounts List Page** (dedicated accounts overview) — _changelog 6.0.0_
 - [ ] **Account Spending Summary Table** — _changelog 5.2.6_
-- [ ] **Ability to Archive Accounts** — _changelog 6.0.0_
+- [x] **Ability to Archive Accounts** — _changelog 6.0.0_
 - [ ] **Group Accounts by Color** in home page accounts list — _changelog 6.0.0_
 - [ ] **Custom Period per Account** in account summary statistics — _changelog 6.0.0_
 - [ ] **Import CSV via Google Drive** — _changelog 6.0.0_
