@@ -38,15 +38,19 @@ class _WidgetSizeState extends State<WidgetSize> {
   var oldSize;
 
   void postFrameCallback(_) {
+    if (!mounted) return;
     var context = widgetKey.currentContext;
     if (context == null) return;
 
     try {
-      Size newSize = context.size ?? Size(0, 0);
-      if (oldSize == newSize) return;
+      final RenderObject? renderBox = context.findRenderObject();
+      if (renderBox is RenderBox && renderBox.hasSize) {
+        Size newSize = renderBox.size;
+        if (oldSize == newSize) return;
 
-      oldSize = newSize;
-      widget.onChange(newSize);
+        oldSize = newSize;
+        widget.onChange(newSize);
+      }
     } catch (e) {
       print(e.toString());
     }

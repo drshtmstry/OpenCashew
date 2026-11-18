@@ -59,7 +59,7 @@ class SelectChips<T> extends StatefulWidget {
 }
 
 class _SelectChipsState<T> extends State<SelectChips<T>> {
-  double heightOfScroll = 0;
+  double heightOfScroll = 35;
   final ItemScrollController itemScrollController = ItemScrollController();
   final ScrollOffsetController scrollOffsetController =
       ScrollOffsetController();
@@ -151,7 +151,7 @@ class _SelectChipsState<T> extends State<SelectChips<T>> {
                           ? null
                           : Column(
                               mainAxisAlignment: MainAxisAlignment.center,
-                              mainAxisSize: MainAxisSize.max,
+                              mainAxisSize: MainAxisSize.min,
                               children: [
                                 avatar,
                               ],
@@ -241,7 +241,9 @@ class _SelectChipsState<T> extends State<SelectChips<T>> {
                         child: widget.extraWidgetBefore == null &&
                                 widget.extraWidgetBeforeSticky == false
                             ? children[0]
-                            : children[1],
+                            : (children.length > 1
+                                ? children[1]
+                                : children[0]),
                       ),
                     ),
                   ),
