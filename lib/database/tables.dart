@@ -928,12 +928,10 @@ class FinanceDatabase extends _$FinanceDatabase {
           await migrator.alterTable(TableMigration(transactions));
           await migrator.deleteTable("Labels");
         }
-        if (from < 46) {
-          try {
-            await migrator.runMigrationSteps(
-              from: from,
-              to: to > 46 ? 46 : to,
-              steps: migrationSteps(
+        await migrator.runMigrationSteps(
+          from: from,
+          to: to,
+          steps: migrationSteps(
             from33To34: (m, schema) async {
               await m.addColumn(schema.wallets, schema.wallets.decimals);
             },
@@ -1231,90 +1229,79 @@ class FinanceDatabase extends _$FinanceDatabase {
                         e.toString());
               }
             },
+            from46To47: (m, schema) async {
+              try {
+                await m.addColumn(
+                    schema.categories, schema.categories.archived);
+              } catch (e) {
+                print("Migration Error: Error creating column categories.archived " +
+                    e.toString());
+              }
+              try {
+                await m.addColumn(schema.wallets, schema.wallets.archived);
+              } catch (e) {
+                print("Migration Error: Error creating column wallets.archived " +
+                    e.toString());
+              }
+              try {
+                await m.addColumn(schema.wallets, schema.wallets.emojiIconName);
+              } catch (e) {
+                print("Migration Error: Error creating column wallets.emojiIconName " +
+                    e.toString());
+              }
+              try {
+                await customStatement(
+                    'ALTER TABLE associated_titles ADD COLUMN archived INTEGER NOT NULL DEFAULT 0');
+              } catch (e) {
+                print("Migration Error: Error creating column associatedTitles.archived " +
+                    e.toString());
+              }
+              try {
+                await customStatement(
+                    'ALTER TABLE scanner_templates ADD COLUMN default_title TEXT');
+              } catch (e) {
+                print("Migration Error: Error creating column scannerTemplates.defaultTitle " +
+                    e.toString());
+              }
+            },
+            from47To48: (m, schema) async {
+              try {
+                await m.createTable(schema.tags);
+              } catch (e) {
+                print("Migration Error: Error creating table TagsTable " +
+                    e.toString());
+              }
+              try {
+                await m.createTable(schema.transactionToTagLinks);
+              } catch (e) {
+                print("Migration Error: Error creating table TransactionToTagLinksTable " +
+                    e.toString());
+              }
+            },
+            from48To49: (m, schema) async {
+              try {
+                await m.createTable(schema.payees);
+              } catch (e) {
+                print("Migration Error: Error creating table Payees " +
+                    e.toString());
+              }
+              try {
+                await m.addColumn(
+                    schema.transactions, schema.transactions.payee);
+              } catch (e) {
+                print("Migration Error: Error adding column transactions.payee " +
+                    e.toString());
+              }
+              try {
+                await m.addColumn(
+                    schema.transactions, schema.transactions.payeeFk);
+              } catch (e) {
+                print("Migration Error: Error adding column transactions.payeeFk " +
+                    e.toString());
+              }
+            },
           ),
         );
-      } catch (e) {
-        print("Migration Error: Error running migration steps " + e.toString());
-      }
-    }
-        if (from <= 46) {
-          try {
-            await migrator.addColumn(categories, categories.archived);
-          } catch (e) {
-            print("Migration Error: Error creating column categories.archived " +
-                e.toString());
-          }
-          try {
-            await migrator.addColumn(wallets, wallets.archived);
-          } catch (e) {
-            print("Migration Error: Error creating column wallets.archived " +
-                e.toString());
-          }
-          try {
-            await migrator.addColumn(wallets, wallets.emojiIconName);
-          } catch (e) {
-            print("Migration Error: Error creating column wallets.emojiIconName " +
-                e.toString());
-          }
-          try {
-            await customStatement(
-                'ALTER TABLE associated_titles ADD COLUMN archived INTEGER NOT NULL DEFAULT 0');
-          } catch (e) {
-            print("Migration Error: Error creating column associatedTitles.archived " +
-                e.toString());
-          }
-          try {
-            await customStatement(
-                'ALTER TABLE scanner_templates ADD COLUMN default_title TEXT');
-          } catch (e) {
-            print("Migration Error: Error creating column scannerTemplates.defaultTitle " +
-                e.toString());
-          }
-        }
-        if (from <= 47) {
-          try {
-            await migrator.createTable(tags);
-          } catch (e) {
-            print("Migration Error: Error creating table TagsTable " +
-                e.toString());
-          }
-          try {
-            await migrator.createTable(transactionToTagLinks);
-          } catch (e) {
-            print("Migration Error: Error creating table TransactionToTagLinksTable " +
-                e.toString());
-          }
-        }
-        if (from <= 48) {
-          try {
-            await customStatement('CREATE TABLE IF NOT EXISTS payees ('
-                'payee_pk TEXT NOT NULL PRIMARY KEY, '
-                'name TEXT NOT NULL, '
-                'category_fk TEXT NOT NULL, '
-                'date_created INTEGER NOT NULL, '
-                'date_time_modified INTEGER, '
-                '"order" INTEGER NOT NULL DEFAULT 0, '
-                'archived INTEGER NOT NULL DEFAULT 0'
-                ');');
-          } catch (e) {
-            print("Migration Error: Error creating table Payees " +
-                e.toString());
-          }
-          try {
-            await customStatement(
-                'ALTER TABLE transactions ADD COLUMN payee TEXT;');
-          } catch (e) {
-            print("Migration Error: Error adding column transactions.payee " +
-                e.toString());
-          }
-          try {
-            await customStatement(
-                'ALTER TABLE transactions ADD COLUMN payee_fk TEXT;');
-          } catch (e) {
-            print("Migration Error: Error adding column transactions.payeeFk " +
-                e.toString());
-          }
-        }
       },
       beforeOpen: (details) async {
         // Safe check for Payees table and columns
