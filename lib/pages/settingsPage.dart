@@ -215,29 +215,6 @@ class MorePages extends StatelessWidget {
                 children: [
                   Expanded(
                     child: SettingsContainerOpenPage(
-                      openPage: ObjectivesListPage(
-                        backButton: true,
-                      ),
-                      title: navBarIconsData["goals"]!.label.tr(),
-                      icon: navBarIconsData["goals"]!.iconData,
-                      isOutlined: true,
-                    ),
-                  ),
-                  Expanded(
-                    child: SettingsContainerOpenPage(
-                      openPage: CreditDebtTransactions(isCredit: null),
-                      title: navBarIconsData["loans"]!.label.tr(),
-                      icon: navBarIconsData["loans"]!.iconData,
-                      isOutlined: true,
-                    ),
-                  ),
-                ],
-              ),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Expanded(
-                    child: SettingsContainerOpenPage(
                       openPage: ActivityPage(),
                       title: "activity-log".tr() != "activity-log"
                           ? "activity-log".tr()
