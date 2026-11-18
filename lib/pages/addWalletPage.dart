@@ -28,6 +28,7 @@ import 'package:budget/widgets/tappable.dart';
 import 'package:budget/widgets/tappableTextEntry.dart';
 import 'package:budget/widgets/textInput.dart';
 import 'package:budget/widgets/textWidgets.dart';
+import 'package:budget/widgets/walletIcon.dart';
 import 'package:budget/widgets/currencyPicker.dart';
 import 'package:budget/widgets/transactionEntry/incomeAmountArrow.dart';
 import 'package:budget/widgets/util/widgetSize.dart';
@@ -62,7 +63,8 @@ class _AddWalletPageState extends State<AddWalletPage> {
   String? selectedTitle;
   late Color? selectedColor =
       widget.wallet?.colour == null ? null : HexColor(widget.wallet?.colour);
-  String? selectedIconName;
+  late String? selectedIconName = widget.wallet?.iconName;
+  late String? selectedEmoji = widget.wallet?.emojiIconName;
   Map<String, dynamic> currencies = {};
   bool customCurrencyIcon = false;
   String? searchCurrency = "";
@@ -139,6 +141,7 @@ class _AddWalletPageState extends State<AddWalletPage> {
       walletPk: widget.wallet != null ? widget.wallet!.walletPk : "-1",
       name: selectedTitle ?? "",
       colour: toHexString(selectedColor),
+      iconName: selectedIconName,
       dateCreated:
           widget.wallet != null ? widget.wallet!.dateCreated : DateTime.now(),
       dateTimeModified: null,
@@ -149,7 +152,7 @@ class _AddWalletPageState extends State<AddWalletPage> {
           ? widget.wallet!.homePageWidgetDisplay
           : defaultWalletHomePageWidgetDisplay,
       archived: selectedArchived,
-      emojiIconName: widget.wallet?.emojiIconName,
+      emojiIconName: selectedEmoji,
     );
   }
 
@@ -190,6 +193,8 @@ class _AddWalletPageState extends State<AddWalletPage> {
       selectedCurrency = widget.wallet!.currency ?? "usd";
       selectedDecimals = widget.wallet!.decimals;
       selectedAccountType = getAccountTypeFromWallet(widget.wallet);
+      selectedIconName = widget.wallet!.iconName;
+      selectedEmoji = widget.wallet!.emojiIconName;
     }
     populateCurrencies();
     Future.delayed(Duration.zero, () async {
@@ -461,19 +466,72 @@ class _AddWalletPageState extends State<AddWalletPage> {
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsetsDirectional.symmetric(horizontal: 20),
-              child: TextInput(
-                autoFocus: kIsWeb && getIsFullScreen(context),
-                focusNode: _titleFocusNode,
-                labelText: "name-placeholder".tr(),
-                bubbly: false,
-                initialValue: selectedTitle,
-                onChanged: (text) {
-                  setSelectedTitle(text);
-                },
-                padding: EdgeInsetsDirectional.only(start: 7, end: 7),
-                fontSize: 30,
-                fontWeight: FontWeight.bold,
-                topContentPadding: 20,
+              child: Row(
+                mainAxisSize: MainAxisSize.max,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Tappable(
+                    color: Colors.transparent,
+                    onTap: () {
+                      openSelectWalletIconBottomSheet(
+                        context: context,
+                        selectedIconName: selectedIconName,
+                        selectedEmoji: selectedEmoji,
+                        selectedAccountType: selectedAccountType,
+                        selectedColor: selectedColor,
+                        onSelectedIcon: (icon) {
+                          setState(() {
+                            selectedIconName = icon;
+                            selectedEmoji = null;
+                          });
+                          determineBottomButton();
+                        },
+                        onSelectedEmoji: (emoji) {
+                          setState(() {
+                            selectedEmoji = emoji;
+                            selectedIconName = null;
+                          });
+                          determineBottomButton();
+                        },
+                        onSelectedAccountType: (type) {
+                          setState(() {
+                            selectedAccountType = type;
+                            userManuallySelectedAccountType = true;
+                            selectedIconName = null;
+                            selectedEmoji = null;
+                          });
+                          determineBottomButton();
+                        },
+                      );
+                    },
+                    child: WalletIconPreview(
+                      selectedIconName: selectedIconName,
+                      selectedEmoji: selectedEmoji,
+                      selectedAccountType: selectedAccountType,
+                      selectedColor: selectedColor,
+                      size: 32,
+                      sizePadding: 16,
+                      borderRadius: 18,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: TextInput(
+                      autoFocus: kIsWeb && getIsFullScreen(context),
+                      focusNode: _titleFocusNode,
+                      labelText: "name-placeholder".tr(),
+                      bubbly: false,
+                      initialValue: selectedTitle,
+                      onChanged: (text) {
+                        setSelectedTitle(text);
+                      },
+                      padding: const EdgeInsetsDirectional.only(start: 7, end: 7),
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                      topContentPadding: 20,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -487,6 +545,13 @@ class _AddWalletPageState extends State<AddWalletPage> {
                 horizontalList: true,
                 selectedColor: selectedColor,
                 setSelectedColor: setSelectedColor,
+                previewBuilder: (color) => WalletIconPreview(
+                  selectedIconName: selectedIconName,
+                  selectedEmoji: selectedEmoji,
+                  selectedAccountType: selectedAccountType,
+                  selectedColor: color,
+                  smallPreview: true,
+                ),
               ),
             ),
           ),

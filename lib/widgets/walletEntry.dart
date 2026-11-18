@@ -18,6 +18,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:budget/pages/walletDetailsPage.dart';
 import 'package:budget/colors.dart';
+import 'package:budget/widgets/walletIcon.dart';
 import 'package:provider/provider.dart';
 import 'package:budget/widgets/countNumber.dart';
 
@@ -64,18 +65,13 @@ class WalletEntry extends StatelessWidget {
                   clipBehavior: Clip.none,
                   children: [
                     PositionedDirectional(
-                      end: -11,
-                      top: -5,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadiusDirectional.circular(100),
-                          color: HexColor(walletWithDetails.wallet.colour,
-                                  defaultColor:
-                                      Theme.of(context).colorScheme.primary)
-                              .withOpacity(0.7),
-                        ),
-                        width: 20,
-                        height: 20,
+                      end: -10,
+                      top: -6,
+                      child: WalletIcon(
+                        wallet: walletWithDetails.wallet,
+                        size: 16,
+                        sizePadding: 8,
+                        borderRadius: 100,
                       ),
                     ),
                     Container(
@@ -224,6 +220,15 @@ class WalletEntryRow extends StatelessWidget {
                                   ),
                                 ),
                         ),
+                        if (!isCurrencyRow) ...[
+                          const SizedBox(width: 8),
+                          WalletIcon(
+                            wallet: walletWithDetails.wallet,
+                            size: 18,
+                            sizePadding: 8,
+                            borderRadius: 8,
+                          ),
+                        ],
                         Flexible(
                           child: Padding(
                             padding: const EdgeInsetsDirectional.only(

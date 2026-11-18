@@ -40,6 +40,7 @@ import 'package:budget/widgets/tappable.dart';
 import 'package:budget/widgets/textInput.dart';
 import 'package:budget/widgets/textWidgets.dart';
 import 'package:budget/widgets/selectChips.dart';
+import 'package:budget/widgets/walletIcon.dart';
 import 'package:budget/widgets/saveBottomButton.dart';
 import 'package:budget/widgets/transactionEntry/transactionEntry.dart';
 import 'package:budget/widgets/transactionEntry/transactionEntryTypeButton.dart';
@@ -1539,6 +1540,15 @@ class _AddTransactionPageState extends State<AddTransactionPage>
                             return getWalletStringName(
                                 Provider.of<AllWallets>(context), wallet);
                           },
+                          getAvatar: (TransactionWallet wallet) {
+                            return WalletIcon(
+                              wallet: wallet,
+                              size: 16,
+                              sizePadding: 2,
+                              borderRadius: 100,
+                              noBackground: true,
+                            );
+                          },
                           extraWidgetAfter: SelectChipsAddButtonExtraWidget(
                             openPage: AddWalletPage(
                               routesToPopAfterDelete:
@@ -2380,9 +2390,11 @@ class SelectedWalletButton extends StatelessWidget {
     Key? key,
     required this.onTap,
     required this.selectedWalletName,
+    this.selectedWallet,
   }) : super(key: key);
   final VoidCallback onTap;
   final String selectedWalletName;
+  final TransactionWallet? selectedWallet;
   @override
   Widget build(BuildContext context) {
     return Tappable(
@@ -2393,13 +2405,21 @@ class SelectedWalletButton extends StatelessWidget {
             const EdgeInsetsDirectional.symmetric(horizontal: 20, vertical: 6),
         child: Row(
           children: [
-            ButtonIcon(
-              onTap: onTap,
-              icon: appStateSettings["outlinedIcons"]
-                  ? Icons.account_balance_wallet_outlined
-                  : Icons.account_balance_wallet_rounded,
-              size: 41,
-            ),
+            selectedWallet != null
+                ? WalletIcon(
+                    wallet: selectedWallet,
+                    size: 26,
+                    sizePadding: 12,
+                    borderRadius: 14,
+                    onTap: onTap,
+                  )
+                : ButtonIcon(
+                    onTap: onTap,
+                    icon: appStateSettings["outlinedIcons"]
+                        ? Icons.account_balance_wallet_outlined
+                        : Icons.account_balance_wallet_rounded,
+                    size: 41,
+                  ),
             SizedBox(width: 15),
             Expanded(
               child: TextFont(

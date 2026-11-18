@@ -33,6 +33,7 @@ import 'package:budget/widgets/periodCyclePicker.dart';
 import 'package:budget/widgets/scrollbarWrap.dart';
 import 'package:budget/widgets/selectedTransactionsAppBar.dart';
 import 'package:budget/widgets/categoryEntry.dart';
+import 'package:budget/widgets/walletIcon.dart';
 import 'package:budget/widgets/framework/pageFramework.dart';
 import 'package:budget/widgets/pieChart.dart';
 import 'package:budget/widgets/settingsContainers.dart';
@@ -1254,6 +1255,34 @@ class WalletDetailsPageState extends State<WalletDetailsPage>
         ),
         title:
             widget.wallet == null ? "summary".tr() : widget.wallet!.name,
+        titleWidget: widget.wallet == null
+            ? null
+            : StreamBuilder<TransactionWallet>(
+                stream: database.getWallet(widget.wallet!.walletPk),
+                builder: (context, snapshot) {
+                  TransactionWallet wallet = snapshot.data ?? widget.wallet!;
+                  return Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      WalletIcon(
+                        wallet: wallet,
+                        size: 26,
+                        sizePadding: 8,
+                        borderRadius: 12,
+                      ),
+                      const SizedBox(width: 8),
+                      Flexible(
+                        child: TextFont(
+                          text: wallet.name,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 25,
+                          maxLines: 1,
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
         subtitle: widget.wallet == null
             ? null
             : StreamBuilder<TransactionWallet>(

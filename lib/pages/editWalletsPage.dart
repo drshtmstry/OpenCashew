@@ -23,6 +23,7 @@ import 'package:budget/widgets/tappable.dart';
 import 'package:budget/widgets/textInput.dart';
 import 'package:budget/widgets/textWidgets.dart';
 import 'package:budget/widgets/transactionEntry/transactionEntryTag.dart';
+import 'package:budget/widgets/walletIcon.dart';
 import 'package:budget/widgets/walletEntry.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart' hide SliverReorderableList;
@@ -299,14 +300,25 @@ class EditWalletsPageState extends State<EditWalletsPage> {
                               currentReorder != -1 && currentReorder != index,
                           index: index,
                           accentColor: accentColor,
-                          content: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                          content: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              TextFont(
-                                text: wallet.name,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 21,
+                              WalletIcon(
+                                wallet: wallet,
+                                size: 26,
+                                sizePadding: 10,
+                                borderRadius: 12,
                               ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    TextFont(
+                                      text: wallet.name,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 21,
+                                    ),
                               Container(height: 2),
                               TextFont(
                                 textAlign: TextAlign.start,
@@ -380,6 +392,9 @@ class EditWalletsPageState extends State<EditWalletsPage> {
                               ),
                             ],
                           ),
+                        ),
+                      ],
+                    ),
                           onDelete: () async {
                             return (await deleteWalletPopup(
                                   context,
@@ -479,14 +494,25 @@ class EditWalletsPageState extends State<EditWalletsPage> {
                               currentReorder: false,
                               index: index,
                               accentColor: accentColor,
-                              content: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                              content: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  TextFont(
-                                    text: wallet.name,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 21,
+                                  WalletIcon(
+                                    wallet: wallet,
+                                    size: 26,
+                                    sizePadding: 10,
+                                    borderRadius: 12,
                                   ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        TextFont(
+                                          text: wallet.name,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 21,
+                                        ),
                                   Container(height: 2),
                                   TextFont(
                                     textAlign: TextAlign.start,
@@ -542,6 +568,9 @@ class EditWalletsPageState extends State<EditWalletsPage> {
                                   ),
                                 ],
                               ),
+                            ),
+                          ],
+                        ),
                               onDelete: () async {
                                 return (await deleteWalletPopup(
                                       context,
