@@ -15,6 +15,7 @@ List<TransactionCategory> defaultCategories() {
       dateTimeModified: null,
       order: 0,
       income: false,
+      archived: false,
     ),
     TransactionCategory(
       categoryPk: "2",
@@ -25,6 +26,7 @@ List<TransactionCategory> defaultCategories() {
       dateTimeModified: null,
       order: 1,
       income: false,
+      archived: false,
     ),
     TransactionCategory(
       categoryPk: "3",
@@ -35,6 +37,7 @@ List<TransactionCategory> defaultCategories() {
       dateTimeModified: null,
       order: 2,
       income: false,
+      archived: false,
     ),
     TransactionCategory(
       categoryPk: "4",
@@ -45,6 +48,7 @@ List<TransactionCategory> defaultCategories() {
       dateTimeModified: null,
       order: 3,
       income: false,
+      archived: false,
     ),
     TransactionCategory(
       categoryPk: "5",
@@ -55,6 +59,7 @@ List<TransactionCategory> defaultCategories() {
       dateTimeModified: null,
       order: 4,
       income: false,
+      archived: false,
     ),
     TransactionCategory(
       categoryPk: "6",
@@ -65,27 +70,8 @@ List<TransactionCategory> defaultCategories() {
       dateTimeModified: null,
       order: 5,
       income: false,
+      archived: false,
     ),
-    // TransactionCategory(
-    //   categoryPk: "7,
-    //   name: "Education",
-    //   colour: toHexString(Colors.blue),
-    //   iconName: "graduation.png",
-    //   dateCreated: DateTime.now(),
-    //   dateTimeModified: null,
-    //   order: 6,
-    //   income: false,
-    // ),
-    // TransactionCategory(
-    //   categoryPk: "8",
-    //   name: "default-category-sports".tr(),
-    //   colour: toHexString(Colors.cyan),
-    //   iconName: "sports.png",
-    //   dateCreated: DateTime.now(),
-    //   dateTimeModified: null,
-    //   order: 7,
-    //   income: false,
-    // ),
     TransactionCategory(
       categoryPk: "7",
       name: "default-category-gifts".tr(),
@@ -95,6 +81,7 @@ List<TransactionCategory> defaultCategories() {
       dateTimeModified: null,
       order: 6,
       income: false,
+      archived: false,
     ),
     TransactionCategory(
       categoryPk: "8",
@@ -105,6 +92,7 @@ List<TransactionCategory> defaultCategories() {
       dateTimeModified: null,
       order: 8,
       income: false,
+      archived: false,
     ),
     TransactionCategory(
       categoryPk: "9",
@@ -115,6 +103,7 @@ List<TransactionCategory> defaultCategories() {
       dateTimeModified: null,
       order: 9,
       income: false,
+      archived: false,
     ),
     TransactionCategory(
       categoryPk: "10",
@@ -125,6 +114,7 @@ List<TransactionCategory> defaultCategories() {
       dateTimeModified: null,
       order: 10,
       income: false,
+      archived: false,
     ),
     TransactionCategory(
       categoryPk: "11",
@@ -135,6 +125,7 @@ List<TransactionCategory> defaultCategories() {
       dateTimeModified: null,
       order: 11,
       income: true,
+      archived: false,
     ),
   ];
 }

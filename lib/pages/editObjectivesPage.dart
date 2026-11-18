@@ -234,6 +234,7 @@ class _EditObjectivesPageState extends State<EditObjectivesPage> {
                               iconName: objective.iconName,
                               colour: objective.colour,
                               emojiIconName: objective.emojiIconName,
+                              archived: false,
                             ),
                             canEditByLongPress: false,
                             borderRadius: 1000,

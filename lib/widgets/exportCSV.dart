@@ -115,6 +115,8 @@ class ExportCSV extends StatelessWidget {
               (transactionWithCategory.wallet?.currency ?? "").allCaps,
           "title": (transactionWithCategory) =>
               transactionWithCategory.transaction.name,
+          "payee": (transactionWithCategory) =>
+              transactionWithCategory.transaction.payee ?? "",
           "note": (transactionWithCategory) =>
               transactionWithCategory.transaction.note,
           "date": (transactionWithCategory) =>

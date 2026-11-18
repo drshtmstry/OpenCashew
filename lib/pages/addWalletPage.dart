@@ -1158,6 +1158,7 @@ Future<TransactionCategory> initializeBalanceCorrectionCategory() async {
         dateTimeModified: null,
         order: numberOfCategories,
         income: false,
+        archived: false,
       ),
     );
     return await database.getCategory("0").$2;

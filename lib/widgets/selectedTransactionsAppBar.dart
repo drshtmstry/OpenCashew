@@ -43,7 +43,7 @@ Future<void> exportSelectedTransactions(
   if (transactions.isEmpty) return;
 
   List<String> headers = [
-    "account", "amount", "currency", "title", "note", "date", "income",
+    "account", "amount", "currency", "title", "payee", "note", "date", "income",
     "type", "category name", "subcategory name", "color", "icon", "emoji",
     "budget", "objective"
   ];
@@ -54,6 +54,7 @@ Future<void> exportSelectedTransactions(
       item.transaction.amount,
       (item.wallet?.currency ?? "").toUpperCase(),
       item.transaction.name,
+      item.transaction.payee ?? "",
       item.transaction.note,
       item.transaction.dateCreated.toString(),
       item.transaction.income,

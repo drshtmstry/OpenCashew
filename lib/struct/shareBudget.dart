@@ -416,6 +416,7 @@ Future<int> downloadTransactionsFromBudgets(
               iconName: transactionDecoded["categoryIcon"],
               colour: transactionDecoded["categoryColour"],
               methodAdded: MethodAdded.shared,
+              archived: false,
             ),
           );
           selectedCategory = await database

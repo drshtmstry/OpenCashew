@@ -167,6 +167,13 @@ class _ImportCSVState extends State<ImportCSV> {
           "setHeaderValue": "",
           "setHeaderIndex": -1,
         },
+        "payee": {
+          "displayName": "payee",
+          "headerValues": ["payee", "payer", "merchant"],
+          "required": false,
+          "setHeaderValue": "",
+          "setHeaderIndex": -1,
+        },
         "note": {
           "displayName": "note",
           "headerValues": ["note"],
@@ -908,6 +915,14 @@ class _ImportingEntriesPopupState extends State<ImportingEntriesPopup> {
       note = row[assignedColumns["note"]!["setHeaderIndex"]].toString().trim();
     }
 
+    String? payee;
+    if (assignedColumns["payee"] != null &&
+        assignedColumns["payee"]!["setHeaderIndex"] != -1) {
+      String p =
+          row[assignedColumns["payee"]!["setHeaderIndex"]].toString().trim();
+      if (p.isNotEmpty) payee = p;
+    }
+
     String categoryFk = "0";
     TransactionCategory selectedCategory;
     try {
@@ -955,6 +970,7 @@ class _ImportingEntriesPopupState extends State<ImportingEntriesPopup> {
             income: amount > 0,
             iconName: "image.png",
             methodAdded: MethodAdded.csv,
+            archived: false,
           ),
         );
         selectedCategory = await database.getCategoryInstanceGivenName(
@@ -1092,6 +1108,7 @@ class _ImportingEntriesPopupState extends State<ImportingEntriesPopup> {
         paid: true,
         skipPaid: false,
         methodAdded: MethodAdded.csv,
+        payee: payee,
       ),
       name == ""
           ? null
@@ -1183,6 +1200,16 @@ class _ImportingEntriesPopupState extends State<ImportingEntriesPopup> {
       List<AssociatedTitlesCompanion> filteredList = titlesMap.values.toList();
 
       await database.createBatchTransactionsOnly(transactionsInserting);
+      for (TransactionsCompanion t in transactionsInserting) {
+        if (t.payee.present &&
+            t.payee.value != null &&
+            t.payee.value!.isNotEmpty) {
+          try {
+            await database.addAssociatedPayee(
+                t.payee.value!, t.categoryFk.value);
+          } catch (_) {}
+        }
+      }
       await database.createBatchAssociatedTitlesOnly(filteredList);
       await database.fixOrderAssociatedTitles();
 
