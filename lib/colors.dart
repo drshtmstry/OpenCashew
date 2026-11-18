@@ -19,30 +19,8 @@ AppColors getAppColors(
     required ThemeData themeData,
     required Color accentColor}) {
   Color lightDarkAccentHeavyLight = brightness == Brightness.light
-      ? appStateSettings["accentSystemColor"] == true &&
-              appStateSettings["materialYou"] &&
-              appStateSettings["batterySaver"] == false
-          ? lightenPastel(
-              themeData.colorScheme.primary,
-              amount: 0.96,
-            )
-          : appStateSettings["materialYou"]
-              ? (appStateSettings["batterySaver"]
-                  ? lightenPastel(accentColor, amount: 0.8)
-                  : lightenPastel(accentColor, amount: 0.92))
-              : (appStateSettings["batterySaver"]
-                  ? Color(0xFFF3F3F3)
-                  : Color(0xFFFFFFFF))
-      : appStateSettings["accentSystemColor"] == true &&
-              appStateSettings["materialYou"] &&
-              appStateSettings["batterySaver"] == false
-          ? darkenPastel(
-              themeData.colorScheme.primary,
-              amount: 0.85,
-            )
-          : appStateSettings["materialYou"]
-              ? darkenPastel(accentColor, amount: 0.8)
-              : Color(0xFF242424);
+      ? const Color(0xFFFFFFFF)
+      : const Color(0xFF1E293B);
   return brightness == Brightness.light
       ? AppColors(
           colors: {
@@ -52,32 +30,23 @@ AppColors getAppColors(
                 ? Colors.black.withOpacity(0.7)
                 : appStateSettings["materialYou"]
                     ? Colors.black.withOpacity(0.4)
-                    : Color(0xFF888888),
-            "lightDarkAccent": appStateSettings["materialYou"]
-                ? lightenPastel(accentColor, amount: 0.6)
-                : Color(0xFFF7F7F7),
+                    : const Color(0xFF64748B), // Slate 500
+            "lightDarkAccent": const Color(0xFFF8FAFC), // Slate 50
             "lightDarkAccentHeavyLight": lightDarkAccentHeavyLight,
-            "canvasContainer": const Color(0xFFEBEBEB),
-            "lightDarkAccentHeavy": Color(0xFFEBEBEB),
-            "shadowColor": const Color(0x655A5A5A),
-            "shadowColorLight": const Color(0x2D5A5A5A),
-            "unPaidUpcoming": Color(0xFF58A4C2),
-            "unPaidOverdue": Color(0xFF6577E0),
-            "incomeAmount": Color(0xFF59A849),
-            "expenseAmount": Color(0xFFCA5A5A),
-            "warningOrange": Color(0xFFCA995A),
-            "starYellow": Color(0xFFFFD723),
+            "canvasContainer": const Color(0xFFF1F5F9), // Slate 100
+            "lightDarkAccentHeavy": const Color(0xFFE2E8F0), // Slate 200
+            "shadowColor": const Color(0x140F172A), // Low-contrast slate shadow
+            "shadowColorLight": const Color(0x0A0F172A),
+            "unPaidUpcoming": const Color(0xFF0284C7), // Sky 600
+            "unPaidOverdue": const Color(0xFF4F46E5), // Indigo 600
+            "incomeAmount": const Color(0xFF059669), // Emerald 600
+            "expenseAmount": const Color(0xFFE11D48), // Rose 600
+            "warningOrange": const Color(0xFFD97706), // Amber 600
+            "starYellow": const Color(0xFFEAB308),
             "dividerColor": appStateSettings["materialYou"]
-                ? Color(0x0F000000)
-                : Color(0xFFF0F0F0),
-            "standardContainerColor": getPlatform() == PlatformOS.isIOS
-                ? themeData.colorScheme.background
-                : appStateSettings["materialYou"]
-                    ? lightenPastel(
-                        themeData.colorScheme.secondaryContainer,
-                        amount: 0.3,
-                      )
-                    : lightDarkAccentHeavyLight,
+                ? const Color(0x140F172A)
+                : const Color(0xFFE2E8F0),
+            "standardContainerColor": const Color(0xFFFFFFFF),
           },
         )
       : AppColors(
@@ -85,37 +54,26 @@ AppColors getAppColors(
             "white": Colors.black,
             "black": Colors.white,
             "textLight": appStateSettings["increaseTextContrast"]
-                ? Colors.white.withOpacity(0.65)
+                ? Colors.white.withOpacity(0.75)
                 : appStateSettings["materialYou"]
-                    ? Colors.white.withOpacity(0.25)
-                    : Color(0xFF494949),
-            "lightDarkAccent": appStateSettings["materialYou"]
-                ? darkenPastel(accentColor, amount: 0.83)
-                : Color(0xFF161616),
+                    ? Colors.white.withOpacity(0.4)
+                    : const Color(0xFF94A3B8), // Slate 400
+            "lightDarkAccent": const Color(0xFF1E293B), // Slate 800
             "lightDarkAccentHeavyLight": lightDarkAccentHeavyLight,
-            "canvasContainer": const Color(0xFF242424),
-            "lightDarkAccentHeavy": const Color(0xFF444444),
-            "shadowColor": const Color(0x69BDBDBD),
-            "shadowColorLight": appStateSettings["materialYou"]
-                ? Colors.transparent
-                : Color(0x28747474),
-            "unPaidUpcoming": Color(0xFF7DB6CC),
-            "unPaidOverdue": Color(0xFF8395FF),
-            "incomeAmount": Color(0xFF62CA77),
-            "expenseAmount": Color(0xFFDA7272),
-            "warningOrange": Color(0xFFDA9C72),
-            "starYellow": Colors.yellow,
+            "canvasContainer": const Color(0xFF0F172A), // Slate 900
+            "lightDarkAccentHeavy": const Color(0xFF334155), // Slate 700
+            "shadowColor": const Color(0x33000000),
+            "shadowColorLight": const Color(0x1A000000),
+            "unPaidUpcoming": const Color(0xFF38BDF8), // Sky 400
+            "unPaidOverdue": const Color(0xFF818CF8), // Indigo 400
+            "incomeAmount": const Color(0xFF10B981), // Emerald 500
+            "expenseAmount": const Color(0xFFF43F5E), // Rose 500
+            "warningOrange": const Color(0xFFF59E0B), // Amber 500
+            "starYellow": const Color(0xFFFACC15),
             "dividerColor": appStateSettings["materialYou"]
-                ? Color(0x13FFFFFF)
-                : Color(0x6F363636),
-            "standardContainerColor": getPlatform() == PlatformOS.isIOS
-                ? themeData.colorScheme.background
-                : appStateSettings["materialYou"]
-                    ? darkenPastel(
-                        themeData.colorScheme.secondaryContainer,
-                        amount: 0.6,
-                      )
-                    : lightDarkAccentHeavyLight,
+                ? const Color(0x1AFFFFFF)
+                : const Color(0xFF334155),
+            "standardContainerColor": const Color(0xFF1E293B),
           },
         );
 }
@@ -431,24 +389,25 @@ ColorScheme getGrayScaleColorScheme(Brightness brightness) {
       onTertiary: Colors.white,
       tertiaryContainer: Colors.teal[100],
       onTertiaryContainer: Colors.blueGrey[900]!,
-      error: Colors.red[700]!,
+      error: const Color(0xFFE11D48), // Rose 600
       onError: Colors.white,
-      errorContainer: Colors.red[100],
-      onErrorContainer: Colors.black,
-      surface: Colors.grey[200]!,
-      onSurface: Colors.black,
-      background:
-          appStateSettings["materialYou"] ? Colors.blueGrey[50]! : Colors.white,
-      onBackground: Colors.black,
-      surfaceVariant: Colors.grey[100]!,
-      onSurfaceVariant: Colors.black,
-      outline: Colors.grey[500]!,
-      outlineVariant: Colors.grey[400],
-      shadow: Colors.black,
-      scrim: Colors.black.withOpacity(0.5),
-      inverseSurface: Colors.grey[800],
+      errorContainer: const Color(0xFFFFE4E6), // Rose 100
+      onErrorContainer: const Color(0xFF881337), // Rose 900
+      surface: const Color(0xFFF8FAFC), // Slate 50
+      onSurface: const Color(0xFF0F172A), // Slate 900
+      background: appStateSettings["materialYou"]
+          ? const Color(0xFFF1F5F9)
+          : Colors.white,
+      onBackground: const Color(0xFF0F172A),
+      surfaceVariant: const Color(0xFFF1F5F9), // Slate 100
+      onSurfaceVariant: const Color(0xFF334155), // Slate 700
+      outline: const Color(0xFF94A3B8), // Slate 400
+      outlineVariant: const Color(0xFFCBD5E1), // Slate 300
+      shadow: const Color(0x1F0F172A),
+      scrim: Colors.black.withOpacity(0.4),
+      inverseSurface: const Color(0xFF1E293B),
       onInverseSurface: Colors.white,
-      inversePrimary: Colors.blueGrey[300],
+      inversePrimary: const Color(0xFF94A3B8),
       surfaceTint: Colors.blueGrey[700],
     );
   } else {
@@ -456,36 +415,36 @@ ColorScheme getGrayScaleColorScheme(Brightness brightness) {
       brightness: Brightness.dark,
       primary: Colors.blueGrey[200]!,
       onPrimary: Colors.black,
-      primaryContainer: Colors.grey[700]!,
+      primaryContainer: const Color(0xFF334155),
       onPrimaryContainer: Colors.white,
-      secondary: Colors.grey[500]!,
+      secondary: const Color(0xFF94A3B8),
       onSecondary: Colors.black,
-      secondaryContainer: Colors.grey[800]!,
+      secondaryContainer: const Color(0xFF1E293B),
       onSecondaryContainer: Colors.white,
       tertiary: Colors.blueGrey[300],
       onTertiary: Colors.black,
       tertiaryContainer: Colors.blueGrey[700],
       onTertiaryContainer: Colors.blueGrey[200]!,
-      error: Colors.red[300]!,
+      error: const Color(0xFFF43F5E), // Rose 500
       onError: Colors.black,
-      errorContainer: Colors.red[900],
-      onErrorContainer: Colors.white,
-      surface: Colors.grey[900]!,
-      onSurface: Colors.white,
+      errorContainer: const Color(0xFF881337),
+      onErrorContainer: const Color(0xFFFFE4E6),
+      surface: const Color(0xFF0F172A), // Slate 900
+      onSurface: const Color(0xFFF8FAFC), // Slate 50
       background: appStateSettings["forceFullDarkBackground"] == true
           ? Colors.black
           : appStateSettings["materialYou"]
-              ? Color(0xFF0F0F0F)
-              : Colors.black,
-      onBackground: Colors.white,
-      surfaceVariant: Colors.grey[800]!,
-      onSurfaceVariant: Colors.white,
-      outline: Colors.grey[600]!,
-      outlineVariant: Colors.grey[500],
+              ? const Color(0xFF020617) // Slate 950
+              : const Color(0xFF0F172A), // Slate 900
+      onBackground: const Color(0xFFF8FAFC),
+      surfaceVariant: const Color(0xFF1E293B), // Slate 800
+      onSurfaceVariant: const Color(0xFFCBD5E1), // Slate 300
+      outline: const Color(0xFF64748B), // Slate 500
+      outlineVariant: const Color(0xFF334155), // Slate 700
       shadow: Colors.black,
-      scrim: Colors.black.withOpacity(0.7),
-      inverseSurface: Colors.grey[100],
-      onInverseSurface: Colors.black,
+      scrim: Colors.black.withOpacity(0.6),
+      inverseSurface: const Color(0xFFF8FAFC),
+      onInverseSurface: const Color(0xFF0F172A),
       inversePrimary: Colors.blueGrey[800],
       surfaceTint: Colors.blueGrey[200],
     );

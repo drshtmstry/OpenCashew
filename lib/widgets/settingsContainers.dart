@@ -393,12 +393,10 @@ class SettingsContainerOutlined extends StatelessWidget {
       content = Container(
         decoration: BoxDecoration(
           border: Border.all(
-            color: (appStateSettings["materialYou"]
-                ? Theme.of(context).colorScheme.secondary.withOpacity(0.5)
-                : getColor(context, "lightDarkAccentHeavy")),
-            width: 2,
+            color: Theme.of(context).colorScheme.outlineVariant.withOpacity(0.18),
+            width: 1,
           ),
-          borderRadius: BorderRadiusDirectional.circular(10),
+          borderRadius: BorderRadiusDirectional.circular(16),
         ),
         padding: EdgeInsetsDirectional.only(
           start: horizontalPadding ?? 3,
@@ -467,12 +465,10 @@ class SettingsContainerOutlined extends StatelessWidget {
       content = Container(
         decoration: BoxDecoration(
           border: Border.all(
-            color: (appStateSettings["materialYou"]
-                ? Theme.of(context).colorScheme.secondary.withOpacity(0.5)
-                : getColor(context, "lightDarkAccentHeavy")),
-            width: 2,
+            color: Theme.of(context).colorScheme.outlineVariant.withOpacity(0.18),
+            width: 1,
           ),
-          borderRadius: BorderRadiusDirectional.circular(10),
+          borderRadius: BorderRadiusDirectional.circular(16),
         ),
         padding: EdgeInsetsDirectional.only(
           start: horizontalPadding ?? 13,
@@ -520,7 +516,7 @@ class SettingsContainerOutlined extends StatelessWidget {
       onLongPress: onLongPress,
       color: Colors.transparent,
       onTap: onTap,
-      borderRadius: 10,
+      borderRadius: 16,
       child: content,
     );
   }
@@ -573,9 +569,7 @@ class SettingsContainer extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadiusDirectional.circular(
           (enableBorderRadius || getIsFullScreen(context)) && isOutlined != true
-              ? getPlatform() == PlatformOS.isIOS
-                  ? 10
-                  : 15
+              ? 16
               : 0),
       child: isOutlined == true
           ? SettingsContainerOutlined(

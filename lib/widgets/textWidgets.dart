@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:budget/colors.dart';
 import 'package:budget/struct/settings.dart';
 import 'package:budget/widgets/util/contextMenu.dart';
@@ -29,6 +30,7 @@ class TextFont extends StatelessWidget {
   final List<TextSpan>? richTextSpan;
   final bool selectableText;
   final double? letterSpacing;
+  final List<FontFeature>? fontFeatures;
 
   const TextFont({
     Key? key,
@@ -49,6 +51,7 @@ class TextFont extends StatelessWidget {
     this.softWrap,
     this.overflowReplacement,
     this.letterSpacing,
+    this.fontFeatures,
   }) : super(key: key);
 
   @override
@@ -64,6 +67,7 @@ class TextFont extends StatelessWidget {
 
     final TextStyle textStyle = TextStyle(
       letterSpacing: letterSpacing,
+      fontFeatures: fontFeatures ?? const [FontFeature.tabularFigures()],
       fontWeight: this.fontWeight,
       fontSize: this.fontSize,
       fontFamily: fallbackFontLocales.contains(appStateSettings["locale"]) &&

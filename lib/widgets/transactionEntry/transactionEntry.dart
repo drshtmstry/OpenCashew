@@ -796,22 +796,17 @@ class _TransactionEntryState extends State<TransactionEntry> {
                                             areTransactionsBeingSelected != true)
                                         ? (Theme.of(context).brightness ==
                                                 Brightness.light
-                                            ? const Color(0xFFF7F9FC)
-                                            : Theme.of(context)
-                                                .colorScheme
-                                                .surface)
+                                            ? const Color(0xFFF8FAFC)
+                                            : const Color(0xFF1E293B))
                                         : Colors.transparent,
                                 border: (isExpanded &&
                                         areTransactionsBeingSelected != true)
                                     ? Border.all(
                                         color: Theme.of(context).brightness ==
                                                 Brightness.light
-                                            ? const Color(0xFFBAC7D5)
-                                            : Theme.of(context)
-                                                .colorScheme
-                                                .outline
-                                                .withOpacity(0.5),
-                                        width: 1.5,
+                                            ? const Color(0xFFE2E8F0)
+                                            : const Color(0xFF334155),
+                                        width: 1.0,
                                       )
                                     : null,
                                 borderRadius: (isExpanded &&
@@ -1175,7 +1170,7 @@ class TransactionActionButtonTile extends StatelessWidget {
   const TransactionActionButtonTile({
     required this.icon,
     required this.onTap,
-    this.iconSize = 20,
+    this.iconSize = 18,
     super.key,
   });
 
@@ -1185,21 +1180,25 @@ class TransactionActionButtonTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color bg = Theme.of(context).brightness == Brightness.light
-        ? const Color(0xFFE2E7EE)
-        : Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.6);
+    final bool isLight = Theme.of(context).brightness == Brightness.light;
+    final Color bg = isLight ? const Color(0xFFF1F5F9) : const Color(0xFF334155);
+    final Color fg = isLight ? const Color(0xFF475569) : const Color(0xFFCBD5E1);
+    final Color borderCol = isLight ? const Color(0xFFE2E8F0) : const Color(0xFF475569);
 
-    Color fg = Theme.of(context).brightness == Brightness.light
-        ? const Color(0xFF4C667B)
-        : Theme.of(context).colorScheme.onSecondaryContainer;
-
-    return Tappable(
-      color: bg,
-      borderRadius: 14,
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        child: Icon(icon, size: iconSize, color: fg),
+    return Container(
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: borderCol, width: 1),
+      ),
+      child: Tappable(
+        color: Colors.transparent,
+        borderRadius: 12,
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 8),
+          child: Icon(icon, size: iconSize, color: fg),
+        ),
       ),
     );
   }

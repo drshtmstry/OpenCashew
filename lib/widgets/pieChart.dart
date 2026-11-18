@@ -222,9 +222,10 @@ class PieChartDisplayState extends State<PieChartDisplay> {
     return PinWheelReveal(
       delay: Duration(milliseconds: 0),
       duration: Duration(milliseconds: 850),
-      child: PieChart(
-        PieChartData(
-          startDegreeOffset: -45,
+      child: RepaintBoundary(
+        child: PieChart(
+          PieChartData(
+            startDegreeOffset: -45,
           pieTouchData: PieTouchData(
               touchCallback: (FlTouchEvent event, pieTouchResponse) {
             // print(event.runtimeType);
@@ -267,6 +268,7 @@ class PieChartDisplayState extends State<PieChartDisplay> {
         swapAnimationDuration: Duration(milliseconds: 1300),
         swapAnimationCurve: ElasticOutCurve(0.6),
       ),
+    ),
     );
   }
 

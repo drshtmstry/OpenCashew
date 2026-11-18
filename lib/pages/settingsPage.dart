@@ -461,22 +461,24 @@ class SettingsHubCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color containerColor = appStateSettings["materialYou"]
-        ? dynamicPastel(
-            context,
-            Theme.of(context).colorScheme.secondaryContainer,
-            amountLight: 0.25,
-            amountDark: 0.6,
-          )
-        : getColor(context, "lightDarkAccentHeavyLight");
+    Color containerColor = Theme.of(context).brightness == Brightness.light
+        ? const Color(0xFFFFFFFF)
+        : const Color(0xFF1E293B); // Slate 800
 
     return Padding(
       padding:
           const EdgeInsetsDirectional.symmetric(horizontal: 16, vertical: 6),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(22),
-        child: Container(
+      child: Container(
+        decoration: BoxDecoration(
           color: containerColor,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(
+            color: Theme.of(context).colorScheme.outlineVariant.withOpacity(0.12),
+            width: 1,
+          ),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(18),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: children,

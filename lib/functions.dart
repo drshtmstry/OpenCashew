@@ -865,10 +865,10 @@ List<BoxShadow> boxShadowGeneral(context) {
   if (appStateSettings["disableShadows"] == true) return [];
   return [
     BoxShadow(
-      color: getColor(context, "shadowColorLight").withAlpha(30),
-      blurRadius: 20,
-      offset: Offset(0, 0),
-      spreadRadius: 8,
+      color: getColor(context, "shadowColorLight").withAlpha(16),
+      blurRadius: 10,
+      offset: const Offset(0, 2),
+      spreadRadius: 0,
     ),
   ];
 }
@@ -877,10 +877,10 @@ List<BoxShadow> boxShadowSharp(context) {
   if (appStateSettings["disableShadows"] == true) return [];
   return [
     BoxShadow(
-      color: getColor(context, "shadowColorLight").withAlpha(30),
-      blurRadius: 2,
-      offset: Offset(0, 0),
-      spreadRadius: 2,
+      color: getColor(context, "shadowColorLight").withAlpha(16),
+      blurRadius: 4,
+      offset: const Offset(0, 1),
+      spreadRadius: 0,
     ),
   ];
 }
