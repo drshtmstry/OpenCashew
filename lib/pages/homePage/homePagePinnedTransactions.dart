@@ -4,7 +4,6 @@ import 'package:budget/functions.dart';
 import 'package:budget/pages/addButton.dart';
 import 'package:budget/pages/addTransactionPage.dart';
 import 'package:budget/pages/managePinnedTransactionsPage.dart';
-import 'package:budget/struct/currencyFunctions.dart';
 import 'package:budget/struct/databaseGlobal.dart';
 import 'package:budget/struct/settings.dart';
 import 'package:budget/widgets/categoryIcon.dart';
