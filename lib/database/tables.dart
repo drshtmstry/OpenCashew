@@ -928,10 +928,12 @@ class FinanceDatabase extends _$FinanceDatabase {
           await migrator.alterTable(TableMigration(transactions));
           await migrator.deleteTable("Labels");
         }
-        await migrator.runMigrationSteps(
-          from: from,
-          to: to,
-          steps: migrationSteps(
+        if (from < 46) {
+          try {
+            await migrator.runMigrationSteps(
+              from: from,
+              to: to > 46 ? 46 : to,
+              steps: migrationSteps(
             from33To34: (m, schema) async {
               await m.addColumn(schema.wallets, schema.wallets.decimals);
             },
@@ -1231,6 +1233,10 @@ class FinanceDatabase extends _$FinanceDatabase {
             },
           ),
         );
+      } catch (e) {
+        print("Migration Error: Error running migration steps " + e.toString());
+      }
+    }
         if (from <= 46) {
           try {
             await migrator.addColumn(categories, categories.archived);
@@ -1281,19 +1287,29 @@ class FinanceDatabase extends _$FinanceDatabase {
         }
         if (from <= 48) {
           try {
-            await migrator.createTable(payees);
+            await customStatement('CREATE TABLE IF NOT EXISTS payees ('
+                'payee_pk TEXT NOT NULL PRIMARY KEY, '
+                'name TEXT NOT NULL, '
+                'category_fk TEXT NOT NULL, '
+                'date_created INTEGER NOT NULL, '
+                'date_time_modified INTEGER, '
+                '"order" INTEGER NOT NULL DEFAULT 0, '
+                'archived INTEGER NOT NULL DEFAULT 0'
+                ');');
           } catch (e) {
             print("Migration Error: Error creating table Payees " +
                 e.toString());
           }
           try {
-            await migrator.addColumn(transactions, transactions.payee);
+            await customStatement(
+                'ALTER TABLE transactions ADD COLUMN payee TEXT;');
           } catch (e) {
             print("Migration Error: Error adding column transactions.payee " +
                 e.toString());
           }
           try {
-            await migrator.addColumn(transactions, transactions.payeeFk);
+            await customStatement(
+                'ALTER TABLE transactions ADD COLUMN payee_fk TEXT;');
           } catch (e) {
             print("Migration Error: Error adding column transactions.payeeFk " +
                 e.toString());
@@ -1303,16 +1319,23 @@ class FinanceDatabase extends _$FinanceDatabase {
       beforeOpen: (details) async {
         // Safe check for Payees table and columns
         try {
-          final m = createMigrator();
-          await m.createTable(payees);
+          await customStatement('CREATE TABLE IF NOT EXISTS payees ('
+              'payee_pk TEXT NOT NULL PRIMARY KEY, '
+              'name TEXT NOT NULL, '
+              'category_fk TEXT NOT NULL, '
+              'date_created INTEGER NOT NULL, '
+              'date_time_modified INTEGER, '
+              '"order" INTEGER NOT NULL DEFAULT 0, '
+              'archived INTEGER NOT NULL DEFAULT 0'
+              ');');
         } catch (_) {}
         try {
-          final m = createMigrator();
-          await m.addColumn(transactions, transactions.payee);
+          await customStatement(
+              'ALTER TABLE transactions ADD COLUMN payee TEXT;');
         } catch (_) {}
         try {
-          final m = createMigrator();
-          await m.addColumn(transactions, transactions.payeeFk);
+          await customStatement(
+              'ALTER TABLE transactions ADD COLUMN payee_fk TEXT;');
         } catch (_) {}
 
         // This code exists because migration 42to43 may have not run correctly...
