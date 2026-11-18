@@ -133,6 +133,8 @@ class _AddTransactionPageState extends State<AddTransactionPage>
     with SingleTickerProviderStateMixin {
   TransactionCategory? selectedCategory;
   TransactionCategory? selectedSubCategory;
+  String? selectedPayee;
+  String? selectedPayeeFk;
   double? selectedAmount;
   String? selectedAmountCalculation;
   String? selectedTitle;
@@ -471,6 +473,15 @@ class _AddTransactionPageState extends State<AddTransactionPage>
         }
       }
 
+      if (selectedPayee != null &&
+          selectedPayee!.trim().isNotEmpty &&
+          selectedCategory != null) {
+        await database.addAssociatedPayee(
+          selectedPayee!,
+          selectedSubCategory?.categoryPk ?? selectedCategory!.categoryPk,
+        );
+      }
+
       Transaction createdTransaction = await createTransaction();
 
       if (widget.transaction != null) {
@@ -730,6 +741,8 @@ class _AddTransactionPageState extends State<AddTransactionPage>
       objectiveLoanFk: selectedObjectiveLoanPk,
       budgetFksExclude:
           selectedExcludedBudgetPks.isEmpty ? null : selectedExcludedBudgetPks,
+      payee: selectedPayee,
+      payeeFk: selectedPayeeFk,
     );
 
     return createdTransaction;
@@ -779,6 +792,8 @@ class _AddTransactionPageState extends State<AddTransactionPage>
       }
       selectedPaid = widget.transaction!.paid;
       selectedIncome = widget.transaction!.income;
+      selectedPayee = widget.transaction!.payee;
+      selectedPayeeFk = widget.transaction!.payeeFk;
       selectedPayer = widget.transaction!.transactionOwnerEmail;
       selectedBudgetPk = widget.transaction!.sharedReferenceBudgetPk;
       selectedObjectivePk = widget.transaction!.objectiveFk;
@@ -2110,7 +2125,27 @@ class _AddTransactionPageState extends State<AddTransactionPage>
               selectedCategoryPk: selectedCategory!.categoryPk,
               selectedSubCategoryPk: selectedSubCategory?.categoryPk,
               padding: const EdgeInsetsDirectional.only(bottom: 6),
-            )
+            ),
+          if (selectedCategory != null)
+            SelectPayeeChips(
+              categoryPk: selectedSubCategory?.categoryPk ??
+                  selectedCategory!.categoryPk,
+              selectedPayee: selectedPayee,
+              isIncome: selectedIncome,
+              onSelected: (Payee payee) {
+                setState(() {
+                  if (selectedPayee?.toLowerCase().trim() ==
+                      payee.name.toLowerCase().trim()) {
+                    selectedPayee = null;
+                    selectedPayeeFk = null;
+                  } else {
+                    selectedPayee = payee.name;
+                    selectedPayeeFk = payee.payeePk;
+                  }
+                });
+              },
+              padding: const EdgeInsetsDirectional.only(bottom: 6),
+            ),
         ],
       ),
     );
@@ -5011,6 +5046,145 @@ class SelectSubcategoryChips extends StatelessWidget {
                 ),
         );
       },
+    );
+  }
+}
+
+class SelectPayeeChips extends StatelessWidget {
+  const SelectPayeeChips({
+    required this.categoryPk,
+    required this.selectedPayee,
+    required this.onSelected,
+    required this.isIncome,
+    this.padding = EdgeInsetsDirectional.zero,
+    super.key,
+  });
+
+  final String categoryPk;
+  final String? selectedPayee;
+  final Function(Payee payee) onSelected;
+  final bool isIncome;
+  final EdgeInsetsDirectional padding;
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<List<Payee>>(
+      stream: database.watchAllPayeesInCategory(categoryPk),
+      builder: (context, snapshot) {
+        List<Payee> payees = snapshot.data ?? [];
+        return AnimatedSizeSwitcher(
+          child: (payees.isEmpty && selectedPayee == null)
+              ? Padding(
+                  padding: const EdgeInsetsDirectional.symmetric(
+                      horizontal: 16, vertical: 4),
+                  child: Row(
+                    children: [
+                      OutlinedButtonStacked(
+                        filled: false,
+                        alignBeside: true,
+                        padding: const EdgeInsetsDirectional.symmetric(
+                            horizontal: 12, vertical: 8),
+                        text: isIncome ? "Add Payer" : "Add Payee",
+                        iconData: appStateSettings["outlinedIcons"]
+                            ? Icons.add_outlined
+                            : Icons.add_rounded,
+                        onTap: () {
+                          openBottomSheet(
+                            context,
+                            popupWithKeyboard: true,
+                            AddPayeePopup(
+                              categoryPk: categoryPk,
+                              isIncome: isIncome,
+                              onPayeeAdded: (newPayee) {
+                                onSelected(newPayee);
+                              },
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                )
+              : Padding(
+                  padding: padding,
+                  child: SelectChips<Payee>(
+                    allowMultipleSelected: false,
+                    items: payees,
+                    getSelected: (Payee payee) {
+                      return selectedPayee?.toLowerCase().trim() ==
+                          payee.name.toLowerCase().trim();
+                    },
+                    onSelected: (Payee payee) {
+                      onSelected(payee);
+                    },
+                    getLabel: (Payee payee) => payee.name,
+                    extraWidgetAfter: SelectChipsAddButtonExtraWidget(
+                      openPage: null,
+                      onTap: () {
+                        openBottomSheet(
+                          context,
+                          popupWithKeyboard: true,
+                          AddPayeePopup(
+                            categoryPk: categoryPk,
+                            isIncome: isIncome,
+                            onPayeeAdded: (newPayee) {
+                              onSelected(newPayee);
+                            },
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+        );
+      },
+    );
+  }
+}
+
+class AddPayeePopup extends StatefulWidget {
+  const AddPayeePopup({
+    required this.categoryPk,
+    required this.isIncome,
+    required this.onPayeeAdded,
+    super.key,
+  });
+
+  final String categoryPk;
+  final bool isIncome;
+  final Function(Payee) onPayeeAdded;
+
+  @override
+  State<AddPayeePopup> createState() => _AddPayeePopupState();
+}
+
+class _AddPayeePopupState extends State<AddPayeePopup> {
+  String selectedText = "";
+
+  @override
+  Widget build(BuildContext context) {
+    String label = widget.isIncome ? "Add Payer" : "Add Payee";
+    return PopupFramework(
+      title: label,
+      child: SelectText(
+        enableButton: selectedText.trim().isNotEmpty,
+        buttonLabel: label,
+        setSelectedText: (value) {
+          setState(() {
+            selectedText = value;
+          });
+        },
+        labelText: widget.isIncome ? "Payer Name" : "Payee Name",
+        placeholder: "e.g. Starbucks, Amazon, Landlord",
+        nextWithInput: (text) async {
+          Payee newPayee = await database.addAssociatedPayee(
+            text.trim(),
+            widget.categoryPk,
+          );
+          widget.onPayeeAdded(newPayee);
+          popRoute(context);
+        },
+      ),
     );
   }
 }

@@ -1,3 +1,4 @@
+import 'package:budget/database/tables.dart';
 import 'package:budget/functions.dart';
 import 'package:budget/pages/addTransactionPage.dart';
 import 'package:budget/pages/transactionFilters.dart';
@@ -155,6 +156,132 @@ class TransactionsSearchPageState extends State<TransactionsSearchPage>
     }
   }
 
+  Future<void> selectSortOption(BuildContext context) async {
+    await openBottomSheet(
+      context,
+      PopupFramework(
+        title: "Sort Transactions",
+        hasPadding: false,
+        child: Column(
+          children: [
+            _sortOptionTile(
+              context,
+              TransactionSortOption.dateDesc,
+              "Date: Newest first",
+              appStateSettings["outlinedIcons"]
+                  ? Icons.calendar_today_outlined
+                  : Icons.calendar_today_rounded,
+            ),
+            _sortOptionTile(
+              context,
+              TransactionSortOption.dateAsc,
+              "Date: Oldest first",
+              appStateSettings["outlinedIcons"]
+                  ? Icons.history_outlined
+                  : Icons.history_rounded,
+            ),
+            _sortOptionTile(
+              context,
+              TransactionSortOption.amountDesc,
+              "Amount: Highest first",
+              appStateSettings["outlinedIcons"]
+                  ? Icons.arrow_downward_outlined
+                  : Icons.arrow_downward_rounded,
+            ),
+            _sortOptionTile(
+              context,
+              TransactionSortOption.amountAsc,
+              "Amount: Lowest first",
+              appStateSettings["outlinedIcons"]
+                  ? Icons.arrow_upward_outlined
+                  : Icons.arrow_upward_rounded,
+            ),
+            _sortOptionTile(
+              context,
+              TransactionSortOption.nameAsc,
+              "Name: A → Z",
+              appStateSettings["outlinedIcons"]
+                  ? Icons.sort_by_alpha_outlined
+                  : Icons.sort_by_alpha_rounded,
+            ),
+            _sortOptionTile(
+              context,
+              TransactionSortOption.nameDesc,
+              "Name: Z → A",
+              appStateSettings["outlinedIcons"]
+                  ? Icons.sort_by_alpha_outlined
+                  : Icons.sort_by_alpha_rounded,
+            ),
+            const SizedBox(height: 10),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _sortOptionTile(
+    BuildContext context,
+    TransactionSortOption option,
+    String label,
+    IconData icon,
+  ) {
+    bool isSelected =
+        (searchFilters.sortOption ?? TransactionSortOption.dateDesc) == option;
+    return Padding(
+      padding:
+          const EdgeInsetsDirectional.symmetric(horizontal: 10, vertical: 2),
+      child: Tappable(
+        color: isSelected
+            ? Theme.of(context).colorScheme.primaryContainer.withOpacity(0.5)
+            : Colors.transparent,
+        borderRadius: 12,
+        onTap: () {
+          setState(() {
+            searchFilters.sortOption = option;
+          });
+          updateSettings(
+            "searchTransactionsSetFiltersString",
+            searchFilters.getFilterString(),
+            updateGlobalState: false,
+          );
+          popRoute(context);
+        },
+        child: Padding(
+          padding: const EdgeInsetsDirectional.symmetric(
+              horizontal: 15, vertical: 12),
+          child: Row(
+            children: [
+              Icon(
+                icon,
+                size: 20,
+                color: isSelected
+                    ? Theme.of(context).colorScheme.primary
+                    : getColor(context, "textLight"),
+              ),
+              const SizedBox(width: 15),
+              Expanded(
+                child: TextFont(
+                  text: label,
+                  fontSize: 16,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                  textColor: isSelected
+                      ? Theme.of(context).colorScheme.primary
+                      : getColor(context, "text"),
+                ),
+              ),
+              if (isSelected)
+                Icon(
+                  Icons.check,
+                  size: 20,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -279,7 +406,36 @@ class TransactionsSearchPageState extends State<TransactionsSearchPage>
                             : Icons.filter_alt_rounded,
                       ),
                     ),
-                    SizedBox(width: 20),
+                    const SizedBox(width: 7),
+                    AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 500),
+                      child: ButtonIcon(
+                        key: ValueKey(
+                          (searchFilters.sortOption ??
+                                  TransactionSortOption.dateDesc)
+                              .toString(),
+                        ),
+                        color: searchFilters.sortOption != null &&
+                                searchFilters.sortOption !=
+                                    TransactionSortOption.dateDesc
+                            ? Theme.of(context).colorScheme.tertiaryContainer
+                            : null,
+                        iconColor: searchFilters.sortOption != null &&
+                                searchFilters.sortOption !=
+                                    TransactionSortOption.dateDesc
+                            ? Theme.of(context)
+                                .colorScheme
+                                .onTertiaryContainer
+                            : null,
+                        onTap: () {
+                          selectSortOption(context);
+                        },
+                        icon: appStateSettings["outlinedIcons"]
+                            ? Icons.sort_outlined
+                            : Icons.sort_rounded,
+                      ),
+                    ),
+                    const SizedBox(width: 20),
                   ],
                 ),
               ),
@@ -344,6 +500,9 @@ class TransactionsSearchPageState extends State<TransactionsSearchPage>
               noResultsMessage: "no-transactions-found".tr(),
               noSearchResultsVariation: true,
               searchFilters: searchFilters,
+              includeDateDivider: (searchFilters.sortOption == null ||
+                  searchFilters.sortOption == TransactionSortOption.dateDesc ||
+                  searchFilters.sortOption == TransactionSortOption.dateAsc),
               // limit: 250,
               noResultsExtraWidget: dateRangeWidget,
               totalCashFlowExtraWidget: Transform.translate(

@@ -18,6 +18,7 @@ import 'package:budget/widgets/openPopup.dart';
 import 'package:budget/widgets/openSnackbar.dart';
 import 'package:budget/widgets/outlinedButtonStacked.dart';
 import 'package:budget/widgets/tappable.dart';
+import 'package:budget/widgets/textInput.dart';
 import 'package:budget/widgets/textWidgets.dart';
 import 'package:budget/widgets/transactionEntry/transactionEntry.dart';
 import 'package:budget/widgets/transactionEntry/transactionLabel.dart';
@@ -612,6 +613,170 @@ class SelectedTransactionsAppBarMenu extends StatelessWidget {
                                       (transactions.length == 1
                                           ? "transaction".tr().toLowerCase()
                                           : "transactions".tr().toLowerCase()),
+                                ),
+                              );
+
+                              globalSelectedID.value[pageID] = [];
+                              globalSelectedID.notifyListeners();
+                            },
+                          ),
+                          EditSelectedTransactionsContainer(
+                            iconData: appStateSettings["outlinedIcons"]
+                                ? Icons.edit_note_outlined
+                                : Icons.edit_note_rounded,
+                            text: "set-note".tr(),
+                            onTap: () async {
+                              String setNoteText = "";
+
+                              dynamic result = await openBottomSheet(
+                                context,
+                                popupWithKeyboard: true,
+                                PopupFramework(
+                                  title: "set-note".tr(),
+                                  child: Column(
+                                    children: [
+                                      TextInput(
+                                        autoFocus: true,
+                                        labelText: "notes-placeholder".tr(),
+                                        padding: EdgeInsetsDirectional.zero,
+                                        onChanged: (text) {
+                                          setNoteText = text;
+                                        },
+                                        onSubmitted: (_) {
+                                          popRoute(context, true);
+                                        },
+                                      ),
+                                      const SizedBox(height: 15),
+                                      Button(
+                                        label: "set-note".tr(),
+                                        onTap: () {
+                                          popRoute(context, true);
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+
+                              if (result != true) return;
+
+                              List<Transaction> transactions =
+                                  await database.getTransactionsFromPk(
+                                      selectedTransactionPks);
+                              await database.changeTransactionsNote(
+                                  transactions, setNoteText.trim());
+
+                              openSnackbar(
+                                SnackbarMessage(
+                                  icon: appStateSettings["outlinedIcons"]
+                                      ? Icons.edit_note_outlined
+                                      : Icons.edit_note_rounded,
+                                  title: "changed-note".tr(),
+                                  description: "for".tr().capitalizeFirst +
+                                      " " +
+                                      transactions.length.toString() +
+                                      " " +
+                                      (transactions.length == 1
+                                          ? "transaction".tr().toLowerCase()
+                                          : "transactions".tr().toLowerCase()),
+                                ),
+                              );
+
+                              globalSelectedID.value[pageID] = [];
+                              globalSelectedID.notifyListeners();
+                            },
+                          ),
+                          EditSelectedTransactionsContainer(
+                            iconData: appStateSettings["outlinedIcons"]
+                                ? Icons.visibility_off_outlined
+                                : Icons.visibility_off_rounded,
+                            text: "include-exclude".tr(),
+                            onTap: () async {
+                              bool? includeChoice = await openBottomSheet(
+                                context,
+                                PopupFramework(
+                                  title: "include-exclude".tr(),
+                                  subtitle: "set-include-exclude-info".tr(),
+                                  child: Column(
+                                    children: [
+                                      OutlinedButtonStacked(
+                                        filled: true,
+                                        alignStart: true,
+                                        alignBeside: true,
+                                        text: "included-amount".tr(),
+                                        iconData:
+                                            appStateSettings["outlinedIcons"]
+                                                ? Icons.check_circle_outlined
+                                                : Icons.check_circle_rounded,
+                                        onTap: () {
+                                          popRoute(context, true);
+                                        },
+                                      ),
+                                      const SizedBox(height: 10),
+                                      OutlinedButtonStacked(
+                                        filled: false,
+                                        alignStart: true,
+                                        alignBeside: true,
+                                        text: "excluded-amount".tr(),
+                                        iconData:
+                                            appStateSettings["outlinedIcons"]
+                                                ? Icons.cancel_outlined
+                                                : Icons.cancel_rounded,
+                                        onTap: () {
+                                          popRoute(context, false);
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+
+                              if (includeChoice == null) return;
+
+                              List<Transaction> transactions =
+                                  await database.getTransactionsFromPk(
+                                      selectedTransactionPks);
+                              List<Transaction> validTransactions = transactions
+                                  .where((t) => t.type == null)
+                                  .toList();
+
+                              if (validTransactions.isEmpty) {
+                                openSnackbar(
+                                  SnackbarMessage(
+                                    icon: Icons.warning_outlined,
+                                    title: "warning".tr(),
+                                    description:
+                                        "only-valid-transactions-were-marked-as-included-excluded"
+                                            .tr(),
+                                  ),
+                                );
+                                return;
+                              }
+
+                              await database.changeTransactionsPaid(
+                                  validTransactions, includeChoice);
+
+                              openSnackbar(
+                                SnackbarMessage(
+                                  icon: includeChoice
+                                      ? (appStateSettings["outlinedIcons"]
+                                          ? Icons.check_circle_outlined
+                                          : Icons.check_circle_rounded)
+                                      : (appStateSettings["outlinedIcons"]
+                                          ? Icons.visibility_off_outlined
+                                          : Icons.visibility_off_rounded),
+                                  title: includeChoice
+                                      ? "included-amount".tr()
+                                      : "excluded-amount".tr(),
+                                  description: "for".tr().capitalizeFirst +
+                                      " " +
+                                      validTransactions.length.toString() +
+                                      " " +
+                                      (validTransactions.length == 1
+                                          ? "transaction".tr().toLowerCase()
+                                          : "transactions"
+                                              .tr()
+                                              .toLowerCase()),
                                 ),
                               );
 

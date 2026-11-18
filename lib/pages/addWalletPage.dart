@@ -73,6 +73,7 @@ class _AddWalletPageState extends State<AddWalletPage> {
   late AccountType selectedAccountType =
       getAccountTypeFromWallet(widget.wallet);
   bool userManuallySelectedAccountType = false;
+  late bool selectedArchived = widget.wallet?.archived ?? false;
 
   void setSelectedTitle(String title) {
     setState(() {
@@ -147,7 +148,7 @@ class _AddWalletPageState extends State<AddWalletPage> {
       homePageWidgetDisplay: widget.wallet != null
           ? widget.wallet!.homePageWidgetDisplay
           : defaultWalletHomePageWidgetDisplay,
-      archived: widget.wallet?.archived ?? false,
+      archived: selectedArchived,
       emojiIconName: widget.wallet?.emojiIconName,
     );
   }
@@ -720,6 +721,30 @@ class _AddWalletPageState extends State<AddWalletPage> {
                       : Icons.receipt_long_rounded,
                   isWideOutlined: true,
                   horizontalPadding: 15,
+                ),
+              ),
+            ),
+          if (widget.wallet != null && widget.wallet!.walletPk != "0")
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsetsDirectional.only(
+                    start: 20, end: 20, bottom: 10),
+                child: SettingsContainerSwitch(
+                  title: "archive-account".tr(),
+                  description: "archive-account-description".tr(),
+                  initialValue: selectedArchived,
+                  icon: selectedArchived
+                      ? (appStateSettings["outlinedIcons"]
+                          ? Icons.visibility_off_outlined
+                          : Icons.visibility_off_rounded)
+                      : (appStateSettings["outlinedIcons"]
+                          ? Icons.visibility_outlined
+                          : Icons.visibility_rounded),
+                  onSwitched: (value) {
+                    setState(() {
+                      selectedArchived = value;
+                    });
+                  },
                 ),
               ),
             ),

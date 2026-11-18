@@ -31,6 +31,7 @@ import 'package:budget/widgets/editRowEntry.dart';
 import 'package:budget/modified/reorderable_list.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
+import 'package:sliver_tools/sliver_tools.dart';
 import 'exchangeRatesPage.dart';
 
 class EditWalletsPage extends StatefulWidget {
@@ -219,105 +220,292 @@ class EditWalletsPageState extends State<EditWalletsPage> {
                 );
               }
               if (snapshot.hasData && (snapshot.data ?? []).length > 0) {
-                return SliverReorderableList(
-                  onReorderStart: (index) {
-                    HapticFeedback.heavyImpact();
-                    setState(() {
-                      dragDownToDismissEnabled = false;
-                      currentReorder = index;
-                    });
-                  },
-                  onReorderEnd: (_) {
-                    setState(() {
-                      dragDownToDismissEnabled = true;
-                      currentReorder = -1;
-                    });
-                  },
-                  itemBuilder: (context, index) {
-                    WalletWithDetails walletWithDetails = snapshot.data![index];
-                    TransactionWallet wallet = walletWithDetails.wallet;
-                    Color accentColor = dynamicPastel(
-                        context,
-                        HexColor(wallet.colour,
-                            defaultColor:
-                                Theme.of(context).colorScheme.primary),
-                        amountLight: 0.55,
-                        amountDark: 0.35);
-                    return EditRowEntry(
-                      extraIcon: Provider.of<SelectedWalletPk>(context)
-                                  .selectedWalletPk ==
-                              wallet.walletPk
-                          ? appStateSettings["outlinedIcons"]
-                              ? Icons.star_outlined
-                              : Icons.star_rounded
-                          : Icons.star_outline,
-                      onExtra: () async {
-                        setPrimaryWallet(
-                          wallet.walletPk,
-                          allWallets:
-                              Provider.of<AllWallets>(context, listen: false),
+                List<WalletWithDetails> activeWallets = (snapshot.data ?? [])
+                    .where((w) => !w.wallet.archived)
+                    .toList();
+                List<WalletWithDetails> archivedWallets = (snapshot.data ?? [])
+                    .where((w) => w.wallet.archived)
+                    .toList();
+
+                return MultiSliver(
+                  children: [
+                    SliverReorderableList(
+                      onReorderStart: (index) {
+                        HapticFeedback.heavyImpact();
+                        setState(() {
+                          dragDownToDismissEnabled = false;
+                          currentReorder = index;
+                        });
+                      },
+                      onReorderEnd: (_) {
+                        setState(() {
+                          dragDownToDismissEnabled = true;
+                          currentReorder = -1;
+                        });
+                      },
+                      itemBuilder: (context, index) {
+                        WalletWithDetails walletWithDetails =
+                            activeWallets[index];
+                        TransactionWallet wallet = walletWithDetails.wallet;
+                        Color accentColor = dynamicPastel(
+                            context,
+                            HexColor(wallet.colour,
+                                defaultColor:
+                                    Theme.of(context).colorScheme.primary),
+                            amountLight: 0.55,
+                            amountDark: 0.35);
+                        return EditRowEntry(
+                          extraIcon: Provider.of<SelectedWalletPk>(context)
+                                      .selectedWalletPk ==
+                                  wallet.walletPk
+                              ? appStateSettings["outlinedIcons"]
+                                  ? Icons.star_outlined
+                                  : Icons.star_rounded
+                              : Icons.star_outline,
+                          onExtra: () async {
+                            setPrimaryWallet(
+                              wallet.walletPk,
+                              allWallets: Provider.of<AllWallets>(context,
+                                  listen: false),
+                            );
+                          },
+                          extraWidget: wallet.walletPk == "0"
+                              ? null
+                              : IconButton(
+                                  icon: Icon(
+                                    wallet.archived
+                                        ? (appStateSettings["outlinedIcons"]
+                                            ? Icons.visibility_off_outlined
+                                            : Icons.visibility_off_rounded)
+                                        : (appStateSettings["outlinedIcons"]
+                                            ? Icons.visibility_outlined
+                                            : Icons.visibility_rounded),
+                                  ),
+                                  onPressed: () async {
+                                    await database.archiveWallet(
+                                        wallet.walletPk, !wallet.archived);
+                                  },
+                                ),
+                          opacity: wallet.archived ? 0.5 : 1,
+                          canDelete: (wallet.walletPk != "0" ||
+                              Provider.of<AllWallets>(context, listen: true)
+                                      .indexedByPk
+                                      .entries
+                                      .length >
+                                  1),
+                          canReorder: searchValue == "" &&
+                              activeWallets.length != 1,
+                          currentReorder:
+                              currentReorder != -1 && currentReorder != index,
+                          index: index,
+                          accentColor: accentColor,
+                          content: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              TextFont(
+                                text: wallet.name,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 21,
+                              ),
+                              Container(height: 2),
+                              TextFont(
+                                textAlign: TextAlign.start,
+                                text: convertToMoney(
+                                  Provider.of<AllWallets>(context),
+                                  walletWithDetails.totalSpent ?? 0,
+                                  currencyKey: wallet.currency,
+                                  decimals: wallet.decimals,
+                                  addCurrencyName: true,
+                                ).toString(),
+                                fontSize: 15,
+                              ),
+                              Wrap(
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                spacing: 5,
+                                runSpacing: 3,
+                                children: [
+                                  AnimatedSizeSwitcher(
+                                    child: Provider.of<SelectedWalletPk>(
+                                                    context)
+                                                .selectedWalletPk ==
+                                            wallet.walletPk
+                                        ? Padding(
+                                            padding: const EdgeInsetsDirectional
+                                                .only(top: 1),
+                                            child: TransactionTag(
+                                              padding:
+                                                  const EdgeInsetsDirectional
+                                                      .symmetric(
+                                                      horizontal: 7,
+                                                      vertical: 1.1),
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .primary,
+                                              name: "primary-default".tr(),
+                                              margin:
+                                                  EdgeInsetsDirectional.zero,
+                                            ),
+                                          )
+                                        : Container(),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsetsDirectional.only(
+                                        top: 1),
+                                    child: TransactionTag(
+                                      padding:
+                                          const EdgeInsetsDirectional.symmetric(
+                                              horizontal: 7, vertical: 1.1),
+                                      color: accentColor,
+                                      name: getAccountTypeName(
+                                          getAccountTypeFromWallet(wallet)),
+                                      margin: EdgeInsetsDirectional.zero,
+                                    ),
+                                  ),
+                                  TextFont(
+                                    textAlign: TextAlign.start,
+                                    text: walletWithDetails.numberTransactions
+                                            .toString() +
+                                        " " +
+                                        (walletWithDetails.numberTransactions ==
+                                                1
+                                            ? "transaction".tr().toLowerCase()
+                                            : "transactions"
+                                                .tr()
+                                                .toLowerCase()),
+                                    fontSize: 14,
+                                    textColor: getColor(context, "black")
+                                        .withOpacity(0.65),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          onDelete: () async {
+                            return (await deleteWalletPopup(
+                                  context,
+                                  wallet: wallet,
+                                  routesToPopAfterDelete:
+                                      RoutesToPopAfterDelete.None,
+                                )) ==
+                                DeletePopupAction.Delete;
+                          },
+                          openPage: WatchedWalletDetailsPage(
+                            walletPk: wallet.walletPk,
+                          ),
+                          key: ValueKey(wallet.walletPk),
                         );
                       },
-                      extraWidget: wallet.walletPk == "0"
-                          ? null
-                          : IconButton(
-                              icon: Icon(
-                                wallet.archived
-                                    ? (appStateSettings["outlinedIcons"]
-                                        ? Icons.visibility_off_outlined
-                                        : Icons.visibility_off_rounded)
-                                    : (appStateSettings["outlinedIcons"]
-                                        ? Icons.visibility_outlined
-                                        : Icons.visibility_rounded),
-                              ),
-                              onPressed: () async {
-                                await database.archiveWallet(
-                                    wallet.walletPk, !wallet.archived);
-                              },
-                            ),
-                      opacity: wallet.archived ? 0.5 : 1,
-                      canDelete: (wallet.walletPk != "0" ||
-                          Provider.of<AllWallets>(context, listen: true)
-                                  .indexedByPk
-                                  .entries
-                                  .length >
-                              1),
-                      canReorder: searchValue == "" &&
-                          (snapshot.data ?? []).length != 1,
-                      currentReorder:
-                          currentReorder != -1 && currentReorder != index,
-                      index: index,
-                      accentColor: accentColor,
-                      content: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          TextFont(
-                            text: wallet.name,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 21,
+                      itemCount: activeWallets.length,
+                      onReorder: (_intPrevious, _intNew) async {
+                        WalletWithDetails oldWalletWithDetails =
+                            activeWallets[_intPrevious];
+                        TransactionWallet oldWallet =
+                            oldWalletWithDetails.wallet;
+
+                        if (_intNew > _intPrevious) {
+                          await database.moveWallet(
+                              oldWallet.walletPk, _intNew - 1, oldWallet.order);
+                        } else {
+                          await database.moveWallet(
+                              oldWallet.walletPk, _intNew, oldWallet.order);
+                        }
+                        return true;
+                      },
+                    ),
+                    if (archivedWallets.isNotEmpty) ...[
+                      SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsetsDirectional.only(
+                            top: 25,
+                            bottom: 8,
+                            start: 22,
+                            end: 22,
                           ),
-                          Container(height: 2),
-                          TextFont(
-                            textAlign: TextAlign.start,
-                            text: convertToMoney(
-                              Provider.of<AllWallets>(context),
-                              walletWithDetails.totalSpent ?? 0,
-                              currencyKey: wallet.currency,
-                              decimals: wallet.decimals,
-                              addCurrencyName: true,
-                            ).toString(),
-                            fontSize: 15,
-                          ),
-                          Wrap(
-                            crossAxisAlignment: WrapCrossAlignment.center,
-                            spacing: 5,
-                            runSpacing: 3,
+                          child: Row(
                             children: [
-                              AnimatedSizeSwitcher(
-                                child: Provider.of<SelectedWalletPk>(context)
-                                            .selectedWalletPk ==
-                                        wallet.walletPk
-                                    ? Padding(
+                              Icon(
+                                appStateSettings["outlinedIcons"]
+                                    ? Icons.archive_outlined
+                                    : Icons.archive_rounded,
+                                size: 17,
+                                color: getColor(context, "textLight"),
+                              ),
+                              const SizedBox(width: 8),
+                              TextFont(
+                                text: "archived-accounts".tr(),
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                textColor: getColor(context, "textLight"),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) {
+                            WalletWithDetails walletWithDetails =
+                                archivedWallets[index];
+                            TransactionWallet wallet = walletWithDetails.wallet;
+                            Color accentColor = dynamicPastel(
+                                context,
+                                HexColor(wallet.colour,
+                                    defaultColor:
+                                        Theme.of(context).colorScheme.primary),
+                                amountLight: 0.55,
+                                amountDark: 0.35);
+                            return EditRowEntry(
+                              extraIcon: null,
+                              extraWidget: IconButton(
+                                icon: Icon(
+                                  appStateSettings["outlinedIcons"]
+                                      ? Icons.unarchive_outlined
+                                      : Icons.unarchive_rounded,
+                                ),
+                                tooltip: "Unarchive",
+                                onPressed: () async {
+                                  await database.archiveWallet(
+                                      wallet.walletPk, false);
+                                },
+                              ),
+                              opacity: 0.6,
+                              canDelete: (wallet.walletPk != "0" ||
+                                  Provider.of<AllWallets>(context, listen: true)
+                                          .indexedByPk
+                                          .entries
+                                          .length >
+                                      1),
+                              canReorder: false,
+                              currentReorder: false,
+                              index: index,
+                              accentColor: accentColor,
+                              content: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  TextFont(
+                                    text: wallet.name,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 21,
+                                  ),
+                                  Container(height: 2),
+                                  TextFont(
+                                    textAlign: TextAlign.start,
+                                    text: convertToMoney(
+                                      Provider.of<AllWallets>(context),
+                                      walletWithDetails.totalSpent ?? 0,
+                                      currencyKey: wallet.currency,
+                                      decimals: wallet.decimals,
+                                      addCurrencyName: true,
+                                    ).toString(),
+                                    fontSize: 15,
+                                  ),
+                                  Wrap(
+                                    crossAxisAlignment:
+                                        WrapCrossAlignment.center,
+                                    spacing: 5,
+                                    runSpacing: 3,
+                                    children: [
+                                      Padding(
                                         padding:
                                             const EdgeInsetsDirectional.only(
                                                 top: 1),
@@ -325,73 +513,55 @@ class EditWalletsPageState extends State<EditWalletsPage> {
                                           padding: const EdgeInsetsDirectional
                                               .symmetric(
                                               horizontal: 7, vertical: 1.1),
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .primary,
-                                          name: "primary-default".tr(),
+                                          color: accentColor,
+                                          name: getAccountTypeName(
+                                              getAccountTypeFromWallet(wallet)),
                                           margin: EdgeInsetsDirectional.zero,
                                         ),
-                                      )
-                                    : Container(),
+                                      ),
+                                      TextFont(
+                                        textAlign: TextAlign.start,
+                                        text: walletWithDetails
+                                                .numberTransactions
+                                                .toString() +
+                                            " " +
+                                            (walletWithDetails
+                                                        .numberTransactions ==
+                                                    1
+                                                ? "transaction"
+                                                    .tr()
+                                                    .toLowerCase()
+                                                : "transactions"
+                                                    .tr()
+                                                    .toLowerCase()),
+                                        fontSize: 14,
+                                        textColor: getColor(context, "black")
+                                            .withOpacity(0.65),
+                                      ),
+                                    ],
+                                  ),
+                                ],
                               ),
-                              Padding(
-                                padding: const EdgeInsetsDirectional.only(
-                                    top: 1),
-                                child: TransactionTag(
-                                  padding: const EdgeInsetsDirectional.symmetric(
-                                      horizontal: 7, vertical: 1.1),
-                                  color: accentColor,
-                                  name: getAccountTypeName(
-                                      getAccountTypeFromWallet(wallet)),
-                                  margin: EdgeInsetsDirectional.zero,
-                                ),
+                              onDelete: () async {
+                                return (await deleteWalletPopup(
+                                      context,
+                                      wallet: wallet,
+                                      routesToPopAfterDelete:
+                                          RoutesToPopAfterDelete.None,
+                                    )) ==
+                                    DeletePopupAction.Delete;
+                              },
+                              openPage: WatchedWalletDetailsPage(
+                                walletPk: wallet.walletPk,
                               ),
-                              TextFont(
-                                textAlign: TextAlign.start,
-                                text: walletWithDetails.numberTransactions
-                                        .toString() +
-                                    " " +
-                                    (walletWithDetails.numberTransactions == 1
-                                        ? "transaction".tr().toLowerCase()
-                                        : "transactions".tr().toLowerCase()),
-                                fontSize: 14,
-                                textColor: getColor(context, "black")
-                                    .withOpacity(0.65),
-                              ),
-                            ],
-                          ),
-                        ],
+                              key: ValueKey("archived_" + wallet.walletPk),
+                            );
+                          },
+                          childCount: archivedWallets.length,
+                        ),
                       ),
-                      onDelete: () async {
-                        return (await deleteWalletPopup(
-                              context,
-                              wallet: wallet,
-                              routesToPopAfterDelete:
-                                  RoutesToPopAfterDelete.None,
-                            )) ==
-                            DeletePopupAction.Delete;
-                      },
-                      openPage: WatchedWalletDetailsPage(
-                        walletPk: wallet.walletPk,
-                      ),
-                      key: ValueKey(wallet.walletPk),
-                    );
-                  },
-                  itemCount: snapshot.data!.length,
-                  onReorder: (_intPrevious, _intNew) async {
-                    WalletWithDetails oldWalletWithDetails =
-                        snapshot.data![_intPrevious];
-                    TransactionWallet oldWallet = oldWalletWithDetails.wallet;
-
-                    if (_intNew > _intPrevious) {
-                      await database.moveWallet(
-                          oldWallet.walletPk, _intNew - 1, oldWallet.order);
-                    } else {
-                      await database.moveWallet(
-                          oldWallet.walletPk, _intNew, oldWallet.order);
-                    }
-                    return true;
-                  },
+                    ],
+                  ],
                 );
               }
               return SliverToBoxAdapter(

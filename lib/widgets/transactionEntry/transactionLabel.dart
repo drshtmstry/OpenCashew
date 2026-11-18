@@ -18,11 +18,22 @@ class TransactionLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return transaction.name != ""
-        ? TransactionTitleNameLabel(
-            transaction: transaction, fontSize: fontSize)
-        : TransactionCategoryNameLabel(
-            transaction: transaction, fontSize: fontSize);
+    if (transaction.name.trim() != "") {
+      return TransactionTitleNameLabel(
+          transaction: transaction, fontSize: fontSize);
+    } else if (transaction.payee != null && transaction.payee!.trim() != "") {
+      return TextFont(
+        text: transaction.payee!,
+        fontSize: fontSize,
+        maxLines: appStateSettings["fadeTransactionNameOverflows"] == false ? null : 1,
+        overflow: appStateSettings["fadeTransactionNameOverflows"] == false
+            ? null
+            : TextOverflow.fade,
+      );
+    } else {
+      return TransactionCategoryNameLabel(
+          transaction: transaction, fontSize: fontSize);
+    }
   }
 }
 
@@ -62,13 +73,22 @@ class TransactionCategoryNameLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String formatSubtitle(String catName) {
+      if (transaction.name.trim() != "" &&
+          transaction.payee != null &&
+          transaction.payee!.trim() != "") {
+        return "${transaction.payee!} • $catName";
+      }
+      return catName;
+    }
+
     return category == null
         ? StreamBuilder<TransactionCategory>(
             stream: database.getCategory(transaction.categoryFk).$1,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 return TextFont(
-                  text: snapshot.data!.name,
+                  text: formatSubtitle(snapshot.data!.name),
                   fontSize: fontSize,
                   maxLines:
                       appStateSettings["fadeTransactionNameOverflows"] == false
@@ -88,7 +108,7 @@ class TransactionCategoryNameLabel extends StatelessWidget {
             },
           )
         : TextFont(
-            text: category!.name,
+            text: formatSubtitle(category!.name),
             fontSize: fontSize,
             maxLines: appStateSettings["fadeTransactionNameOverflows"] == false
                 ? null
@@ -105,7 +125,11 @@ class TransactionCategoryNameLabel extends StatelessWidget {
 
 Future<String> getTransactionLabel(Transaction transaction,
     {TransactionCategory? category}) async {
-  if (transaction.name.trim() == "") {
+  if (transaction.name.trim() != "") {
+    return transaction.name.capitalizeFirst;
+  } else if (transaction.payee != null && transaction.payee!.trim() != "") {
+    return transaction.payee!.capitalizeFirst;
+  } else {
     if (category == null) {
       TransactionCategory categorySearch =
           await database.getCategory(transaction.categoryFk).$2;
@@ -113,16 +137,16 @@ Future<String> getTransactionLabel(Transaction transaction,
     } else {
       return category.name.capitalizeFirst;
     }
-  } else {
-    return transaction.name.capitalizeFirst;
   }
 }
 
 String getTransactionLabelSync(
     Transaction transaction, TransactionCategory? category) {
-  if (transaction.name.trim() == "") {
-    return category?.name.capitalizeFirst ?? transaction.name.capitalizeFirst;
-  } else {
+  if (transaction.name.trim() != "") {
     return transaction.name.capitalizeFirst;
+  } else if (transaction.payee != null && transaction.payee!.trim() != "") {
+    return transaction.payee!.capitalizeFirst;
+  } else {
+    return category?.name.capitalizeFirst ?? transaction.name.capitalizeFirst;
   }
 }

@@ -1102,11 +1102,215 @@ class _AddCategoryPageState extends State<AddCategoryPage>
                         }
                         return SizedBox();
                       }),
+                if (widget.category != null) SizedBox(height: 20),
+                if (widget.category != null)
+                  Padding(
+                    padding:
+                        const EdgeInsetsDirectional.symmetric(horizontal: 20),
+                    child: TextFont(
+                      text: selectedCategoryType == CategoryType.income
+                          ? "Payers"
+                          : "Payees / Payers",
+                      textColor: getColor(context, "textLight"),
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                if (widget.category != null) SizedBox(height: 5),
+                if (widget.category != null)
+                  Padding(
+                    padding:
+                        const EdgeInsetsDirectional.symmetric(horizontal: 20),
+                    child: TextFont(
+                      text:
+                          "Quick-add merchant or person chips shown when this category is selected.",
+                      textColor: getColor(context, "textLight"),
+                      fontSize: 13,
+                      maxLines: 10,
+                    ),
+                  ),
+                if (widget.category != null) SizedBox(height: 10),
+                if (widget.category != null)
+                  Row(
+                    children: [
+                      Expanded(
+                        child: AddButton(
+                          margin: const EdgeInsetsDirectional.only(
+                            start: 15,
+                            end: 15,
+                            bottom: 9,
+                            top: 4,
+                          ),
+                          onTap: () {
+                            openBottomSheet(
+                              context,
+                              popupWithKeyboard: true,
+                              AddPayee(category: widget.category),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                if (widget.category != null)
+                  StreamBuilder<List<Payee>>(
+                    stream: database.watchAllPayeesInCategory(
+                      widget.category!.categoryPk,
+                    ),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData && (snapshot.data ?? []).isNotEmpty) {
+                        return Column(
+                          children: [
+                            for (Payee payee in snapshot.data!)
+                              Padding(
+                                padding: const EdgeInsetsDirectional.symmetric(
+                                    horizontal: 15),
+                                child: PayeeContainer(
+                                  payee: payee,
+                                  onRenamed: (text) async {
+                                    await database.createOrUpdatePayee(
+                                      payee.copyWith(name: text.trim()),
+                                    );
+                                  },
+                                ),
+                              ),
+                          ],
+                        );
+                      }
+                      return const SizedBox.shrink();
+                    },
+                  ),
                 SizedBox(height: 80),
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class AddPayee extends StatefulWidget {
+  const AddPayee({required this.category, super.key});
+  final TransactionCategory? category;
+  @override
+  State<AddPayee> createState() => _AddPayeeState();
+}
+
+class _AddPayeeState extends State<AddPayee> {
+  String selectedText = "";
+  @override
+  Widget build(BuildContext context) {
+    return PopupFramework(
+      title: "Add Payee / Payer",
+      child: SelectText(
+        enableButton: selectedText.trim().isNotEmpty,
+        buttonLabel: "Add Payee",
+        setSelectedText: (value) {
+          setState(() {
+            selectedText = value;
+          });
+        },
+        labelText: "Payee / Payer Name",
+        placeholder: "e.g. Starbucks, Amazon, Landlord",
+        nextWithInput: (text) async {
+          if (widget.category == null) return;
+          await database.addAssociatedPayee(text.trim(), widget.category!.categoryPk);
+        },
+      ),
+    );
+  }
+}
+
+class PayeeContainer extends StatelessWidget {
+  const PayeeContainer({
+    Key? key,
+    required this.payee,
+    required this.onRenamed,
+  }) : super(key: key);
+
+  final Payee payee;
+  final Function(String) onRenamed;
+
+  @override
+  Widget build(BuildContext context) {
+    String payeeName = payee.name;
+    Color backgroundColor = appStateSettings["materialYou"]
+        ? dynamicPastel(
+            context, Theme.of(context).colorScheme.secondaryContainer,
+            amountLight: 0, amountDark: 0.6)
+        : getColor(context, "lightDarkAccent");
+
+    return Padding(
+      padding: const EdgeInsetsDirectional.only(bottom: 8.0),
+      child: Tappable(
+        onTap: () {
+          openBottomSheet(
+            context,
+            popupWithKeyboard: true,
+            PopupFramework(
+              title: "Edit Payee / Payer",
+              child: SelectText(
+                buttonLabel: "Save",
+                setSelectedText: (text) {
+                  payeeName = text;
+                  onRenamed(text);
+                },
+                labelText: "Payee / Payer Name",
+                selectedText: payeeName,
+                placeholder: "e.g. Starbucks, Amazon, Landlord",
+              ),
+            ),
+          );
+        },
+        borderRadius: 15,
+        color: backgroundColor,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsetsDirectional.symmetric(
+                    horizontal: 25, vertical: 15),
+                child: TextFont(
+                  text: payee.name,
+                  fontSize: 16.5,
+                ),
+              ),
+            ),
+            Tappable(
+              onTap: () async {
+                DeletePopupAction? action = await openDeletePopup(
+                  context,
+                  title: "Delete Payee?",
+                  subtitle: payee.name,
+                );
+                if (action == DeletePopupAction.Delete) {
+                  await database.deletePayee(payee.payeePk);
+                  openSnackbar(
+                    SnackbarMessage(
+                      title: "Deleted Payee",
+                      icon: Icons.delete,
+                      description: payee.name,
+                    ),
+                  );
+                }
+              },
+              borderRadius: 15,
+              color: backgroundColor,
+              child: Padding(
+                padding: const EdgeInsetsDirectional.all(14),
+                child: Icon(
+                  appStateSettings["outlinedIcons"]
+                      ? Icons.close_outlined
+                      : Icons.close_rounded,
+                  size: 25,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

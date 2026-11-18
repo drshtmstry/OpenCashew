@@ -1616,7 +1616,7 @@ class Objective extends DataClass implements Insertable<Objective> {
       this.emojiIconName,
       required this.income,
       required this.pinned,
-      required this.archived,
+      this.archived = false,
       required this.walletFk});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -2301,6 +2301,17 @@ class $TransactionsTable extends Transactions
               type: DriftSqlType.string, requiredDuringInsert: false)
           .withConverter<List<String>?>(
               $TransactionsTable.$converterbudgetFksExcluden);
+  static const VerificationMeta _payeeMeta = const VerificationMeta('payee');
+  @override
+  late final GeneratedColumn<String> payee = GeneratedColumn<String>(
+      'payee', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _payeeFkMeta =
+      const VerificationMeta('payeeFk');
+  @override
+  late final GeneratedColumn<String> payeeFk = GeneratedColumn<String>(
+      'payee_fk', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   @override
   List<GeneratedColumn> get $columns => [
         transactionPk,
@@ -2333,7 +2344,9 @@ class $TransactionsTable extends Transactions
         sharedReferenceBudgetPk,
         objectiveFk,
         objectiveLoanFk,
-        budgetFksExclude
+        budgetFksExclude,
+        payee,
+        payeeFk
       ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -2495,6 +2508,14 @@ class $TransactionsTable extends Transactions
           objectiveLoanFk.isAcceptableOrUnknown(
               data['objective_loan_fk']!, _objectiveLoanFkMeta));
     }
+    if (data.containsKey('payee')) {
+      context.handle(
+          _payeeMeta, payee.isAcceptableOrUnknown(data['payee']!, _payeeMeta));
+    }
+    if (data.containsKey('payee_fk')) {
+      context.handle(_payeeFkMeta,
+          payeeFk.isAcceptableOrUnknown(data['payee_fk']!, _payeeFkMeta));
+    }
     return context;
   }
 
@@ -2576,6 +2597,10 @@ class $TransactionsTable extends Transactions
       budgetFksExclude: $TransactionsTable.$converterbudgetFksExcluden.fromSql(
           attachedDatabase.typeMapping.read(DriftSqlType.string,
               data['${effectivePrefix}budget_fks_exclude'])),
+      payee: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}payee']),
+      payeeFk: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}payee_fk']),
     );
   }
 
@@ -2641,6 +2666,8 @@ class Transaction extends DataClass implements Insertable<Transaction> {
   final String? objectiveFk;
   final String? objectiveLoanFk;
   final List<String>? budgetFksExclude;
+  final String? payee;
+  final String? payeeFk;
   const Transaction(
       {required this.transactionPk,
       this.pairedTransactionFk,
@@ -2672,7 +2699,9 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       this.sharedReferenceBudgetPk,
       this.objectiveFk,
       this.objectiveLoanFk,
-      this.budgetFksExclude});
+      this.budgetFksExclude,
+      this.payee,
+      this.payeeFk});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -2759,6 +2788,12 @@ class Transaction extends DataClass implements Insertable<Transaction> {
           .$converterbudgetFksExcluden
           .toSql(budgetFksExclude));
     }
+    if (!nullToAbsent || payee != null) {
+      map['payee'] = Variable<String>(payee);
+    }
+    if (!nullToAbsent || payeeFk != null) {
+      map['payee_fk'] = Variable<String>(payeeFk);
+    }
     return map;
   }
 
@@ -2838,6 +2873,11 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       budgetFksExclude: budgetFksExclude == null && nullToAbsent
           ? const Value.absent()
           : Value(budgetFksExclude),
+      payee:
+          payee == null && nullToAbsent ? const Value.absent() : Value(payee),
+      payeeFk: payeeFk == null && nullToAbsent
+          ? const Value.absent()
+          : Value(payeeFk),
     );
   }
 
@@ -2889,6 +2929,8 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       objectiveLoanFk: serializer.fromJson<String?>(json['objectiveLoanFk']),
       budgetFksExclude:
           serializer.fromJson<List<String>?>(json['budgetFksExclude']),
+      payee: serializer.fromJson<String?>(json['payee']),
+      payeeFk: serializer.fromJson<String?>(json['payeeFk']),
     );
   }
   @override
@@ -2935,6 +2977,8 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       'objectiveFk': serializer.toJson<String?>(objectiveFk),
       'objectiveLoanFk': serializer.toJson<String?>(objectiveLoanFk),
       'budgetFksExclude': serializer.toJson<List<String>?>(budgetFksExclude),
+      'payee': serializer.toJson<String?>(payee),
+      'payeeFk': serializer.toJson<String?>(payeeFk),
     };
   }
 
@@ -2969,7 +3013,9 @@ class Transaction extends DataClass implements Insertable<Transaction> {
           Value<String?> sharedReferenceBudgetPk = const Value.absent(),
           Value<String?> objectiveFk = const Value.absent(),
           Value<String?> objectiveLoanFk = const Value.absent(),
-          Value<List<String>?> budgetFksExclude = const Value.absent()}) =>
+          Value<List<String>?> budgetFksExclude = const Value.absent(),
+          Value<String?> payee = const Value.absent(),
+          Value<String?> payeeFk = const Value.absent()}) =>
       Transaction(
         transactionPk: transactionPk ?? this.transactionPk,
         pairedTransactionFk: pairedTransactionFk.present
@@ -3029,6 +3075,8 @@ class Transaction extends DataClass implements Insertable<Transaction> {
         budgetFksExclude: budgetFksExclude.present
             ? budgetFksExclude.value
             : this.budgetFksExclude,
+        payee: payee.present ? payee.value : this.payee,
+        payeeFk: payeeFk.present ? payeeFk.value : this.payeeFk,
       );
   Transaction copyWithCompanion(TransactionsCompanion data) {
     return Transaction(
@@ -3103,6 +3151,8 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       budgetFksExclude: data.budgetFksExclude.present
           ? data.budgetFksExclude.value
           : this.budgetFksExclude,
+      payee: data.payee.present ? data.payee.value : this.payee,
+      payeeFk: data.payeeFk.present ? data.payeeFk.value : this.payeeFk,
     );
   }
 
@@ -3142,7 +3192,9 @@ class Transaction extends DataClass implements Insertable<Transaction> {
           ..write('sharedReferenceBudgetPk: $sharedReferenceBudgetPk, ')
           ..write('objectiveFk: $objectiveFk, ')
           ..write('objectiveLoanFk: $objectiveLoanFk, ')
-          ..write('budgetFksExclude: $budgetFksExclude')
+          ..write('budgetFksExclude: $budgetFksExclude, ')
+          ..write('payee: $payee, ')
+          ..write('payeeFk: $payeeFk')
           ..write(')'))
         .toString();
   }
@@ -3179,7 +3231,9 @@ class Transaction extends DataClass implements Insertable<Transaction> {
         sharedReferenceBudgetPk,
         objectiveFk,
         objectiveLoanFk,
-        budgetFksExclude
+        budgetFksExclude,
+        payee,
+        payeeFk
       ]);
   @override
   bool operator ==(Object other) =>
@@ -3218,7 +3272,9 @@ class Transaction extends DataClass implements Insertable<Transaction> {
           other.sharedReferenceBudgetPk == this.sharedReferenceBudgetPk &&
           other.objectiveFk == this.objectiveFk &&
           other.objectiveLoanFk == this.objectiveLoanFk &&
-          other.budgetFksExclude == this.budgetFksExclude);
+          other.budgetFksExclude == this.budgetFksExclude &&
+          other.payee == this.payee &&
+          other.payeeFk == this.payeeFk);
 }
 
 class TransactionsCompanion extends UpdateCompanion<Transaction> {
@@ -3253,6 +3309,8 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
   final Value<String?> objectiveFk;
   final Value<String?> objectiveLoanFk;
   final Value<List<String>?> budgetFksExclude;
+  final Value<String?> payee;
+  final Value<String?> payeeFk;
   final Value<int> rowid;
   const TransactionsCompanion({
     this.transactionPk = const Value.absent(),
@@ -3286,6 +3344,8 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
     this.objectiveFk = const Value.absent(),
     this.objectiveLoanFk = const Value.absent(),
     this.budgetFksExclude = const Value.absent(),
+    this.payee = const Value.absent(),
+    this.payeeFk = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   TransactionsCompanion.insert({
@@ -3320,6 +3380,8 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
     this.objectiveFk = const Value.absent(),
     this.objectiveLoanFk = const Value.absent(),
     this.budgetFksExclude = const Value.absent(),
+    this.payee = const Value.absent(),
+    this.payeeFk = const Value.absent(),
     this.rowid = const Value.absent(),
   })  : name = Value(name),
         amount = Value(amount),
@@ -3357,6 +3419,8 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
     Expression<String>? objectiveFk,
     Expression<String>? objectiveLoanFk,
     Expression<String>? budgetFksExclude,
+    Expression<String>? payee,
+    Expression<String>? payeeFk,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -3397,6 +3461,8 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
       if (objectiveFk != null) 'objective_fk': objectiveFk,
       if (objectiveLoanFk != null) 'objective_loan_fk': objectiveLoanFk,
       if (budgetFksExclude != null) 'budget_fks_exclude': budgetFksExclude,
+      if (payee != null) 'payee': payee,
+      if (payeeFk != null) 'payee_fk': payeeFk,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -3433,6 +3499,8 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
       Value<String?>? objectiveFk,
       Value<String?>? objectiveLoanFk,
       Value<List<String>?>? budgetFksExclude,
+      Value<String?>? payee,
+      Value<String?>? payeeFk,
       Value<int>? rowid}) {
     return TransactionsCompanion(
       transactionPk: transactionPk ?? this.transactionPk,
@@ -3471,6 +3539,8 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
       objectiveFk: objectiveFk ?? this.objectiveFk,
       objectiveLoanFk: objectiveLoanFk ?? this.objectiveLoanFk,
       budgetFksExclude: budgetFksExclude ?? this.budgetFksExclude,
+      payee: payee ?? this.payee,
+      payeeFk: payeeFk ?? this.payeeFk,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -3583,6 +3653,12 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
           .$converterbudgetFksExcluden
           .toSql(budgetFksExclude.value));
     }
+    if (payee.present) {
+      map['payee'] = Variable<String>(payee.value);
+    }
+    if (payeeFk.present) {
+      map['payee_fk'] = Variable<String>(payeeFk.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -3626,6 +3702,8 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
           ..write('objectiveFk: $objectiveFk, ')
           ..write('objectiveLoanFk: $objectiveLoanFk, ')
           ..write('budgetFksExclude: $budgetFksExclude, ')
+          ..write('payee: $payee, ')
+          ..write('payeeFk: $payeeFk, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -4139,7 +4217,7 @@ class Budget extends DataClass implements Insertable<Budget> {
       this.categoryFks,
       this.categoryFksExclude,
       required this.income,
-      required this.archived,
+      this.archived = false,
       required this.addedTransactionsOnly,
       required this.periodLength,
       this.reoccurrence,
@@ -7242,7 +7320,7 @@ class TransactionTag extends DataClass implements Insertable<TransactionTag> {
       required this.dateCreated,
       this.dateTimeModified,
       required this.order,
-      required this.archived});
+      this.archived = false});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -7749,6 +7827,415 @@ class TransactionToTagLinksCompanion
   }
 }
 
+class $PayeesTable extends Payees with TableInfo<$PayeesTable, Payee> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PayeesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _payeePkMeta =
+      const VerificationMeta('payeePk');
+  @override
+  late final GeneratedColumn<String> payeePk = GeneratedColumn<String>(
+      'payee_pk', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      clientDefault: () => uuid.v4());
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+      'name', aliasedName, false,
+      additionalChecks: GeneratedColumn.checkTextLength(),
+      type: DriftSqlType.string,
+      requiredDuringInsert: true);
+  static const VerificationMeta _categoryFkMeta =
+      const VerificationMeta('categoryFk');
+  @override
+  late final GeneratedColumn<String> categoryFk = GeneratedColumn<String>(
+      'category_fk', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: true,
+      defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'REFERENCES categories (category_pk)'));
+  static const VerificationMeta _dateCreatedMeta =
+      const VerificationMeta('dateCreated');
+  @override
+  late final GeneratedColumn<DateTime> dateCreated = GeneratedColumn<DateTime>(
+      'date_created', aliasedName, false,
+      type: DriftSqlType.dateTime,
+      requiredDuringInsert: false,
+      clientDefault: () => DateTime.now());
+  static const VerificationMeta _dateTimeModifiedMeta =
+      const VerificationMeta('dateTimeModified');
+  @override
+  late final GeneratedColumn<DateTime> dateTimeModified =
+      GeneratedColumn<DateTime>('date_time_modified', aliasedName, true,
+          type: DriftSqlType.dateTime,
+          requiredDuringInsert: false,
+          defaultValue: Constant(DateTime.now()));
+  static const VerificationMeta _orderMeta = const VerificationMeta('order');
+  @override
+  late final GeneratedColumn<int> order = GeneratedColumn<int>(
+      'order', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(0));
+  static const VerificationMeta _archivedMeta =
+      const VerificationMeta('archived');
+  @override
+  late final GeneratedColumn<bool> archived = GeneratedColumn<bool>(
+      'archived', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("archived" IN (0, 1))'),
+      defaultValue: const Constant(false));
+  @override
+  List<GeneratedColumn> get $columns => [
+        payeePk,
+        name,
+        categoryFk,
+        dateCreated,
+        dateTimeModified,
+        order,
+        archived
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'payees';
+  @override
+  VerificationContext validateIntegrity(Insertable<Payee> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('payee_pk')) {
+      context.handle(_payeePkMeta,
+          payeePk.isAcceptableOrUnknown(data['payee_pk']!, _payeePkMeta));
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+          _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('category_fk')) {
+      context.handle(
+          _categoryFkMeta,
+          categoryFk.isAcceptableOrUnknown(
+              data['category_fk']!, _categoryFkMeta));
+    } else if (isInserting) {
+      context.missing(_categoryFkMeta);
+    }
+    if (data.containsKey('date_created')) {
+      context.handle(
+          _dateCreatedMeta,
+          dateCreated.isAcceptableOrUnknown(
+              data['date_created']!, _dateCreatedMeta));
+    }
+    if (data.containsKey('date_time_modified')) {
+      context.handle(
+          _dateTimeModifiedMeta,
+          dateTimeModified.isAcceptableOrUnknown(
+              data['date_time_modified']!, _dateTimeModifiedMeta));
+    }
+    if (data.containsKey('order')) {
+      context.handle(
+          _orderMeta, order.isAcceptableOrUnknown(data['order']!, _orderMeta));
+    }
+    if (data.containsKey('archived')) {
+      context.handle(_archivedMeta,
+          archived.isAcceptableOrUnknown(data['archived']!, _archivedMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {payeePk};
+  @override
+  Payee map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Payee(
+      payeePk: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}payee_pk'])!,
+      name: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
+      categoryFk: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}category_fk'])!,
+      dateCreated: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}date_created'])!,
+      dateTimeModified: attachedDatabase.typeMapping.read(
+          DriftSqlType.dateTime, data['${effectivePrefix}date_time_modified']),
+      order: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}order'])!,
+      archived: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}archived'])!,
+    );
+  }
+
+  @override
+  $PayeesTable createAlias(String alias) {
+    return $PayeesTable(attachedDatabase, alias);
+  }
+}
+
+class Payee extends DataClass implements Insertable<Payee> {
+  final String payeePk;
+  final String name;
+  final String categoryFk;
+  final DateTime dateCreated;
+  final DateTime? dateTimeModified;
+  final int order;
+  final bool archived;
+  const Payee(
+      {required this.payeePk,
+      required this.name,
+      required this.categoryFk,
+      required this.dateCreated,
+      this.dateTimeModified,
+      required this.order,
+      this.archived = false});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['payee_pk'] = Variable<String>(payeePk);
+    map['name'] = Variable<String>(name);
+    map['category_fk'] = Variable<String>(categoryFk);
+    map['date_created'] = Variable<DateTime>(dateCreated);
+    if (!nullToAbsent || dateTimeModified != null) {
+      map['date_time_modified'] = Variable<DateTime>(dateTimeModified);
+    }
+    map['order'] = Variable<int>(order);
+    map['archived'] = Variable<bool>(archived);
+    return map;
+  }
+
+  PayeesCompanion toCompanion(bool nullToAbsent) {
+    return PayeesCompanion(
+      payeePk: Value(payeePk),
+      name: Value(name),
+      categoryFk: Value(categoryFk),
+      dateCreated: Value(dateCreated),
+      dateTimeModified: dateTimeModified == null && nullToAbsent
+          ? const Value.absent()
+          : Value(dateTimeModified),
+      order: Value(order),
+      archived: Value(archived),
+    );
+  }
+
+  factory Payee.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Payee(
+      payeePk: serializer.fromJson<String>(json['payeePk']),
+      name: serializer.fromJson<String>(json['name']),
+      categoryFk: serializer.fromJson<String>(json['categoryFk']),
+      dateCreated: serializer.fromJson<DateTime>(json['dateCreated']),
+      dateTimeModified:
+          serializer.fromJson<DateTime?>(json['dateTimeModified']),
+      order: serializer.fromJson<int>(json['order']),
+      archived: serializer.fromJson<bool>(json['archived']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'payeePk': serializer.toJson<String>(payeePk),
+      'name': serializer.toJson<String>(name),
+      'categoryFk': serializer.toJson<String>(categoryFk),
+      'dateCreated': serializer.toJson<DateTime>(dateCreated),
+      'dateTimeModified': serializer.toJson<DateTime?>(dateTimeModified),
+      'order': serializer.toJson<int>(order),
+      'archived': serializer.toJson<bool>(archived),
+    };
+  }
+
+  Payee copyWith(
+          {String? payeePk,
+          String? name,
+          String? categoryFk,
+          DateTime? dateCreated,
+          Value<DateTime?> dateTimeModified = const Value.absent(),
+          int? order,
+          bool? archived}) =>
+      Payee(
+        payeePk: payeePk ?? this.payeePk,
+        name: name ?? this.name,
+        categoryFk: categoryFk ?? this.categoryFk,
+        dateCreated: dateCreated ?? this.dateCreated,
+        dateTimeModified: dateTimeModified.present
+            ? dateTimeModified.value
+            : this.dateTimeModified,
+        order: order ?? this.order,
+        archived: archived ?? this.archived,
+      );
+  Payee copyWithCompanion(PayeesCompanion data) {
+    return Payee(
+      payeePk: data.payeePk.present ? data.payeePk.value : this.payeePk,
+      name: data.name.present ? data.name.value : this.name,
+      categoryFk:
+          data.categoryFk.present ? data.categoryFk.value : this.categoryFk,
+      dateCreated:
+          data.dateCreated.present ? data.dateCreated.value : this.dateCreated,
+      dateTimeModified: data.dateTimeModified.present
+          ? data.dateTimeModified.value
+          : this.dateTimeModified,
+      order: data.order.present ? data.order.value : this.order,
+      archived: data.archived.present ? data.archived.value : this.archived,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Payee(')
+          ..write('payeePk: $payeePk, ')
+          ..write('name: $name, ')
+          ..write('categoryFk: $categoryFk, ')
+          ..write('dateCreated: $dateCreated, ')
+          ..write('dateTimeModified: $dateTimeModified, ')
+          ..write('order: $order, ')
+          ..write('archived: $archived')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(payeePk, name, categoryFk, dateCreated,
+      dateTimeModified, order, archived);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Payee &&
+          other.payeePk == this.payeePk &&
+          other.name == this.name &&
+          other.categoryFk == this.categoryFk &&
+          other.dateCreated == this.dateCreated &&
+          other.dateTimeModified == this.dateTimeModified &&
+          other.order == this.order &&
+          other.archived == this.archived);
+}
+
+class PayeesCompanion extends UpdateCompanion<Payee> {
+  final Value<String> payeePk;
+  final Value<String> name;
+  final Value<String> categoryFk;
+  final Value<DateTime> dateCreated;
+  final Value<DateTime?> dateTimeModified;
+  final Value<int> order;
+  final Value<bool> archived;
+  final Value<int> rowid;
+  const PayeesCompanion({
+    this.payeePk = const Value.absent(),
+    this.name = const Value.absent(),
+    this.categoryFk = const Value.absent(),
+    this.dateCreated = const Value.absent(),
+    this.dateTimeModified = const Value.absent(),
+    this.order = const Value.absent(),
+    this.archived = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  PayeesCompanion.insert({
+    this.payeePk = const Value.absent(),
+    required String name,
+    required String categoryFk,
+    this.dateCreated = const Value.absent(),
+    this.dateTimeModified = const Value.absent(),
+    this.order = const Value.absent(),
+    this.archived = const Value.absent(),
+    this.rowid = const Value.absent(),
+  })  : name = Value(name),
+        categoryFk = Value(categoryFk);
+  static Insertable<Payee> custom({
+    Expression<String>? payeePk,
+    Expression<String>? name,
+    Expression<String>? categoryFk,
+    Expression<DateTime>? dateCreated,
+    Expression<DateTime>? dateTimeModified,
+    Expression<int>? order,
+    Expression<bool>? archived,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (payeePk != null) 'payee_pk': payeePk,
+      if (name != null) 'name': name,
+      if (categoryFk != null) 'category_fk': categoryFk,
+      if (dateCreated != null) 'date_created': dateCreated,
+      if (dateTimeModified != null) 'date_time_modified': dateTimeModified,
+      if (order != null) 'order': order,
+      if (archived != null) 'archived': archived,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  PayeesCompanion copyWith(
+      {Value<String>? payeePk,
+      Value<String>? name,
+      Value<String>? categoryFk,
+      Value<DateTime>? dateCreated,
+      Value<DateTime?>? dateTimeModified,
+      Value<int>? order,
+      Value<bool>? archived,
+      Value<int>? rowid}) {
+    return PayeesCompanion(
+      payeePk: payeePk ?? this.payeePk,
+      name: name ?? this.name,
+      categoryFk: categoryFk ?? this.categoryFk,
+      dateCreated: dateCreated ?? this.dateCreated,
+      dateTimeModified: dateTimeModified ?? this.dateTimeModified,
+      order: order ?? this.order,
+      archived: archived ?? this.archived,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (payeePk.present) {
+      map['payee_pk'] = Variable<String>(payeePk.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (categoryFk.present) {
+      map['category_fk'] = Variable<String>(categoryFk.value);
+    }
+    if (dateCreated.present) {
+      map['date_created'] = Variable<DateTime>(dateCreated.value);
+    }
+    if (dateTimeModified.present) {
+      map['date_time_modified'] = Variable<DateTime>(dateTimeModified.value);
+    }
+    if (order.present) {
+      map['order'] = Variable<int>(order.value);
+    }
+    if (archived.present) {
+      map['archived'] = Variable<bool>(archived.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PayeesCompanion(')
+          ..write('payeePk: $payeePk, ')
+          ..write('name: $name, ')
+          ..write('categoryFk: $categoryFk, ')
+          ..write('dateCreated: $dateCreated, ')
+          ..write('dateTimeModified: $dateTimeModified, ')
+          ..write('order: $order, ')
+          ..write('archived: $archived, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$FinanceDatabase extends GeneratedDatabase {
   _$FinanceDatabase(QueryExecutor e) : super(e);
   $FinanceDatabaseManager get managers => $FinanceDatabaseManager(this);
@@ -7768,6 +8255,7 @@ abstract class _$FinanceDatabase extends GeneratedDatabase {
   late final $TagsTable tags = $TagsTable(this);
   late final $TransactionToTagLinksTable transactionToTagLinks =
       $TransactionToTagLinksTable(this);
+  late final $PayeesTable payees = $PayeesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -7784,7 +8272,8 @@ abstract class _$FinanceDatabase extends GeneratedDatabase {
         scannerTemplates,
         deleteLogs,
         tags,
-        transactionToTagLinks
+        transactionToTagLinks,
+        payees
       ];
 }
 
@@ -8588,6 +9077,21 @@ final class $$CategoriesTableReferences extends BaseReferences<
     return ProcessedTableManager(
         manager.$state.copyWith(prefetchedData: cache));
   }
+
+  static MultiTypedResultKey<$PayeesTable, List<Payee>> _payeesRefsTable(
+          _$FinanceDatabase db) =>
+      MultiTypedResultKey.fromTable(db.payees,
+          aliasName: 'categories__category_pk__payees__category_fk');
+
+  $$PayeesTableProcessedTableManager get payeesRefs {
+    final manager = $$PayeesTableTableManager($_db, $_db.payees).filter((f) => f
+        .categoryFk.categoryPk
+        .sqlEquals($_itemColumn<String>('category_pk')!));
+
+    final cache = $_typedResult.readTableOrNull(_payeesRefsTable($_db));
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: cache));
+  }
 }
 
 class $$CategoriesTableFilterComposer
@@ -8711,6 +9215,27 @@ class $$CategoriesTableFilterComposer
             $$ScannerTemplatesTableFilterComposer(
               $db: $db,
               $table: $db.scannerTemplates,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+
+  Expression<bool> payeesRefs(
+      Expression<bool> Function($$PayeesTableFilterComposer f) f) {
+    final $$PayeesTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.categoryPk,
+        referencedTable: $db.payees,
+        getReferencedColumn: (t) => t.categoryFk,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$PayeesTableFilterComposer(
+              $db: $db,
+              $table: $db.payees,
               $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
               joinBuilder: joinBuilder,
               $removeJoinBuilderFromRootComposer:
@@ -8912,6 +9437,27 @@ class $$CategoriesTableAnnotationComposer
             ));
     return f(composer);
   }
+
+  Expression<T> payeesRefs<T extends Object>(
+      Expression<T> Function($$PayeesTableAnnotationComposer a) f) {
+    final $$PayeesTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.categoryPk,
+        referencedTable: $db.payees,
+        getReferencedColumn: (t) => t.categoryFk,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$PayeesTableAnnotationComposer(
+              $db: $db,
+              $table: $db.payees,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
 }
 
 class $$CategoriesTableTableManager extends RootTableManager<
@@ -8929,7 +9475,8 @@ class $$CategoriesTableTableManager extends RootTableManager<
         {bool mainCategoryPk,
         bool categoryBudgetLimitsRefs,
         bool associatedTitlesRefs,
-        bool scannerTemplatesRefs})> {
+        bool scannerTemplatesRefs,
+        bool payeesRefs})> {
   $$CategoriesTableTableManager(_$FinanceDatabase db, $CategoriesTable table)
       : super(TableManagerState(
           db: db,
@@ -9010,13 +9557,15 @@ class $$CategoriesTableTableManager extends RootTableManager<
               {mainCategoryPk = false,
               categoryBudgetLimitsRefs = false,
               associatedTitlesRefs = false,
-              scannerTemplatesRefs = false}) {
+              scannerTemplatesRefs = false,
+              payeesRefs = false}) {
             return PrefetchHooks(
               db: db,
               explicitlyWatchedTables: [
                 if (categoryBudgetLimitsRefs) db.categoryBudgetLimits,
                 if (associatedTitlesRefs) db.associatedTitles,
-                if (scannerTemplatesRefs) db.scannerTemplates
+                if (scannerTemplatesRefs) db.scannerTemplates,
+                if (payeesRefs) db.payees
               ],
               addJoins: <
                   T extends TableManagerState<
@@ -9091,6 +9640,18 @@ class $$CategoriesTableTableManager extends RootTableManager<
                                 .scannerTemplatesRefs,
                         currentColumn: 'category_pk',
                         referencedColumn: 'default_category_fk',
+                        typedResults: items),
+                  if (payeesRefs)
+                    await $_getPrefetchedDataByColumns<TransactionCategory,
+                            $CategoriesTable, Payee, $PayeesTable>(
+                        currentTable: table,
+                        referencedTable:
+                            $$CategoriesTableReferences._payeesRefsTable(db),
+                        managerFromTypedResult: (p0) =>
+                            $$CategoriesTableReferences(db, table, p0)
+                                .payeesRefs,
+                        currentColumn: 'category_pk',
+                        referencedColumn: 'category_fk',
                         typedResults: items)
                 ];
               },
@@ -9114,7 +9675,8 @@ typedef $$CategoriesTableProcessedTableManager = ProcessedTableManager<
         {bool mainCategoryPk,
         bool categoryBudgetLimitsRefs,
         bool associatedTitlesRefs,
-        bool scannerTemplatesRefs})>;
+        bool scannerTemplatesRefs,
+        bool payeesRefs})>;
 typedef $$ObjectivesTableCreateCompanionBuilder = ObjectivesCompanion Function({
   Value<String> objectivePk,
   Value<ObjectiveType> type,
@@ -9575,6 +10137,8 @@ typedef $$TransactionsTableCreateCompanionBuilder = TransactionsCompanion
   Value<String?> objectiveFk,
   Value<String?> objectiveLoanFk,
   Value<List<String>?> budgetFksExclude,
+  Value<String?> payee,
+  Value<String?> payeeFk,
   Value<int> rowid,
 });
 typedef $$TransactionsTableUpdateCompanionBuilder = TransactionsCompanion
@@ -9610,6 +10174,8 @@ typedef $$TransactionsTableUpdateCompanionBuilder = TransactionsCompanion
   Value<String?> objectiveFk,
   Value<String?> objectiveLoanFk,
   Value<List<String>?> budgetFksExclude,
+  Value<String?> payee,
+  Value<String?> payeeFk,
   Value<int> rowid,
 });
 
@@ -9829,6 +10395,12 @@ class $$TransactionsTableFilterComposer
       get budgetFksExclude => $composableBuilder(
           column: $table.budgetFksExclude,
           builder: (column) => ColumnWithTypeConverterFilters(column));
+
+  ColumnFilters<String> get payee => $composableBuilder(
+      column: $table.payee, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get payeeFk => $composableBuilder(
+      column: $table.payeeFk, builder: (column) => ColumnFilters(column));
 
   $$TransactionsTableFilterComposer get pairedTransactionFk {
     final $$TransactionsTableFilterComposer composer = $composerBuilder(
@@ -10075,6 +10647,12 @@ class $$TransactionsTableOrderingComposer
       column: $table.budgetFksExclude,
       builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<String> get payee => $composableBuilder(
+      column: $table.payee, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get payeeFk => $composableBuilder(
+      column: $table.payeeFk, builder: (column) => ColumnOrderings(column));
+
   $$TransactionsTableOrderingComposer get pairedTransactionFk {
     final $$TransactionsTableOrderingComposer composer = $composerBuilder(
         composer: this,
@@ -10290,6 +10868,12 @@ class $$TransactionsTableAnnotationComposer
       get budgetFksExclude => $composableBuilder(
           column: $table.budgetFksExclude, builder: (column) => column);
 
+  GeneratedColumn<String> get payee =>
+      $composableBuilder(column: $table.payee, builder: (column) => column);
+
+  GeneratedColumn<String> get payeeFk =>
+      $composableBuilder(column: $table.payeeFk, builder: (column) => column);
+
   $$TransactionsTableAnnotationComposer get pairedTransactionFk {
     final $$TransactionsTableAnnotationComposer composer = $composerBuilder(
         composer: this,
@@ -10496,6 +11080,8 @@ class $$TransactionsTableTableManager extends RootTableManager<
             Value<String?> objectiveFk = const Value.absent(),
             Value<String?> objectiveLoanFk = const Value.absent(),
             Value<List<String>?> budgetFksExclude = const Value.absent(),
+            Value<String?> payee = const Value.absent(),
+            Value<String?> payeeFk = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               TransactionsCompanion(
@@ -10530,6 +11116,8 @@ class $$TransactionsTableTableManager extends RootTableManager<
             objectiveFk: objectiveFk,
             objectiveLoanFk: objectiveLoanFk,
             budgetFksExclude: budgetFksExclude,
+            payee: payee,
+            payeeFk: payeeFk,
             rowid: rowid,
           ),
           createCompanionCallback: ({
@@ -10564,6 +11152,8 @@ class $$TransactionsTableTableManager extends RootTableManager<
             Value<String?> objectiveFk = const Value.absent(),
             Value<String?> objectiveLoanFk = const Value.absent(),
             Value<List<String>?> budgetFksExclude = const Value.absent(),
+            Value<String?> payee = const Value.absent(),
+            Value<String?> payeeFk = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               TransactionsCompanion.insert(
@@ -10598,6 +11188,8 @@ class $$TransactionsTableTableManager extends RootTableManager<
             objectiveFk: objectiveFk,
             objectiveLoanFk: objectiveLoanFk,
             budgetFksExclude: budgetFksExclude,
+            payee: payee,
+            payeeFk: payeeFk,
             rowid: rowid,
           ),
           withReferenceMapper: (p0) => p0
@@ -13688,6 +14280,310 @@ typedef $$TransactionToTagLinksTableProcessedTableManager
         (TransactionToTagLink, $$TransactionToTagLinksTableReferences),
         TransactionToTagLink,
         PrefetchHooks Function({bool transactionPk, bool tagPk})>;
+typedef $$PayeesTableCreateCompanionBuilder = PayeesCompanion Function({
+  Value<String> payeePk,
+  required String name,
+  required String categoryFk,
+  Value<DateTime> dateCreated,
+  Value<DateTime?> dateTimeModified,
+  Value<int> order,
+  Value<bool> archived,
+  Value<int> rowid,
+});
+typedef $$PayeesTableUpdateCompanionBuilder = PayeesCompanion Function({
+  Value<String> payeePk,
+  Value<String> name,
+  Value<String> categoryFk,
+  Value<DateTime> dateCreated,
+  Value<DateTime?> dateTimeModified,
+  Value<int> order,
+  Value<bool> archived,
+  Value<int> rowid,
+});
+
+final class $$PayeesTableReferences
+    extends BaseReferences<_$FinanceDatabase, $PayeesTable, Payee> {
+  $$PayeesTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $CategoriesTable _categoryFkTable(_$FinanceDatabase db) =>
+      db.categories.createAlias('payees__category_fk__categories__category_pk');
+
+  $$CategoriesTableProcessedTableManager get categoryFk {
+    final $_column = $_itemColumn<String>('category_fk')!;
+
+    final manager = $$CategoriesTableTableManager($_db, $_db.categories)
+        .filter((f) => f.categoryPk.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_categoryFkTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: [item]));
+  }
+}
+
+class $$PayeesTableFilterComposer
+    extends Composer<_$FinanceDatabase, $PayeesTable> {
+  $$PayeesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get payeePk => $composableBuilder(
+      column: $table.payeePk, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get dateCreated => $composableBuilder(
+      column: $table.dateCreated, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get dateTimeModified => $composableBuilder(
+      column: $table.dateTimeModified,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get order => $composableBuilder(
+      column: $table.order, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get archived => $composableBuilder(
+      column: $table.archived, builder: (column) => ColumnFilters(column));
+
+  $$CategoriesTableFilterComposer get categoryFk {
+    final $$CategoriesTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.categoryFk,
+        referencedTable: $db.categories,
+        getReferencedColumn: (t) => t.categoryPk,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$CategoriesTableFilterComposer(
+              $db: $db,
+              $table: $db.categories,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$PayeesTableOrderingComposer
+    extends Composer<_$FinanceDatabase, $PayeesTable> {
+  $$PayeesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get payeePk => $composableBuilder(
+      column: $table.payeePk, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get dateCreated => $composableBuilder(
+      column: $table.dateCreated, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get dateTimeModified => $composableBuilder(
+      column: $table.dateTimeModified,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get order => $composableBuilder(
+      column: $table.order, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get archived => $composableBuilder(
+      column: $table.archived, builder: (column) => ColumnOrderings(column));
+
+  $$CategoriesTableOrderingComposer get categoryFk {
+    final $$CategoriesTableOrderingComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.categoryFk,
+        referencedTable: $db.categories,
+        getReferencedColumn: (t) => t.categoryPk,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$CategoriesTableOrderingComposer(
+              $db: $db,
+              $table: $db.categories,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$PayeesTableAnnotationComposer
+    extends Composer<_$FinanceDatabase, $PayeesTable> {
+  $$PayeesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get payeePk =>
+      $composableBuilder(column: $table.payeePk, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get dateCreated => $composableBuilder(
+      column: $table.dateCreated, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get dateTimeModified => $composableBuilder(
+      column: $table.dateTimeModified, builder: (column) => column);
+
+  GeneratedColumn<int> get order =>
+      $composableBuilder(column: $table.order, builder: (column) => column);
+
+  GeneratedColumn<bool> get archived =>
+      $composableBuilder(column: $table.archived, builder: (column) => column);
+
+  $$CategoriesTableAnnotationComposer get categoryFk {
+    final $$CategoriesTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.categoryFk,
+        referencedTable: $db.categories,
+        getReferencedColumn: (t) => t.categoryPk,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$CategoriesTableAnnotationComposer(
+              $db: $db,
+              $table: $db.categories,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$PayeesTableTableManager extends RootTableManager<
+    _$FinanceDatabase,
+    $PayeesTable,
+    Payee,
+    $$PayeesTableFilterComposer,
+    $$PayeesTableOrderingComposer,
+    $$PayeesTableAnnotationComposer,
+    $$PayeesTableCreateCompanionBuilder,
+    $$PayeesTableUpdateCompanionBuilder,
+    (Payee, $$PayeesTableReferences),
+    Payee,
+    PrefetchHooks Function({bool categoryFk})> {
+  $$PayeesTableTableManager(_$FinanceDatabase db, $PayeesTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PayeesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PayeesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PayeesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> payeePk = const Value.absent(),
+            Value<String> name = const Value.absent(),
+            Value<String> categoryFk = const Value.absent(),
+            Value<DateTime> dateCreated = const Value.absent(),
+            Value<DateTime?> dateTimeModified = const Value.absent(),
+            Value<int> order = const Value.absent(),
+            Value<bool> archived = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              PayeesCompanion(
+            payeePk: payeePk,
+            name: name,
+            categoryFk: categoryFk,
+            dateCreated: dateCreated,
+            dateTimeModified: dateTimeModified,
+            order: order,
+            archived: archived,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            Value<String> payeePk = const Value.absent(),
+            required String name,
+            required String categoryFk,
+            Value<DateTime> dateCreated = const Value.absent(),
+            Value<DateTime?> dateTimeModified = const Value.absent(),
+            Value<int> order = const Value.absent(),
+            Value<bool> archived = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              PayeesCompanion.insert(
+            payeePk: payeePk,
+            name: name,
+            categoryFk: categoryFk,
+            dateCreated: dateCreated,
+            dateTimeModified: dateTimeModified,
+            order: order,
+            archived: archived,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (
+                    e.readTable<$PayeesTable, Payee>(table),
+                    $$PayeesTableReferences(db, table, e)
+                  ))
+              .toList(),
+          prefetchHooksCallback: ({categoryFk = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins: <
+                  T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic>>(state) {
+                if (categoryFk) {
+                  state = state.withJoin(
+                    currentTable: table,
+                    currentColumn: table.categoryFk,
+                    referencedTable:
+                        $$PayeesTableReferences._categoryFkTable(db),
+                    referencedColumn:
+                        $$PayeesTableReferences._categoryFkTable(db).categoryPk,
+                  ) as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ));
+}
+
+typedef $$PayeesTableProcessedTableManager = ProcessedTableManager<
+    _$FinanceDatabase,
+    $PayeesTable,
+    Payee,
+    $$PayeesTableFilterComposer,
+    $$PayeesTableOrderingComposer,
+    $$PayeesTableAnnotationComposer,
+    $$PayeesTableCreateCompanionBuilder,
+    $$PayeesTableUpdateCompanionBuilder,
+    (Payee, $$PayeesTableReferences),
+    Payee,
+    PrefetchHooks Function({bool categoryFk})>;
 
 class $FinanceDatabaseManager {
   final _$FinanceDatabase _db;
@@ -13715,4 +14611,6 @@ class $FinanceDatabaseManager {
   $$TagsTableTableManager get tags => $$TagsTableTableManager(_db, _db.tags);
   $$TransactionToTagLinksTableTableManager get transactionToTagLinks =>
       $$TransactionToTagLinksTableTableManager(_db, _db.transactionToTagLinks);
+  $$PayeesTableTableManager get payees =>
+      $$PayeesTableTableManager(_db, _db.payees);
 }

@@ -44,6 +44,8 @@ class SearchFilters {
     this.searchQuery,
     this.titleContains,
     this.noteContains,
+    this.excludedFromTotals,
+    this.sortOption,
   }) {
     walletPks = this.walletPks.isEmpty ? [] : this.walletPks;
     categoryPks = this.categoryPks.isEmpty ? [] : this.categoryPks;
@@ -88,6 +90,8 @@ class SearchFilters {
   String? searchQuery;
   String? titleContains;
   String? noteContains;
+  bool? excludedFromTotals;
+  TransactionSortOption? sortOption;
 
   SearchFilters copyWith({
     List<String>? walletPks,
@@ -109,6 +113,10 @@ class SearchFilters {
     String? searchQuery,
     String? titleContains,
     String? noteContains,
+    bool? excludedFromTotals,
+    bool forceSetExcludedFromTotals = false,
+    TransactionSortOption? sortOption,
+    bool forceSetSortOption = false,
   }) {
     return SearchFilters(
       walletPks: walletPks ?? this.walletPks,
@@ -132,6 +140,12 @@ class SearchFilters {
       searchQuery: searchQuery ?? this.searchQuery,
       titleContains: titleContains ?? this.titleContains,
       noteContains: noteContains ?? this.noteContains,
+      excludedFromTotals: forceSetExcludedFromTotals
+          ? excludedFromTotals
+          : (excludedFromTotals ?? this.excludedFromTotals),
+      sortOption: forceSetSortOption
+          ? sortOption
+          : (sortOption ?? this.sortOption),
     );
   }
 
@@ -155,6 +169,8 @@ class SearchFilters {
     searchQuery = null;
     titleContains = null;
     noteContains = null;
+    excludedFromTotals = null;
+    sortOption = null;
   }
 
   bool isClear({bool? ignoreDateTimeRange, bool? ignoreSearchQuery}) {
@@ -176,7 +192,9 @@ class SearchFilters {
         (ignoreDateTimeRange == true || dateTimeRange == null) &&
         (ignoreSearchQuery == true || searchQuery == null) &&
         titleContains == null &&
-        noteContains == null)
+        noteContains == null &&
+        excludedFromTotals == null &&
+        sortOption == null)
       return true;
     else
       return false;
@@ -305,6 +323,27 @@ class SearchFilters {
               noteContains = value;
             }
             break;
+          case 'excludedFromTotals':
+            if (value == "true") {
+              excludedFromTotals = true;
+            } else if (value == "false") {
+              excludedFromTotals = false;
+            } else {
+              excludedFromTotals = null;
+            }
+            break;
+          case 'sortOption':
+            if (value == "null" || value.trim() == "") {
+              sortOption = null;
+            } else {
+              int? idx = int.tryParse(value);
+              if (idx != null &&
+                  idx >= 0 &&
+                  idx < TransactionSortOption.values.length) {
+                sortOption = TransactionSortOption.values[idx];
+              }
+            }
+            break;
           default:
             break;
         }
@@ -370,6 +409,10 @@ class SearchFilters {
     outString += "searchQuery:-:" + searchQuery.toString() + ":-:";
     outString += "titleContains:-:" + titleContains.toString() + ":-:";
     outString += "noteContains:-:" + noteContains.toString() + ":-:";
+    outString +=
+        "excludedFromTotals:-:" + excludedFromTotals.toString() + ":-:";
+    outString +=
+        "sortOption:-:" + (sortOption?.index.toString() ?? "null") + ":-:";
     //print(outString);
     return outString;
   }
@@ -785,6 +828,23 @@ class _TransactionFiltersSelectionState
           },
           getSelected: (PaidStatus item) {
             return selectedFilters.paidStatus.contains(item);
+          },
+        ),
+        SelectChips(
+          items: const [true, false],
+          getLabel: (bool item) {
+            return item ? "excluded-amount".tr() : "included-amount".tr();
+          },
+          onSelected: (bool item) {
+            if (selectedFilters.excludedFromTotals == item) {
+              selectedFilters.excludedFromTotals = null;
+            } else {
+              selectedFilters.excludedFromTotals = item;
+            }
+            setSearchFilters();
+          },
+          getSelected: (bool item) {
+            return selectedFilters.excludedFromTotals == item;
           },
         ),
         if (appStateSettings["showMethodAdded"] == true)
@@ -1404,6 +1464,15 @@ class AppliedFilterChips extends StatelessWidget {
         openFiltersSelection: openFiltersSelection,
       ));
     }
+    // Excluded from totals
+    if (searchFilters.excludedFromTotals != null) {
+      out.add(AppliedFilterChip(
+        label: searchFilters.excludedFromTotals == true
+            ? "excluded-amount".tr()
+            : "included-amount".tr(),
+        openFiltersSelection: openFiltersSelection,
+      ));
+    }
     // Budget Transaction Filters
     if (searchFilters.budgetTransactionFilters
         .contains(BudgetTransactionFilters.sharedToOtherBudget)) {
@@ -1549,6 +1618,38 @@ class AppliedFilterChips extends StatelessWidget {
         label: methodAdded?.name.toString().capitalizeFirst ?? "default".tr(),
         openFiltersSelection: openFiltersSelection,
       ));
+    }
+
+    // Sort option
+    if (searchFilters.sortOption != null &&
+        searchFilters.sortOption != TransactionSortOption.dateDesc) {
+      String sortName = "";
+      switch (searchFilters.sortOption!) {
+        case TransactionSortOption.dateAsc:
+          sortName = "Date: Oldest first";
+          break;
+        case TransactionSortOption.amountDesc:
+          sortName = "Amount: Highest first";
+          break;
+        case TransactionSortOption.amountAsc:
+          sortName = "Amount: Lowest first";
+          break;
+        case TransactionSortOption.nameAsc:
+          sortName = "Name: A → Z";
+          break;
+        case TransactionSortOption.nameDesc:
+          sortName = "Name: Z → A";
+          break;
+        default:
+          break;
+      }
+      if (sortName.isNotEmpty) {
+        out.add(AppliedFilterChip(
+          icon: Icons.sort_outlined,
+          label: sortName,
+          openFiltersSelection: openFiltersSelection,
+        ));
+      }
     }
 
     return out;

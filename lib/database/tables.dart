@@ -27,7 +27,7 @@ import 'package:budget/struct/categoryTypes.dart';
 import 'package:flutter/material.dart' show RangeValues;
 part 'tables.g.dart';
 
-int schemaVersionGlobal = 48;
+int schemaVersionGlobal = 49;
 
 // To update and migrate the database, check the README
 
@@ -69,6 +69,15 @@ enum PaidStatus {
   paid,
   notPaid,
   skipped,
+}
+
+enum TransactionSortOption {
+  dateDesc,
+  dateAsc,
+  amountDesc,
+  amountAsc,
+  nameAsc,
+  nameDesc,
 }
 
 // You should explain what each one does to the user in ViewBudgetTransactionFilterInfo
@@ -337,6 +346,8 @@ class Transactions extends Table {
       text().references(Objectives, #objectivePk).nullable()();
   TextColumn get budgetFksExclude =>
       text().map(const StringListInColumnConverter()).nullable()();
+  TextColumn get payee => text().nullable()();
+  TextColumn get payeeFk => text().nullable()();
 
   @override
   Set<Column> get primaryKey => {transactionPk};
@@ -410,6 +421,22 @@ class AssociatedTitles extends Table {
 
   @override
   Set<Column> get primaryKey => {associatedTitlePk};
+}
+
+@DataClassName('Payee')
+class Payees extends Table {
+  TextColumn get payeePk => text().clientDefault(() => uuid.v4())();
+  TextColumn get name => text().withLength(max: NAME_LIMIT)();
+  TextColumn get categoryFk => text().references(Categories, #categoryPk)();
+  DateTimeColumn get dateCreated =>
+      dateTime().clientDefault(() => DateTime.now())();
+  DateTimeColumn get dateTimeModified =>
+      dateTime().withDefault(Constant(DateTime.now())).nullable()();
+  IntColumn get order => integer().withDefault(const Constant(0))();
+  BoolColumn get archived => boolean().withDefault(const Constant(false))();
+
+  @override
+  Set<Column> get primaryKey => {payeePk};
 }
 
 // @DataClassName('TransactionLabel')
@@ -725,6 +752,7 @@ class CategoryWithTotal {
   Objectives,
   Tags,
   TransactionToTagLinks,
+  Payees,
 ])
 class FinanceDatabase extends _$FinanceDatabase {
   // FinanceDatabase() : super(_openConnection());
@@ -1251,8 +1279,42 @@ class FinanceDatabase extends _$FinanceDatabase {
                 e.toString());
           }
         }
+        if (from <= 48) {
+          try {
+            await migrator.createTable(payees);
+          } catch (e) {
+            print("Migration Error: Error creating table Payees " +
+                e.toString());
+          }
+          try {
+            await migrator.addColumn(transactions, transactions.payee);
+          } catch (e) {
+            print("Migration Error: Error adding column transactions.payee " +
+                e.toString());
+          }
+          try {
+            await migrator.addColumn(transactions, transactions.payeeFk);
+          } catch (e) {
+            print("Migration Error: Error adding column transactions.payeeFk " +
+                e.toString());
+          }
+        }
       },
       beforeOpen: (details) async {
+        // Safe check for Payees table and columns
+        try {
+          final m = createMigrator();
+          await m.createTable(payees);
+        } catch (_) {}
+        try {
+          final m = createMigrator();
+          await m.addColumn(transactions, transactions.payee);
+        } catch (_) {}
+        try {
+          final m = createMigrator();
+          await m.addColumn(transactions, transactions.payeeFk);
+        } catch (_) {}
+
         // This code exists because migration 42to43 may have not run correctly...
         // See explanation in 41to42
         try {
@@ -1553,6 +1615,7 @@ class FinanceDatabase extends _$FinanceDatabase {
     SearchFilters? searchFilters,
     int? limit,
     Budget? budget,
+    TransactionSortOption? sortOption,
   }) {
     final $CategoriesTable subCategories = alias(categories, 'subCategories');
     final $ObjectivesTable objectiveLoans = alias(objectives, 'objectiveLoans');
@@ -1577,22 +1640,45 @@ class FinanceDatabase extends _$FinanceDatabase {
           subCategories.categoryPk.equalsExp(transactions.subCategoryFk)),
     ])
       ..limit(limit ?? DEFAULT_LIMIT, offset: null)
-      ..orderBy([
-        // This will bring unpaid transactions to the top of the list
-        // Before it brought it to the top of the day, but now
-        // This returns all transactions within a time range
-        // (t) => OrderingTerm(
-        //       expression: (t.type
-        //                   .equalsValue(TransactionSpecialType.repetitive) |
-        //               t.type.equalsValue(
-        //                   TransactionSpecialType.subscription) |
-        //               t.type.equalsValue(TransactionSpecialType.upcoming)) &
-        //           t.paid.equals(false),
-        //       mode: OrderingMode.desc,
-        //     ),
-        OrderingTerm.desc(transactions.dateCreated),
-        OrderingTerm.desc(transactions.dateTimeModified),
-      ])
+      ..orderBy(
+        (sortOption ?? searchFilters?.sortOption) ==
+                TransactionSortOption.dateAsc
+            ? [
+                OrderingTerm.asc(transactions.dateCreated),
+                OrderingTerm.asc(transactions.dateTimeModified),
+              ]
+            : (sortOption ?? searchFilters?.sortOption) ==
+                    TransactionSortOption.amountDesc
+                ? [
+                    OrderingTerm.desc(transactions.amount.abs()),
+                    OrderingTerm.desc(transactions.dateCreated),
+                  ]
+                : (sortOption ?? searchFilters?.sortOption) ==
+                        TransactionSortOption.amountAsc
+                    ? [
+                        OrderingTerm.asc(transactions.amount.abs()),
+                        OrderingTerm.desc(transactions.dateCreated),
+                      ]
+                    : (sortOption ?? searchFilters?.sortOption) ==
+                            TransactionSortOption.nameAsc
+                        ? [
+                            OrderingTerm.asc(
+                                transactions.name.collate(Collate.noCase)),
+                            OrderingTerm.desc(transactions.dateCreated),
+                          ]
+                        : (sortOption ?? searchFilters?.sortOption) ==
+                                TransactionSortOption.nameDesc
+                            ? [
+                                OrderingTerm.desc(
+                                    transactions.name.collate(Collate.noCase)),
+                                OrderingTerm.desc(transactions.dateCreated),
+                              ]
+                            : [
+                                OrderingTerm.desc(transactions.dateCreated),
+                                OrderingTerm.desc(
+                                    transactions.dateTimeModified),
+                              ],
+      )
       ..where(
         // Should match that of getTransactionCategoryWithDay
         onlyShowTransactionBasedOnSearchQuery(transactions, search,
@@ -3073,6 +3159,63 @@ class FinanceDatabase extends _$FinanceDatabase {
           ..where((t) => t.categoryFk.equals(categoryFk))
           ..orderBy([(t) => OrderingTerm.asc(t.order)]))
         .get();
+  }
+
+  Stream<List<Payee>> watchAllPayeesInCategory(String categoryFk, {int? limit}) {
+    return (select(payees)
+          ..where((t) => t.categoryFk.equals(categoryFk) & t.archived.equals(false))
+          ..orderBy([(t) => OrderingTerm.asc(t.order)])
+          ..limit(limit ?? DEFAULT_LIMIT))
+        .watch();
+  }
+
+  Future<List<Payee>> getAllPayeesInCategory(String categoryFk) {
+    return (select(payees)
+          ..where((t) => t.categoryFk.equals(categoryFk) & t.archived.equals(false))
+          ..orderBy([(t) => OrderingTerm.asc(t.order)]))
+        .get();
+  }
+
+  Future<int> createOrUpdatePayee(Payee payee) {
+    Payee payeeClean = payee.copyWith(
+      name: payee.name.trim(),
+      dateTimeModified: Value(DateTime.now()),
+    );
+    return into(payees)
+        .insert(payeeClean.toCompanion(true), mode: InsertMode.insertOrReplace);
+  }
+
+  Future<int> deletePayee(String payeePk) {
+    return (delete(payees)..where((t) => t.payeePk.equals(payeePk))).go();
+  }
+
+  Future<Payee> addAssociatedPayee(String name, String categoryFk) async {
+    String cleanName = name.trim();
+    if (cleanName.isEmpty) throw ArgumentError("Payee name cannot be empty");
+
+    Payee? existing = await (select(payees)
+          ..where((t) =>
+              t.categoryFk.equals(categoryFk) &
+              t.name.lower().equals(cleanName.toLowerCase()))
+          ..limit(1))
+        .getSingleOrNull();
+
+    if (existing != null) {
+      return existing;
+    }
+
+    int count = (await getAllPayeesInCategory(categoryFk)).length;
+    Payee newPayee = Payee(
+      payeePk: uuid.v4(),
+      name: cleanName,
+      categoryFk: categoryFk,
+      dateCreated: DateTime.now(),
+      dateTimeModified: DateTime.now(),
+      order: count,
+      archived: false,
+    );
+    await into(payees).insert(newPayee.toCompanion(true));
+    return newPayee;
   }
 
   Stream<List<CategoryBudgetLimit>> watchAllCategoryLimitsInBudget(
@@ -5072,6 +5215,26 @@ class FinanceDatabase extends _$FinanceDatabase {
     await updateBatchTransactionsOnly(transactionsInserting);
   }
 
+  Future changeTransactionsNote(
+      List<Transaction> transactionsToUpdate, String note) async {
+    List<Transaction> transactionsInserting = [];
+    for (Transaction transaction in transactionsToUpdate) {
+      transactionsInserting.add(transaction.copyWith(
+          note: note, dateTimeModified: Value(DateTime.now())));
+    }
+    await updateBatchTransactionsOnly(transactionsInserting);
+  }
+
+  Future changeTransactionsPaid(
+      List<Transaction> transactionsToUpdate, bool paid) async {
+    List<Transaction> transactionsInserting = [];
+    for (Transaction transaction in transactionsToUpdate) {
+      transactionsInserting.add(transaction.copyWith(
+          paid: paid, dateTimeModified: Value(DateTime.now())));
+    }
+    await updateBatchTransactionsOnly(transactionsInserting);
+  }
+
   //delete category given key
   Future deleteCategory(String categoryPk, int order) async {
     await deleteCategoryTitles(categoryPk);
@@ -5883,6 +6046,50 @@ class FinanceDatabase extends _$FinanceDatabase {
     return totalDoubleStream(mergedStreams);
   }
 
+Expression<bool> buildBooleanTextFilter(
+  Expression<String> column,
+  String rawInput,
+) {
+  String input = rawInput.trim();
+  if (input.endsWith(",")) {
+    input = input.substring(0, input.length - 1).trim();
+  }
+  if (input.isEmpty) return const Constant(true);
+
+  List<String> orClauses = input.split(RegExp(r'\|\||,'));
+  Expression<bool>? combinedOrExpression;
+
+  for (String orClause in orClauses) {
+    String trimmedOrClause = orClause.trim();
+    if (trimmedOrClause.isEmpty) continue;
+
+    List<String> andClauses = trimmedOrClause.split('&&');
+    Expression<bool>? combinedAndExpression;
+
+    for (String andClause in andClauses) {
+      String term = andClause.trim();
+      if (term.isEmpty) continue;
+      Expression<bool> termExpr =
+          column.collate(Collate.noCase).like("%" + term + "%");
+      if (combinedAndExpression == null) {
+        combinedAndExpression = termExpr;
+      } else {
+        combinedAndExpression = combinedAndExpression & termExpr;
+      }
+    }
+
+    if (combinedAndExpression != null) {
+      if (combinedOrExpression == null) {
+        combinedOrExpression = combinedAndExpression;
+      } else {
+        combinedOrExpression = combinedOrExpression | combinedAndExpression;
+      }
+    }
+  }
+
+  return combinedOrExpression ?? const Constant(true);
+}
+
   Expression<bool> onlyShowIfFollowsSearchFilters(
     $TransactionsTable tbl,
     SearchFilters? searchFilters, {
@@ -6038,24 +6245,20 @@ class FinanceDatabase extends _$FinanceDatabase {
 
     Expression<bool> isInTitleContains =
         searchFilters.titleContains == null || searchFilters.titleContains == ""
-            ? Constant(true)
-            : Constant(false);
-
-    if (searchFilters.titleContains != null) {
-      String stringToSplit = searchFilters.titleContains ?? "";
-      if (stringToSplit.endsWith(",")) {
-        stringToSplit = stringToSplit.substring(0, stringToSplit.length - 1);
-      }
-      for (String titleContain in stringToSplit.split(", ")) {
-        isInTitleContains |=
-            tbl.name.collate(Collate.noCase).like("%" + titleContain + "%");
-      }
-    }
+            ? const Constant(true)
+            : buildBooleanTextFilter(tbl.name, searchFilters.titleContains!);
 
     String? noteContains = searchFilters.noteContains;
-    Expression<bool> isInNoteContains = noteContains == null
-        ? Constant(true)
-        : tbl.note.collate(Collate.noCase).like("%" + noteContains + "%");
+    Expression<bool> isInNoteContains = noteContains == null || noteContains == ""
+        ? const Constant(true)
+        : buildBooleanTextFilter(tbl.note, noteContains);
+
+    Expression<bool> isExcludedFromTotals =
+        searchFilters.excludedFromTotals == null
+            ? const Constant(true)
+            : searchFilters.excludedFromTotals == true
+                ? tbl.paid.equals(false)
+                : tbl.paid.equals(true);
 
     return isInWalletPks &
         isInCategoryPks &
@@ -6074,7 +6277,8 @@ class FinanceDatabase extends _$FinanceDatabase {
         isInAmountRange &
         isMethodAdded &
         isInTitleContains &
-        isInNoteContains;
+        isInNoteContains &
+        isExcludedFromTotals;
   }
 
   Expression<bool> onlyShowTransactionBasedOnSearchQuery(

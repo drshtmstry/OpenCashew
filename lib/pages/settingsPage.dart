@@ -301,7 +301,7 @@ class EditDataGrid extends StatelessWidget {
                 text: "edit-delete-and-reorder-data-description".tr() !=
                         "edit-delete-and-reorder-data-description"
                     ? "edit-delete-and-reorder-data-description".tr()
-                    : "For accounts, categories, titles, budgets, goals, loans",
+                    : "For accounts, categories, budgets, goals, loans",
                 fontSize: 13,
                 maxLines: 2,
                 textColor:
@@ -327,15 +327,6 @@ class EditDataGrid extends StatelessWidget {
                 openPage: EditCategoriesPage(),
                 title: navBarIconsData["categoriesDetails"]!.label.tr(),
                 icon: navBarIconsData["categoriesDetails"]!.iconData,
-                isOutlined: true,
-              ),
-            ),
-            Expanded(
-              child: SettingsContainerOpenPage(
-                isOutlinedColumn: true,
-                openPage: EditAssociatedTitlesPage(),
-                title: navBarIconsData["titlesDetails"]!.label.tr(),
-                icon: navBarIconsData["titlesDetails"]!.iconData,
                 isOutlined: true,
               ),
             ),

@@ -1738,5 +1738,8 @@
   "data-recovery": "Data Recovery",
   "data-recovery-description": "Automatically creates periodic local backups to protect against accidental data loss. Backups are removed if the app is uninstalled. It's still recommended to periodically export separate backups.",
   "manage-backups": "Manage Backups",
-  "no-backup-files-found": "No backup files found"
+  "no-backup-files-found": "No backup files found",
+  "archive-account": "Archive Account",
+  "archive-account-description": "Hide this account from selectors and active lists",
+  "archived-accounts": "Archived Accounts"
 }
