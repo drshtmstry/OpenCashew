@@ -29,6 +29,7 @@ import 'package:budget/widgets/tappableTextEntry.dart';
 import 'package:budget/widgets/textInput.dart';
 import 'package:budget/widgets/textWidgets.dart';
 import 'package:budget/widgets/walletIcon.dart';
+import 'package:budget/widgets/walletEntry.dart';
 import 'package:budget/widgets/currencyPicker.dart';
 import 'package:budget/widgets/transactionEntry/incomeAmountArrow.dart';
 import 'package:budget/widgets/util/widgetSize.dart';
@@ -793,30 +794,119 @@ class _AddWalletPageState extends State<AddWalletPage> {
                 ),
               ),
             ),
-          if (widget.wallet != null && widget.wallet!.walletPk != "0")
+          if (widget.wallet != null) ...[
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsetsDirectional.only(
                     start: 20, end: 20, bottom: 10),
-                child: SettingsContainerSwitch(
-                  title: "archive-account".tr(),
-                  description: "archive-account-description".tr(),
-                  initialValue: selectedArchived,
-                  icon: selectedArchived
-                      ? (appStateSettings["outlinedIcons"]
-                          ? Icons.visibility_off_outlined
-                          : Icons.visibility_off_rounded)
-                      : (appStateSettings["outlinedIcons"]
-                          ? Icons.visibility_outlined
-                          : Icons.visibility_rounded),
-                  onSwitched: (value) {
-                    setState(() {
-                      selectedArchived = value;
-                    });
-                  },
-                ),
+                child: Builder(builder: (context) {
+                  final bool isPrimary = Provider.of<SelectedWalletPk>(context)
+                          .selectedWalletPk ==
+                      widget.wallet!.walletPk;
+                  return SettingsContainerSwitch(
+                    title: "primary-default".tr(),
+                    description: isPrimary
+                        ? "This is your primary default account used when creating new transactions."
+                        : "Set this account as the primary default account for new transactions.",
+                    initialValue: isPrimary,
+                    syncWithInitialValue: true,
+                    icon: isPrimary
+                        ? (appStateSettings["outlinedIcons"]
+                            ? Icons.star_outlined
+                            : Icons.star_rounded)
+                        : (appStateSettings["outlinedIcons"]
+                            ? Icons.star_outline
+                            : Icons.star_border_rounded),
+                    onSwitched: (value) async {
+                      if (value) {
+                        await setPrimaryWallet(
+                          widget.wallet!.walletPk,
+                          allWallets: Provider.of<AllWallets>(context,
+                              listen: false),
+                        );
+                        setState(() {});
+                      } else {
+                        openSnackbar(
+                          SnackbarMessage(
+                            title: "Select another account to set as default",
+                            icon: Icons.info_outline,
+                          ),
+                        );
+                      }
+                    },
+                  );
+                }),
               ),
             ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsetsDirectional.only(
+                    start: 20, end: 20, bottom: 10),
+                child: Builder(builder: (context) {
+                  final bool isPrimary = Provider.of<SelectedWalletPk>(context)
+                          .selectedWalletPk ==
+                      widget.wallet!.walletPk;
+                  return SettingsContainerSwitch(
+                    title: "archive-account".tr(),
+                    description: isPrimary
+                        ? "Primary default account cannot be archived."
+                        : "archive-account-description".tr(),
+                    initialValue: selectedArchived,
+                    icon: selectedArchived
+                        ? (appStateSettings["outlinedIcons"]
+                            ? Icons.visibility_off_outlined
+                            : Icons.visibility_off_rounded)
+                        : (appStateSettings["outlinedIcons"]
+                            ? Icons.visibility_outlined
+                            : Icons.visibility_rounded),
+                    onSwitched: (value) {
+                      if (isPrimary && value) {
+                        openSnackbar(
+                          SnackbarMessage(
+                            title: "Primary account cannot be archived",
+                            icon: Icons.info_outline,
+                          ),
+                        );
+                        return;
+                      }
+                      setState(() {
+                        selectedArchived = value;
+                      });
+                      determineBottomButton();
+                    },
+                  );
+                }),
+              ),
+            ),
+            if ((widget.wallet!.walletPk != "0" ||
+                    Provider.of<AllWallets>(context, listen: false)
+                            .indexedByPk
+                            .length >
+                        1) &&
+                widget.routesToPopAfterDelete !=
+                    RoutesToPopAfterDelete.PreventDelete)
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsetsDirectional.only(
+                      start: 20, end: 20, bottom: 10),
+                  child: SettingsContainer(
+                    icon: appStateSettings["outlinedIcons"]
+                        ? Icons.delete_outlined
+                        : Icons.delete_rounded,
+                    title: "delete-account".tr(),
+                    description: "delete-account-merge-warning".tr(),
+                    isWideOutlined: true,
+                    onTap: () {
+                      deleteWalletPopup(
+                        context,
+                        wallet: widget.wallet!,
+                        routesToPopAfterDelete: widget.routesToPopAfterDelete,
+                      );
+                    },
+                  ),
+                ),
+              ),
+          ],
           if (widget.wallet == null)
             SliverToBoxAdapter(
               child: Padding(

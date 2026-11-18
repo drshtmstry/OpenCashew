@@ -228,205 +228,243 @@ class EditWalletsPageState extends State<EditWalletsPage> {
                     .where((w) => w.wallet.archived)
                     .toList();
 
+                Map<AccountType, List<WalletWithDetails>> groupedWallets = {};
+                for (AccountType type in AccountType.values) {
+                  groupedWallets[type] = [];
+                }
+                for (WalletWithDetails w in activeWallets) {
+                  AccountType type = getAccountTypeFromWallet(w.wallet);
+                  groupedWallets[type]!.add(w);
+                }
+
                 return MultiSliver(
                   children: [
-                    SliverReorderableList(
-                      onReorderStart: (index) {
-                        HapticFeedback.heavyImpact();
-                        setState(() {
-                          dragDownToDismissEnabled = false;
-                          currentReorder = index;
-                        });
-                      },
-                      onReorderEnd: (_) {
-                        setState(() {
-                          dragDownToDismissEnabled = true;
-                          currentReorder = -1;
-                        });
-                      },
-                      itemBuilder: (context, index) {
-                        WalletWithDetails walletWithDetails =
-                            activeWallets[index];
-                        TransactionWallet wallet = walletWithDetails.wallet;
-                        Color accentColor = dynamicPastel(
-                            context,
-                            HexColor(wallet.colour,
-                                defaultColor:
-                                    Theme.of(context).colorScheme.primary),
-                            amountLight: 0.55,
-                            amountDark: 0.35);
-                        return EditRowEntry(
-                          extraIcon: Provider.of<SelectedWalletPk>(context)
-                                      .selectedWalletPk ==
-                                  wallet.walletPk
-                              ? appStateSettings["outlinedIcons"]
-                                  ? Icons.star_outlined
-                                  : Icons.star_rounded
-                              : Icons.star_outline,
-                          onExtra: () async {
-                            setPrimaryWallet(
-                              wallet.walletPk,
-                              allWallets: Provider.of<AllWallets>(context,
-                                  listen: false),
-                            );
-                          },
-                          extraWidget: wallet.walletPk == "0"
-                              ? null
-                              : IconButton(
-                                  icon: Icon(
-                                    wallet.archived
-                                        ? (appStateSettings["outlinedIcons"]
-                                            ? Icons.visibility_off_outlined
-                                            : Icons.visibility_off_rounded)
-                                        : (appStateSettings["outlinedIcons"]
-                                            ? Icons.visibility_outlined
-                                            : Icons.visibility_rounded),
+                    for (AccountType type in AccountType.values)
+                      if ((groupedWallets[type] ?? []).isNotEmpty) ...[
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsetsDirectional.only(
+                              top: 22,
+                              bottom: 8,
+                              start: 22,
+                              end: 22,
+                            ),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  getAccountTypeIcon(
+                                    type,
+                                    outlined: appStateSettings["outlinedIcons"],
                                   ),
-                                  onPressed: () async {
-                                    await database.archiveWallet(
-                                        wallet.walletPk, !wallet.archived);
-                                  },
+                                  size: 18,
+                                  color: Theme.of(context).colorScheme.primary,
                                 ),
-                          opacity: wallet.archived ? 0.5 : 1,
-                          canDelete: (wallet.walletPk != "0" ||
-                              Provider.of<AllWallets>(context, listen: true)
-                                      .indexedByPk
-                                      .entries
-                                      .length >
-                                  1),
-                          canReorder: searchValue == "" &&
-                              activeWallets.length != 1,
-                          currentReorder:
-                              currentReorder != -1 && currentReorder != index,
-                          index: index,
-                          accentColor: accentColor,
-                          content: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              WalletIcon(
-                                wallet: wallet,
-                                size: 26,
-                                sizePadding: 10,
-                                borderRadius: 12,
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    TextFont(
-                                      text: wallet.name,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 21,
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Row(
+                                    children: [
+                                      Flexible(
+                                        child: TextFont(
+                                          text: getAccountTypeName(type),
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          maxLines: 1,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 6),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 6, vertical: 1.5),
+                                        decoration: BoxDecoration(
+                                          color: getColor(
+                                              context, "lightDarkAccentHeavy"),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        child: TextFont(
+                                          text: groupedWallets[type]!
+                                              .length
+                                              .toString(),
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.bold,
+                                          textColor:
+                                              getColor(context, "textLight"),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                TextFont(
+                                  text: convertToMoney(
+                                    Provider.of<AllWallets>(context),
+                                    groupedWallets[type]!.fold<double>(
+                                      0,
+                                      (sum, w) => sum + (w.totalSpent ?? 0),
                                     ),
-                              Container(height: 2),
-                              TextFont(
-                                textAlign: TextAlign.start,
-                                text: convertToMoney(
-                                  Provider.of<AllWallets>(context),
-                                  walletWithDetails.totalSpent ?? 0,
-                                  currencyKey: wallet.currency,
-                                  decimals: wallet.decimals,
-                                  addCurrencyName: true,
-                                ).toString(),
-                                fontSize: 15,
-                              ),
-                              Wrap(
-                                crossAxisAlignment: WrapCrossAlignment.center,
-                                spacing: 5,
-                                runSpacing: 3,
+                                  ),
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                  textColor: getColor(context, "textLight"),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        SliverReorderableList(
+                          onReorderStart: (index) {
+                            HapticFeedback.heavyImpact();
+                            setState(() {
+                              dragDownToDismissEnabled = false;
+                              currentReorder = index;
+                            });
+                          },
+                          onReorderEnd: (_) {
+                            setState(() {
+                              dragDownToDismissEnabled = true;
+                              currentReorder = -1;
+                            });
+                          },
+                          itemBuilder: (context, index) {
+                            List<WalletWithDetails> typeWallets =
+                                groupedWallets[type]!;
+                            WalletWithDetails walletWithDetails =
+                                typeWallets[index];
+                            TransactionWallet wallet =
+                                walletWithDetails.wallet;
+                            Color accentColor = dynamicPastel(
+                                context,
+                                HexColor(wallet.colour,
+                                    defaultColor:
+                                        Theme.of(context).colorScheme.primary),
+                                amountLight: 0.55,
+                                amountDark: 0.35);
+                            final bool isPrimary =
+                                Provider.of<SelectedWalletPk>(context)
+                                        .selectedWalletPk ==
+                                    wallet.walletPk;
+
+                            return EditRowEntry(
+                              extraIcon: null,
+                              onExtra: null,
+                              extraWidget: null,
+                              canDelete: false,
+                              onDelete: null,
+                              canReorder: searchValue == "" &&
+                                  typeWallets.length > 1,
+                              currentReorder: currentReorder != -1 &&
+                                  currentReorder != index,
+                              index: index,
+                              accentColor: accentColor,
+                              content: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  AnimatedSizeSwitcher(
-                                    child: Provider.of<SelectedWalletPk>(
-                                                    context)
-                                                .selectedWalletPk ==
-                                            wallet.walletPk
-                                        ? Padding(
-                                            padding: const EdgeInsetsDirectional
-                                                .only(top: 1),
-                                            child: TransactionTag(
-                                              padding:
-                                                  const EdgeInsetsDirectional
-                                                      .symmetric(
-                                                      horizontal: 7,
-                                                      vertical: 1.1),
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .primary,
-                                              name: "primary-default".tr(),
-                                              margin:
-                                                  EdgeInsetsDirectional.zero,
+                                  WalletIcon(
+                                    wallet: wallet,
+                                    size: 26,
+                                    sizePadding: 10,
+                                    borderRadius: 12,
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: TextFont(
+                                                text: wallet.name,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 20,
+                                              ),
                                             ),
-                                          )
-                                        : Container(),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsetsDirectional.only(
-                                        top: 1),
-                                    child: TransactionTag(
-                                      padding:
-                                          const EdgeInsetsDirectional.symmetric(
-                                              horizontal: 7, vertical: 1.1),
-                                      color: accentColor,
-                                      name: getAccountTypeName(
-                                          getAccountTypeFromWallet(wallet)),
-                                      margin: EdgeInsetsDirectional.zero,
+                                            if (isPrimary)
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsetsDirectional
+                                                        .only(start: 6),
+                                                child: TransactionTag(
+                                                  padding:
+                                                      const EdgeInsetsDirectional
+                                                          .symmetric(
+                                                      horizontal: 7,
+                                                      vertical: 1.5),
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .primary,
+                                                  name: "primary-default".tr(),
+                                                  margin: EdgeInsetsDirectional
+                                                      .zero,
+                                                ),
+                                              ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 2),
+                                        TextFont(
+                                          textAlign: TextAlign.start,
+                                          text: convertToMoney(
+                                            Provider.of<AllWallets>(context),
+                                            walletWithDetails.totalSpent ?? 0,
+                                            currencyKey: wallet.currency,
+                                            decimals: wallet.decimals,
+                                            addCurrencyName: true,
+                                          ).toString(),
+                                          fontSize: 15,
+                                        ),
+                                        const SizedBox(height: 2),
+                                        TextFont(
+                                          textAlign: TextAlign.start,
+                                          text: walletWithDetails
+                                                  .numberTransactions
+                                                  .toString() +
+                                              " " +
+                                              (walletWithDetails
+                                                          .numberTransactions ==
+                                                      1
+                                                  ? "transaction"
+                                                      .tr()
+                                                      .toLowerCase()
+                                                  : "transactions"
+                                                      .tr()
+                                                      .toLowerCase()),
+                                          fontSize: 13,
+                                          textColor: getColor(context, "black")
+                                              .withOpacity(0.6),
+                                        ),
+                                      ],
                                     ),
-                                  ),
-                                  TextFont(
-                                    textAlign: TextAlign.start,
-                                    text: walletWithDetails.numberTransactions
-                                            .toString() +
-                                        " " +
-                                        (walletWithDetails.numberTransactions ==
-                                                1
-                                            ? "transaction".tr().toLowerCase()
-                                            : "transactions"
-                                                .tr()
-                                                .toLowerCase()),
-                                    fontSize: 14,
-                                    textColor: getColor(context, "black")
-                                        .withOpacity(0.65),
                                   ),
                                 ],
                               ),
-                            ],
-                          ),
+                              openPage: WatchedWalletDetailsPage(
+                                walletPk: wallet.walletPk,
+                              ),
+                              key: ValueKey(wallet.walletPk),
+                            );
+                          },
+                          itemCount: groupedWallets[type]!.length,
+                          onReorder: (_intPrevious, _intNew) async {
+                            List<WalletWithDetails> typeWallets =
+                                groupedWallets[type]!;
+                            WalletWithDetails oldWalletWithDetails =
+                                typeWallets[_intPrevious];
+                            TransactionWallet oldWallet =
+                                oldWalletWithDetails.wallet;
+                            int targetIndex =
+                                _intNew > _intPrevious ? _intNew - 1 : _intNew;
+                            WalletWithDetails targetWalletWithDetails =
+                                typeWallets[targetIndex];
+                            TransactionWallet targetWallet =
+                                targetWalletWithDetails.wallet;
+
+                            await database.moveWallet(oldWallet.walletPk,
+                                targetWallet.order, oldWallet.order);
+                            return true;
+                          },
                         ),
                       ],
-                    ),
-                          onDelete: () async {
-                            return (await deleteWalletPopup(
-                                  context,
-                                  wallet: wallet,
-                                  routesToPopAfterDelete:
-                                      RoutesToPopAfterDelete.None,
-                                )) ==
-                                DeletePopupAction.Delete;
-                          },
-                          openPage: WatchedWalletDetailsPage(
-                            walletPk: wallet.walletPk,
-                          ),
-                          key: ValueKey(wallet.walletPk),
-                        );
-                      },
-                      itemCount: activeWallets.length,
-                      onReorder: (_intPrevious, _intNew) async {
-                        WalletWithDetails oldWalletWithDetails =
-                            activeWallets[_intPrevious];
-                        TransactionWallet oldWallet =
-                            oldWalletWithDetails.wallet;
-
-                        if (_intNew > _intPrevious) {
-                          await database.moveWallet(
-                              oldWallet.walletPk, _intNew - 1, oldWallet.order);
-                        } else {
-                          await database.moveWallet(
-                              oldWallet.walletPk, _intNew, oldWallet.order);
-                        }
-                        return true;
-                      },
-                    ),
                     if (archivedWallets.isNotEmpty) ...[
                       SliverToBoxAdapter(
                         child: Padding(
@@ -442,13 +480,47 @@ class EditWalletsPageState extends State<EditWalletsPage> {
                                 appStateSettings["outlinedIcons"]
                                     ? Icons.archive_outlined
                                     : Icons.archive_rounded,
-                                size: 17,
+                                size: 18,
                                 color: getColor(context, "textLight"),
                               ),
                               const SizedBox(width: 8),
+                              Expanded(
+                                child: Row(
+                                  children: [
+                                    TextFont(
+                                      text: "archived-accounts".tr(),
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      textColor: getColor(context, "textLight"),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 6, vertical: 1.5),
+                                      decoration: BoxDecoration(
+                                        color: getColor(
+                                            context, "lightDarkAccentHeavy"),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: TextFont(
+                                        text: archivedWallets.length.toString(),
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.bold,
+                                        textColor: getColor(context, "textLight"),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                               TextFont(
-                                text: "archived-accounts".tr(),
-                                fontSize: 14,
+                                text: convertToMoney(
+                                  Provider.of<AllWallets>(context),
+                                  archivedWallets.fold<double>(
+                                    0,
+                                    (sum, w) => sum + (w.totalSpent ?? 0),
+                                  ),
+                                ),
+                                fontSize: 13,
                                 fontWeight: FontWeight.bold,
                                 textColor: getColor(context, "textLight"),
                               ),
@@ -471,25 +543,11 @@ class EditWalletsPageState extends State<EditWalletsPage> {
                                 amountDark: 0.35);
                             return EditRowEntry(
                               extraIcon: null,
-                              extraWidget: IconButton(
-                                icon: Icon(
-                                  appStateSettings["outlinedIcons"]
-                                      ? Icons.unarchive_outlined
-                                      : Icons.unarchive_rounded,
-                                ),
-                                tooltip: "Unarchive",
-                                onPressed: () async {
-                                  await database.archiveWallet(
-                                      wallet.walletPk, false);
-                                },
-                              ),
+                              onExtra: null,
+                              extraWidget: null,
+                              canDelete: false,
+                              onDelete: null,
                               opacity: 0.6,
-                              canDelete: (wallet.walletPk != "0" ||
-                                  Provider.of<AllWallets>(context, listen: true)
-                                          .indexedByPk
-                                          .entries
-                                          .length >
-                                      1),
                               canReorder: false,
                               currentReorder: false,
                               index: index,
@@ -506,80 +564,73 @@ class EditWalletsPageState extends State<EditWalletsPage> {
                                   const SizedBox(width: 12),
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: TextFont(
+                                                text: wallet.name,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 20,
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsetsDirectional.only(
+                                                      start: 6),
+                                              child: TransactionTag(
+                                                padding:
+                                                    const EdgeInsetsDirectional
+                                                        .symmetric(
+                                                    horizontal: 7, vertical: 1.5),
+                                                color: getColor(
+                                                    context, "textLight"),
+                                                name: "archived-accounts".tr(),
+                                                margin:
+                                                    EdgeInsetsDirectional.zero,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 2),
                                         TextFont(
-                                          text: wallet.name,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 21,
+                                          textAlign: TextAlign.start,
+                                          text: convertToMoney(
+                                            Provider.of<AllWallets>(context),
+                                            walletWithDetails.totalSpent ?? 0,
+                                            currencyKey: wallet.currency,
+                                            decimals: wallet.decimals,
+                                            addCurrencyName: true,
+                                          ).toString(),
+                                          fontSize: 15,
                                         ),
-                                  Container(height: 2),
-                                  TextFont(
-                                    textAlign: TextAlign.start,
-                                    text: convertToMoney(
-                                      Provider.of<AllWallets>(context),
-                                      walletWithDetails.totalSpent ?? 0,
-                                      currencyKey: wallet.currency,
-                                      decimals: wallet.decimals,
-                                      addCurrencyName: true,
-                                    ).toString(),
-                                    fontSize: 15,
-                                  ),
-                                  Wrap(
-                                    crossAxisAlignment:
-                                        WrapCrossAlignment.center,
-                                    spacing: 5,
-                                    runSpacing: 3,
-                                    children: [
-                                      Padding(
-                                        padding:
-                                            const EdgeInsetsDirectional.only(
-                                                top: 1),
-                                        child: TransactionTag(
-                                          padding: const EdgeInsetsDirectional
-                                              .symmetric(
-                                              horizontal: 7, vertical: 1.1),
-                                          color: accentColor,
-                                          name: getAccountTypeName(
-                                              getAccountTypeFromWallet(wallet)),
-                                          margin: EdgeInsetsDirectional.zero,
+                                        const SizedBox(height: 2),
+                                        TextFont(
+                                          textAlign: TextAlign.start,
+                                          text: walletWithDetails
+                                                  .numberTransactions
+                                                  .toString() +
+                                              " " +
+                                              (walletWithDetails
+                                                          .numberTransactions ==
+                                                      1
+                                                  ? "transaction"
+                                                      .tr()
+                                                      .toLowerCase()
+                                                  : "transactions"
+                                                      .tr()
+                                                      .toLowerCase()),
+                                          fontSize: 13,
+                                          textColor: getColor(context, "black")
+                                              .withOpacity(0.6),
                                         ),
-                                      ),
-                                      TextFont(
-                                        textAlign: TextAlign.start,
-                                        text: walletWithDetails
-                                                .numberTransactions
-                                                .toString() +
-                                            " " +
-                                            (walletWithDetails
-                                                        .numberTransactions ==
-                                                    1
-                                                ? "transaction"
-                                                    .tr()
-                                                    .toLowerCase()
-                                                : "transactions"
-                                                    .tr()
-                                                    .toLowerCase()),
-                                        fontSize: 14,
-                                        textColor: getColor(context, "black")
-                                            .withOpacity(0.65),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
                                 ],
                               ),
-                            ),
-                          ],
-                        ),
-                              onDelete: () async {
-                                return (await deleteWalletPopup(
-                                      context,
-                                      wallet: wallet,
-                                      routesToPopAfterDelete:
-                                          RoutesToPopAfterDelete.None,
-                                    )) ==
-                                    DeletePopupAction.Delete;
-                              },
                               openPage: WatchedWalletDetailsPage(
                                 walletPk: wallet.walletPk,
                               ),

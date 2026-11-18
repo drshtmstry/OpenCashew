@@ -1307,7 +1307,7 @@ class WalletDetailsPageState extends State<WalletDetailsPage>
                 if (widget.wallet != null)
                   CustomPopupMenuButton(
                     showButtons: enableDoubleColumn(context),
-                    keepOutFirst: false,
+                    keepOutFirst: true,
                     items: [
                       DropdownItemMenu(
                         id: "edit-account",
