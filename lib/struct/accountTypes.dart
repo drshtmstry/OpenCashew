@@ -20,7 +20,7 @@ String getAccountTypeName(AccountType type) {
     case AccountType.card:
       return "Card (Credit / Debit)";
     case AccountType.prepaid:
-      return "Top-up / Prepaid / Wallet";
+      return "Online Wallet / Prepaid";
     case AccountType.savings:
       return "Savings & Investments";
     case AccountType.other:
@@ -37,7 +37,7 @@ String getAccountTypeDescription(AccountType type) {
     case AccountType.card:
       return "Credit card, debit card, or charge card";
     case AccountType.prepaid:
-      return "Digital wallet, UPI Lite, transit, or gift card";
+      return "Online wallet, digital wallet, UPI, transit, or prepaid card";
     case AccountType.savings:
       return "Savings, fixed deposit, stocks, or retirement";
     case AccountType.other:
@@ -56,9 +56,7 @@ IconData getAccountTypeIcon(AccountType type, {bool outlined = false}) {
     case AccountType.card:
       return outlined ? Icons.credit_card_outlined : Icons.credit_card_rounded;
     case AccountType.prepaid:
-      return outlined
-          ? Icons.account_balance_wallet_outlined
-          : Icons.account_balance_wallet_rounded;
+      return outlined ? Icons.language_outlined : Icons.language_rounded;
     case AccountType.savings:
       return outlined ? Icons.savings_outlined : Icons.savings_rounded;
     case AccountType.other:
@@ -90,7 +88,13 @@ AccountType getAccountTypeFromPk(String walletPk, {String? name}) {
         lower.contains("debit")) {
       return AccountType.card;
     }
-    if (lower.contains("lite") ||
+    if (lower.contains("online") ||
+        lower.contains("digital") ||
+        lower.contains("upi") ||
+        lower.contains("gpay") ||
+        lower.contains("phonepe") ||
+        lower.contains("paypal") ||
+        lower.contains("lite") ||
         lower.contains("prepaid") ||
         lower.contains("wallet") ||
         lower.contains("paytm") ||

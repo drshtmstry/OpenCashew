@@ -104,17 +104,20 @@ class _AddWalletPageState extends State<AddWalletPage> {
 
   Future addWallet({bool popContext = true}) async {
     print("Added wallet");
+    final TransactionWallet walletToSave = await createTransactionWallet();
     final int? rowId = await database.createOrUpdateWallet(
-        insert: widget.wallet == null, await createTransactionWallet());
+      walletToSave,
+      insert: widget.wallet == null,
+    );
 
-    if (rowId != null) {
-      final TransactionWallet walletJustAdded =
-          await database.getWalletFromRowId(rowId);
-      await setAccountTypeForWallet(
-          walletJustAdded.walletPk, selectedAccountType);
-    } else if (widget.wallet != null) {
-      await setAccountTypeForWallet(
-          widget.wallet!.walletPk, selectedAccountType);
+    final String targetWalletPk = widget.wallet != null
+        ? widget.wallet!.walletPk
+        : (rowId != null
+            ? (await database.getWalletFromRowId(rowId)).walletPk
+            : walletToSave.walletPk);
+
+    if (targetWalletPk != "-1") {
+      await setAccountTypeForWallet(targetWalletPk, selectedAccountType);
     }
 
     // set initial amount
@@ -159,8 +162,8 @@ class _AddWalletPageState extends State<AddWalletPage> {
   void populateCurrencies() {
     Future.delayed(Duration.zero, () async {
       setState(() {
-        //Set to false because we can't save until we made some changes
-        canAddWallet = false;
+        // When editing an existing wallet, saving is allowed immediately.
+        canAddWallet = widget.wallet != null;
         currencies = currenciesJSON;
       });
     });
@@ -591,6 +594,7 @@ class _AddWalletPageState extends State<AddWalletPage> {
                         userManuallySelectedAccountType = true;
                         selectedAccountType = t;
                       });
+                      determineBottomButton();
                       break;
                     }
                   }

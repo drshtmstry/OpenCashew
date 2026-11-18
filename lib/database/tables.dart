@@ -2933,12 +2933,12 @@ class FinanceDatabase extends _$FinanceDatabase {
     wallet = wallet.copyWith(name: wallet.name.trim());
     wallet = wallet.copyWith(
         dateTimeModified: Value(customDateTimeModified ?? DateTime.now()));
-    WalletsCompanion companionToInsert = wallet.toCompanion(true);
+    WalletsCompanion companionToInsert = wallet.toCompanion(false);
 
     if (insert) {
       // Use auto incremented ID when inserting
       companionToInsert = companionToInsert.copyWith(
-        walletPk: Value.absent(),
+        walletPk: const Value.absent(),
         homePageWidgetDisplay: Value(defaultWalletHomePageWidgetDisplay),
       );
     }
