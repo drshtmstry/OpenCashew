@@ -51,3 +51,8 @@ keystore.jks
 # Agent metadata
 .agents/
 skills-lock.json
+
+# Firebase & Google Services (contains private credentials/API keys)
+android/app/google-services.json
+google-services.json
+*.local_backup

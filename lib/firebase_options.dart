@@ -47,30 +47,33 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyBGiaRl72d4k3Ki0dh8ra-gU4v2z04CgIw',
-    appId: '1:267621253497:web:12558fe9abebf7fa842fa8',
-    messagingSenderId: '267621253497',
-    projectId: 'budget-app-flutter',
-    authDomain: 'budget-app-flutter.firebaseapp.com',
-    storageBucket: 'budget-app-flutter.appspot.com',
+    apiKey: String.fromEnvironment('FIREBASE_WEB_API_KEY',
+        defaultValue: 'YOUR_FIREBASE_WEB_API_KEY'),
+    appId: '1:869343141943:web:placeholder',
+    messagingSenderId: '869343141943',
+    projectId: 'opencashew-df69b',
+    authDomain: 'opencashew-df69b.firebaseapp.com',
+    storageBucket: 'opencashew-df69b.firebasestorage.app',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDNVDtwGJUHBZohwB2RDeUco-5hAGfx2bA',
-    appId: '1:267621253497:android:e7a2967eaf8dd072842fa8',
-    messagingSenderId: '267621253497',
-    projectId: 'budget-app-flutter',
-    storageBucket: 'budget-app-flutter.appspot.com',
+    apiKey: String.fromEnvironment('FIREBASE_ANDROID_API_KEY',
+        defaultValue: 'YOUR_FIREBASE_ANDROID_API_KEY'),
+    appId: '1:869343141943:android:36bcf04def13530f6d1fb2',
+    messagingSenderId: '869343141943',
+    projectId: 'opencashew-df69b',
+    storageBucket: 'opencashew-df69b.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyBts7THLrbIh-xReN70k5AsknAMwBNhrD0',
-    appId: '1:267621253497:ios:17af91fbac7c01b9842fa8',
-    messagingSenderId: '267621253497',
-    projectId: 'budget-app-flutter',
-    storageBucket: 'budget-app-flutter.appspot.com',
-    androidClientId: '267621253497-0h976snjlf34gs8m75bh8nik8gcvr2mk.apps.googleusercontent.com',
-    iosClientId: '267621253497-ih94g1srq37gun4mdmvadgl3ev588vpf.apps.googleusercontent.com',
-    iosBundleId: 'com.budget.tracker-app',
+    apiKey: String.fromEnvironment('FIREBASE_IOS_API_KEY',
+        defaultValue: 'YOUR_FIREBASE_IOS_API_KEY'),
+    appId: '1:869343141943:ios:placeholder',
+    messagingSenderId: '869343141943',
+    projectId: 'opencashew-df69b',
+    storageBucket: 'opencashew-df69b.firebasestorage.app',
+    androidClientId: '',
+    iosClientId: '',
+    iosBundleId: 'org.opencashew.app',
   );
 }
