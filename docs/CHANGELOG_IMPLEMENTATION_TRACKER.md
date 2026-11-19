@@ -3,7 +3,7 @@
 > Tracks every single item from the production 6.x release notes (v6.0.0 through v6.7.5) against the OpenCashew codebase.
 > Status legend: `[x]` Implemented in OpenCashew | `[ ]` Pending implementation | `[-]` iOS-only / App Store specific
 >
-> **Status note (2026-11-15):** This release-note tracker has not been fully reconciled with `todo.md` or the current code. Use [`todo.md`](todo.md) for current project priorities and completed-work status. Entries below are a historical cross-reference until individually audited.
+> **Status note (2026-11-19):** Reconciled with `docs/todo.md`. Items implemented in Milestones 1, 2, 3, and core enhancements are marked `[x]` below.
 
 ## Version 6.7.0 (43 items)
 
@@ -16,8 +16,8 @@
 - [ ] Fix skipped transactions contributing toward upcoming percentage in budget progress
 - [ ] Fix "added only" custom time period budgets line graph not including previously dated transactions
 - [ ] Fix custom time period budget line graph date ranges
-- [ ] Add spending per day and total day metrics when setting custom budget period
-- [ ] Add new hierachical visual representation of category to subcategories for budgets
+- [x] Add spending per day and total day metrics when setting custom budget period *(Implemented in Milestone 3: AddBudgetPage)*
+- [x] Add new hierachical visual representation of category to subcategories for budgets *(Implemented in Milestone 2: CategoryLimits tree and branch indicators)*
 - [ ] Fix budget category saving/spending goal banner totals not adding up correctly
 - [ ] Fix repetitive transactions with end date at end of month overflowing to month after
 - [ ] Fix overlay hints triggering more than once
@@ -62,7 +62,7 @@
 - [ ] Improve layout spacing of long-term loan / goal summary container
 - [ ] Fix incorrect statistic totals when including income in a spending budget / including expense in a savings budget
 - [ ] Tap "Today" in the budget page progress bar to view more information about the current period
-- [ ] Add ability to export selected transaction references with app links
+- [-] Add ability to export selected transaction references with app links *(Descoped / Excluded from plan)*
 - [ ] On first sync/login of a device, settings are now restored
 - [-] New parse message for transaction details shortcut (i) *(iOS platform-specific)*
 - [ ] Improve message parsing automation template save changes
@@ -121,7 +121,7 @@
 - [ ] Improve animations when "Remove animations" operating system setting enabled
 - [ ] Increase contrast of some colors and upcoming spending progress bar
 - [ ] Increase contrast of flashing transaction background color after edit/creation
-- [ ] Improve 'Intelligence' settings layout and implementation
+- [-] Improve 'Intelligence' settings layout and implementation *(Descoped / Excluded from plan)*
 - [ ] Automatic backup date check every time app is resumed, rather than just initial launch
 - [ ] Automatically apply filters after navigating to the All Spending Summary page through the total amounts banner
 - [ ] Improve bottom padding safe area and spacing for devices with reserved space
@@ -151,7 +151,7 @@
 - [x] Scroll behavior setting *(Implemented: ScrollBehaviorSetting with System, Bouncing, Clamping)*
 - [x] Add gray theme color *(tracked complete in current `todo.md`)*
 - [x] Font scale setting *(tracked complete; `fontScale` preference exists)*
-- [ ] Support custom font files
+- [-] Support custom font files *(Descoped / Excluded from plan)*
 - [x] Animated budget container setting (can significantly increase performance if disabled) *(tracked complete in current `todo.md`)*
 - [x] Prompt for upcoming transaction amount when paid setting *(tracked complete in current `todo.md`)*
 - [ ] Improved app loading performance
@@ -167,7 +167,7 @@
 - [ ] Improved scroll to bottom/top in large lists
 - [ ] Improved navigation bar layout rendering
 - [-] Support liquid glass navigation bar (i) *(iOS platform-specific)*
-- [ ] New floating navigation bar option (A) *(still pending in current `todo.md`)*
+- [-] New floating navigation bar option (A) *(Descoped / Excluded from plan)*
 - [ ] Improved FAB rendering on all pages
 - [ ] Improved and recreated tab bar selection UI component
 - [ ] Improved and recreated dropdown menu action selection
@@ -186,16 +186,16 @@
 - [-] Improve popup bottom sheet with keyboard fluidity (i) *(iOS platform-specific)*
 - [-] Fix auto correct from removing a recommended title choice click (i) *(iOS platform-specific)*
 - [x] Add bi-weekly and quarterly repeat options *(tracked complete in current `todo.md`; tutorial may remain separate)*
-- [ ] Excluded from totals transactions filter
-- [ ] Filter "Notes contains" and "Title contains" using "and" "&&" or "or" "||"
-- [ ] Sort transactions in Search transactions page and monthly list page
+- [x] Excluded from totals transactions filter *(Implemented in Milestone 1: SearchFilters & AllTransactionsPage)*
+- [x] Filter "Notes contains" and "Title contains" using "and" "&&" or "or" "||" *(Implemented in Milestone 1: buildBooleanTextFilter)*
+- [x] Sort transactions in Search transactions page and monthly list page *(Implemented in Milestone 1)*
 - [x] Export selected transactions directly from Search transactions page as CSV *(implemented; current `todo.md`)*
 - [ ] Significantly improved search algorithm with multiple languages and latin character conversion
 - [ ] Added debug logging shortcut in about app page
 - [ ] Search titles by category name and title when editing
 - [ ] Improved editing selected transactions
-- [ ] Edit include/exclude toggle when editing the amount of selected transactions
-- [ ] Edit note on all selected transactions
+- [x] Edit include/exclude toggle when editing the amount of selected transactions *(Implemented in Milestone 1)*
+- [x] Edit note on all selected transactions *(Implemented in Milestone 1: Bulk Edit Note)*
 - [ ] Evaluate a partial calculation when entering amounts
 - [ ] Support copying and pasting calculations when entering amounts
 - [ ] Improved archiving/hiding of budgets, goals, long term loans
@@ -211,24 +211,24 @@
 - [ ] Improved bottom sheet interaction and flow
 - [ ] Onboarding UI guide and overlay hints
 - [ ] Add subscription page graph visual
-- [ ] New progress bar style
+- [x] New progress bar style *(Implemented: LinearProgressBarStyleSetting with WavyProgressBarPainter)*
 - [ ] New date and time picker style
 - [ ] Net total style setting: colorful / simple
 - [ ] Custom currency number format: symbol / currency code
-- [ ] Subcategory filter support for all transaction budgets
-- [ ] Ability to archive accounts
+- [x] Subcategory filter support for all transaction budgets *(Implemented in Milestone 3: AddBudgetPage & tables.dart)*
+- [x] Ability to archive accounts *(Implemented in Milestone 1 & Account Customization: AddWalletPage & EditWalletsPage)*
 - [ ] Budget spending limit total type
 - [ ] Budget page sorting transactions
 - [ ] Custom exchange rate when creating a transfer
-- [x] Pinned transaction manager shortcut from the `+` long-press menu *(current `todo.md`; direct pin action and pinned home section remain pending)*
+- [x] Pinned transaction manager shortcut from the `+` long-press menu *(current `todo.md`)*
 - [ ] Pinned transactions UI layout list type
-- [ ] Pinned transactions home page section *(still pending in current `todo.md`)*
-- [ ] Merged common/frequent transactions feature with pinned transactions
+- [x] Pinned transactions home page section *(Implemented in Milestone 2: HomePagePinnedTransactions)*
+- [x] Merged common/frequent transactions feature with pinned transactions *(Implemented in Milestone 2)*
 - [ ] Transactions monthly list page custom total type setting
-- [ ] Calendar page daily total, monthly total banner, filter and search support
-- [ ] Calendar page add transaction on selected day with a double press
-- [ ] Calendar page net spending total / day total toggle
-- [ ] Improve calendar page performance and layouts
+- [x] Calendar page daily total, monthly total banner, filter and search support *(Implemented in Milestone 3: CalendarPage)*
+- [x] Calendar page add transaction on selected day with a double press *(Implemented in Milestone 3: CalendarPage)*
+- [x] Calendar page net spending total / day total toggle *(Implemented in Milestone 3: CalendarPage)*
+- [x] Improve calendar page performance and layouts *(Implemented in Milestone 3: CalendarPage)*
 - [ ] Custom filters of transactions to include in monthly total banners
 - [ ] Range filters can be set to 0
 - [ ] Improved subcategory filters
@@ -253,9 +253,9 @@
 - [ ] Refactor category grid selection and drag and drop to rearrange grid
 - [ ] Added discard changes warning when importing a CSV
 - [ ] Improve column selection when importing a CSV
-- [ ] Allow CSV files to be imported through Google Drive
+- [-] Allow CSV files to be imported through Google Drive *(Descoped / Excluded from plan)*
 - [ ] Improve custom date format when importing CSV
-- [ ] Auto detection and support for unstandardized CSV formats, such as semicolon separated entries
+- [-] Auto detection and support for unstandardized CSV formats, such as semicolon separated entries *(Descoped / Excluded from plan)*
 - [ ] Improve dropdown settings UI component
 - [ ] New onboarding tutorial and feature highlight overlay
 - [ ] Add FAQ/Guide informational links throughout interface
@@ -271,6 +271,6 @@
 - [ ] When tapping upcoming transaction notification, it will highlight in the upcoming transaction page list
 - [ ] Optimized notification scheduling
 - [ ] Improved automatically pay upcoming, repetitive, subscription transactions queries
-- [ ] App Link flow improvements
+- [-] App Link flow improvements *(Descoped / Excluded from plan)*
 - [ ] Experimental features section
-- [ ] Add transactions with AI (Cashew intelligence) experimental feature (disabled by default)
+- [-] Add transactions with AI (Cashew intelligence) experimental feature (disabled by default) *(Descoped / Excluded from plan)*

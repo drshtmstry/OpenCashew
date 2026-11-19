@@ -70,27 +70,32 @@
 - [ ] **Copy/Paste Calculations when Entering Amounts** — _changelog 6.0.0_
 - [ ] **Budget Spending Limit Total Type Setting** — _changelog 6.0.0_
 - [ ] **Savings Budget vs Expense Budget Type** — _web app audit_
-- [ ] **Support Custom Font Files** — allow user-provided `.ttf`/`.otf` — _changelog 6.0.0_
-- [ ] **New Floating Navigation Bar Option** (Android) — _changelog 6.0.0_
 - [ ] **Reorder / Disable Shortcuts on More Page** — _changelog 6.0.0_
 - [ ] **Biometrics Auto-Lock After App Closed** — _changelog 6.0.0_
 - [ ] **Custom Period per Account in Account Summary Statistics** — _changelog 6.0.0_
-- [ ] **Import CSV via Google Drive** — _changelog 6.0.0_
-- [ ] **Auto-detect Unstandardized CSV Formats** (semicolon-separated etc.) — _changelog 6.0.0_
 - [ ] **Export Transactions with Date Range in CSV** — _changelog 5.3.5_
-- [ ] **Import Google Sheet (Real-Time Sync)** — _web app audit_
 
 ---
 
-## 🔴 Future Intelligence & Automation
+## 🔴 User Experience & Guidance
 
-- [ ] **Intelligence / AI Natural Language Parsing**:
+- [ ] **New Onboarding Tutorial and Feature Highlight Overlays** — guided walkthrough for first-time users.
+
+---
+
+## ⚪ Descoped / Excluded from Plan (Per User Direction)
+
+- [-] **Intelligence / AI Natural Language Parsing**:
   - Google Gemini API integration (`models/gemini-flash-lite-latest`) via API key
   - Custom Webhook, SMS, and Regex transaction parser configurations
   - Parsed message inspection log
   - Settings section: Experimental > Intelligence
-- [ ] **Deep Link / App Link API (Android)** — automate adding transactions via external URL parameters.
-- [ ] **New Onboarding Tutorial and Feature Highlight Overlays** — guided walkthrough for first-time users.
+- [-] **Deep Link / App Link API (Android)** — automate adding transactions via external URL parameters.
+- [-] **Import Google Sheet (Real-Time Sync)** — _web app audit_
+- [-] **Import CSV via Google Drive** — _changelog 6.0.0_
+- [-] **Auto-detect Unstandardized CSV Formats** (semicolon-separated etc.) — _changelog 6.0.0_
+- [-] **Support Custom Font Files** — allow user-provided `.ttf`/`.otf` — _changelog 6.0.0_
+- [-] **New Floating Navigation Bar Option** (Android) — _changelog 6.0.0_
 
 ---
 
