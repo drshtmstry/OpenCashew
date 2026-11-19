@@ -256,6 +256,7 @@ class ButtonIcon extends StatelessWidget {
     this.iconColor,
     this.padding,
     this.iconPadding = 20,
+    this.borderRadius,
   }) : super(key: key);
   final VoidCallback onTap;
   final IconData icon;
@@ -264,6 +265,7 @@ class ButtonIcon extends StatelessWidget {
   final Color? iconColor;
   final EdgeInsetsDirectional? padding;
   final double iconPadding;
+  final double? borderRadius;
   @override
   Widget build(BuildContext context) {
     return Tappable(
@@ -282,7 +284,7 @@ class ButtonIcon extends StatelessWidget {
       color: color == null
           ? Theme.of(context).colorScheme.secondaryContainer
           : color,
-      borderRadius: getPlatform() == PlatformOS.isIOS ? 10 : 15,
+      borderRadius: borderRadius ?? (getPlatform() == PlatformOS.isIOS ? 10 : 15),
       onTap: onTap,
     );
   }

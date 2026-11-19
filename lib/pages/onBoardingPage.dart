@@ -8,6 +8,7 @@ import 'package:budget/struct/settings.dart';
 import 'package:budget/widgets/accountAndBackup.dart';
 import 'package:budget/widgets/button.dart';
 import 'package:budget/widgets/currencyPicker.dart';
+import 'package:budget/widgets/tappable.dart';
 import 'package:budget/widgets/framework/popupFramework.dart';
 import 'package:budget/widgets/linearGradientFadedEdges.dart';
 import 'package:budget/widgets/moreIcons.dart';
@@ -279,12 +280,23 @@ class OnBoardingPageBodyState extends State<OnBoardingPageBody> {
           SizedBox(height: 15),
           Padding(
             padding: const EdgeInsetsDirectional.symmetric(horizontal: 25),
-            child: TextFont(
-              text: "onboarding-title-2".tr(),
-              fontWeight: FontWeight.bold,
-              textAlign: TextAlign.center,
-              fontSize: 25,
-              maxLines: 5,
+            child: Column(
+              children: [
+                TextFont(
+                  text: "onboarding-title-2".tr(),
+                  fontWeight: FontWeight.bold,
+                  textAlign: TextAlign.center,
+                  fontSize: 26,
+                  maxLines: 5,
+                ),
+                TextFont(
+                  text: "onboarding-title-2-1".tr(),
+                  fontWeight: FontWeight.bold,
+                  textAlign: TextAlign.center,
+                  fontSize: 22,
+                  maxLines: 5,
+                ),
+              ],
             ),
           ),
           SizedBox(height: 10),
@@ -428,12 +440,22 @@ class OnBoardingPageBodyState extends State<OnBoardingPageBody> {
           SizedBox(height: 15),
           Padding(
             padding: const EdgeInsetsDirectional.symmetric(horizontal: 25),
-            child: TextFont(
-              text: "onboarding-title-3".tr(namedArgs: {"app": globalAppName}),
-              fontWeight: FontWeight.bold,
-              textAlign: TextAlign.center,
-              fontSize: 25,
-              maxLines: 5,
+            child: Column(
+              children: [
+                TextFont(
+                  text: "welcome-to".tr(),
+                  fontWeight: FontWeight.bold,
+                  textAlign: TextAlign.center,
+                  fontSize: 20,
+                  textColor: getColor(context, "black").withOpacity(0.5),
+                ),
+                TextFont(
+                  text: globalAppName,
+                  fontWeight: FontWeight.bold,
+                  textAlign: TextAlign.center,
+                  fontSize: 34,
+                ),
+              ],
             ),
           ),
           SizedBox(height: 25),
@@ -582,6 +604,22 @@ class OnBoardingPageBodyState extends State<OnBoardingPageBody> {
           children: children,
         ),
         PositionedDirectional(
+          top: MediaQuery.paddingOf(context).top + 10,
+          start: 18,
+          child: ButtonIcon(
+            onTap: () {
+              nextNavigation();
+            },
+            icon: appStateSettings["outlinedIcons"]
+                ? Icons.close_outlined
+                : Icons.close_rounded,
+            size: 46,
+            iconPadding: 22,
+            borderRadius: 100,
+            color: getColor(context, "canvasContainer"),
+          ),
+        ),
+        PositionedDirectional(
           bottom: 0,
           child: IgnorePointer(
             child: Container(
@@ -642,8 +680,69 @@ class OnBoardingPageBodyState extends State<OnBoardingPageBody> {
                         );
                       },
                     ),
-                    PageIndicator(
-                        controller: controller, itemCount: children.length),
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        AnimatedBuilder(
+                          animation: controller,
+                          builder: (context, _) {
+                            int currentIndex =
+                                controller.page?.round().toInt() ?? 0;
+                            if (currentIndex == 1) {
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 10),
+                                child: Tappable(
+                                  color: getColor(context, "canvasContainer"),
+                                  borderRadius: 20,
+                                  onTap: () {
+                                    openPopup(
+                                      context,
+                                      icon: appStateSettings["outlinedIcons"]
+                                          ? Icons.pie_chart_outline
+                                          : Icons.pie_chart_rounded,
+                                      title: "onboarding-title-budget".tr(),
+                                      description: "onboarding-info-budget".tr(
+                                          namedArgs: {"app": globalAppName}),
+                                      onSubmit: () => popRoute(context),
+                                      onSubmitLabel: "ok".tr(),
+                                    );
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 14, vertical: 7),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        TextFont(
+                                          text: "budgets".tr().capitalizeFirst,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          textColor: getColor(context, "black")
+                                              .withOpacity(0.6),
+                                        ),
+                                        SizedBox(width: 5),
+                                        Icon(
+                                          appStateSettings["outlinedIcons"]
+                                              ? Icons.info_outline
+                                              : Icons.info_rounded,
+                                          size: 16,
+                                          color: getColor(context, "black")
+                                              .withOpacity(0.4),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }
+                            return SizedBox.shrink();
+                          },
+                        ),
+                        PageIndicator(
+                            controller: controller,
+                            itemCount: children.length),
+                      ],
+                    ),
                     AnimatedBuilder(
                       animation: controller,
                       builder: (BuildContext context, Widget? child) {
