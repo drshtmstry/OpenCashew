@@ -731,7 +731,7 @@ class _TransactionEntryState extends State<TransactionEntry> {
                             color: Colors.transparent,
                             borderRadius: (isExpanded &&
                                     areTransactionsBeingSelected != true)
-                                ? 18
+                                ? borderRadius
                                 : (enableSelectionCheckmark ? 0 : borderRadius),
                             onLongPress: () {
                               selectTransaction(transaction, selected, true);
@@ -814,7 +814,7 @@ class _TransactionEntryState extends State<TransactionEntry> {
                                     : null,
                                 borderRadius: (isExpanded &&
                                         areTransactionsBeingSelected != true)
-                                    ? BorderRadius.circular(18)
+                                    ? BorderRadius.circular(borderRadius)
                                     : BorderRadiusDirectional.vertical(
                                         top: Radius.circular(
                                           isTransactionBeforeSelected

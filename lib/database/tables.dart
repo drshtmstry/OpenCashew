@@ -6552,22 +6552,42 @@ Expression<bool> buildBooleanTextFilter(
       tbl, List<String>? categoryFks, List<String>? categoryFksExclude) {
     if ((categoryFks ?? []).length <= 0) categoryFks = null;
     if ((categoryFksExclude ?? []).length <= 0) categoryFksExclude = null;
+
+    final Expression<String> categoryCol = tbl.categoryFk;
+    Expression<String>? subCategoryCol;
+    try {
+      subCategoryCol = tbl.subCategoryFk;
+    } catch (_) {
+      subCategoryCol = null;
+    }
+
+    if (subCategoryCol == null) {
+      return categoryFks == null && categoryFksExclude == null
+          ? categoryCol.isNotNull()
+          : categoryFks != null && categoryFksExclude == null
+              ? categoryCol.isIn(categoryFks)
+              : categoryFks == null && categoryFksExclude != null
+                  ? categoryCol.isNotIn(categoryFksExclude)
+                  : categoryCol.isIn(categoryFks ?? []) &
+                      categoryCol.isNotIn(categoryFksExclude ?? []);
+    }
+
     return categoryFks == null && categoryFksExclude == null
-        ? tbl.categoryFk.isNotNull()
+        ? categoryCol.isNotNull()
         : categoryFks != null && categoryFksExclude == null
-            ? (tbl.categoryFk.isIn(categoryFks) |
-                (tbl.subCategoryFk.isNotNull() &
-                    tbl.subCategoryFk.isIn(categoryFks)))
+            ? (categoryCol.isIn(categoryFks) |
+                (subCategoryCol.isNotNull() &
+                    subCategoryCol.isIn(categoryFks)))
             : categoryFks == null && categoryFksExclude != null
-                ? (tbl.categoryFk.isNotIn(categoryFksExclude) &
-                    (tbl.subCategoryFk.isNull() |
-                        tbl.subCategoryFk.isNotIn(categoryFksExclude)))
-                : (tbl.categoryFk.isIn(categoryFks ?? []) |
-                        (tbl.subCategoryFk.isNotNull() &
-                            tbl.subCategoryFk.isIn(categoryFks ?? []))) &
-                    (tbl.categoryFk.isNotIn(categoryFksExclude ?? []) &
-                        (tbl.subCategoryFk.isNull() |
-                            tbl.subCategoryFk.isNotIn(categoryFksExclude ?? [])));
+                ? (categoryCol.isNotIn(categoryFksExclude) &
+                    (subCategoryCol.isNull() |
+                        subCategoryCol.isNotIn(categoryFksExclude)))
+                : (categoryCol.isIn(categoryFks ?? []) |
+                        (subCategoryCol.isNotNull() &
+                            subCategoryCol.isIn(categoryFks ?? []))) &
+                    (categoryCol.isNotIn(categoryFksExclude ?? []) &
+                        (subCategoryCol.isNull() |
+                            subCategoryCol.isNotIn(categoryFksExclude ?? [])));
   }
 
   bool isInCategoryCheck(String categoryFk, List<String>? categoryFks,
