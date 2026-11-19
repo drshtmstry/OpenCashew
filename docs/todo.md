@@ -64,16 +64,16 @@
 
 ---
 
-## 🟡 Remaining Settings & Feature Polish
+## 🟢 Remaining Settings & Feature Polish (Completed)
 
-- [ ] **Evaluate Partial Calculation when Entering Amounts** (e.g., `50+30`) — _changelog 6.0.0_
-- [ ] **Copy/Paste Calculations when Entering Amounts** — _changelog 6.0.0_
-- [ ] **Budget Spending Limit Total Type Setting** — _changelog 6.0.0_
-- [ ] **Savings Budget vs Expense Budget Type** — _web app audit_
-- [ ] **Reorder / Disable Shortcuts on More Page** — _changelog 6.0.0_
-- [ ] **Biometrics Auto-Lock After App Closed** — _changelog 6.0.0_
-- [ ] **Custom Period per Account in Account Summary Statistics** — _changelog 6.0.0_
-- [ ] **Export Transactions with Date Range in CSV** — _changelog 5.3.5_
+- [x] **Evaluate Partial Calculation when Entering Amounts** (e.g., `50+30`) — _changelog 6.0.0_
+- [x] **Copy/Paste Calculations when Entering Amounts** — _changelog 6.0.0_
+- [x] **Budget Spending Limit Total Type Setting** — _changelog 6.0.0_
+- [x] **Savings Budget vs Expense Budget Type** — _web app audit_
+- [x] **Reorder / Disable Shortcuts on More Page** — _changelog 6.0.0_
+- [x] **Biometrics Auto-Lock After App Closed** — _changelog 6.0.0_
+- [x] **Custom Period per Account in Account Summary Statistics** — _changelog 6.0.0_
+- [x] **Export Transactions with Date Range in CSV** — _changelog 5.3.5_
 
 ---
 

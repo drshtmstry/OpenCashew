@@ -11,6 +11,9 @@ import 'package:budget/widgets/animatedExpanded.dart';
 import 'package:budget/widgets/button.dart';
 import 'package:budget/widgets/openBottomSheet.dart';
 import 'package:budget/widgets/openPopup.dart';
+import 'package:budget/widgets/openSnackbar.dart';
+import 'package:budget/widgets/globalSnackbar.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:budget/widgets/selectChips.dart';
 import 'package:budget/widgets/tappable.dart';
 import 'package:budget/widgets/textWidgets.dart';
@@ -22,7 +25,6 @@ import 'package:math_expressions/math_expressions.dart';
 import 'package:budget/colors.dart';
 import 'package:provider/provider.dart';
 import 'package:budget/struct/currencyFunctions.dart';
-import 'dart:io';
 import 'dart:ui' as ui;
 
 String getDecimalSeparator() {
@@ -266,6 +268,10 @@ class _SelectAmountState extends State<SelectAmount> {
       } else if (keyIsPressed &&
           event.logicalKey == LogicalKeyboardKey.delete) {
         removeToAmount();
+      } else if (keyIsPressed &&
+          (event.logicalKey == LogicalKeyboardKey.equal ||
+              event.character == "=")) {
+        evaluatePartialCalculation();
       } else if (keyIsPressed && event.logicalKey == LogicalKeyboardKey.enter) {
         if (widget.next != null) {
           widget.next!();
@@ -482,18 +488,81 @@ class _SelectAmountState extends State<SelectAmount> {
     return true;
   }
 
-  pasteFromClipboard() async {
-    double? amount = await readAmountFromClipboard();
-    if (amount != null) {
+  String sanitizeCalculationString(String input) {
+    String sanitized = input.trim();
+    if (getDecimalSeparator() == ",") {
+      sanitized = sanitized.replaceAll(".", "").replaceAll(",", ".");
+    } else {
+      sanitized = sanitized.replaceAll(",", "");
+    }
+    sanitized = sanitized
+        .replaceAll(" ", "")
+        .replaceAll("/", "÷")
+        .replaceAll("*", "×")
+        .replaceAll("x", "×")
+        .replaceAll("X", "×")
+        .replaceAll("—", "-")
+        .replaceAll("−", "-")
+        .replaceAll("–", "-");
+    sanitized = sanitized.replaceAll(RegExp(r'[^0-9\.\+\-\×\÷]'), '');
+    return sanitized;
+  }
+
+  void evaluatePartialCalculation() {
+    if (includesOperations(amount, false) &&
+        onlyOneOperationAndIsNegativeSign(amount) == false) {
+      double result = calculateResult(amount);
+      String resultString = removeTrailingZeroes(result.toString());
       setState(() {
-        this.amount = amount.toString();
+        amount = resultString;
       });
-      widget.setSelectedAmount(amount, amount.toString());
+      widget.setSelectedAmount(result, resultString);
+      HapticFeedback.mediumImpact();
+    }
+  }
+
+  pasteFromClipboard() async {
+    String? clipboardText = await readClipboard(showSnackbar: false);
+    if (clipboardText != null) {
+      String sanitized = sanitizeCalculationString(clipboardText);
+      if (sanitized.isNotEmpty && includesOperations(sanitized, false)) {
+        double result = calculateResult(sanitized);
+        setState(() {
+          this.amount = sanitized;
+        });
+        widget.setSelectedAmount(result, sanitized);
+        bottomSheetControllerGlobal.reMeasure();
+        openSnackbar(SnackbarMessage(
+          title: "pasted-from-clipboard".tr(),
+          icon: appStateSettings["outlinedIcons"]
+              ? Icons.paste_outlined
+              : Icons.paste_rounded,
+          timeout: Duration(milliseconds: 2500),
+        ));
+        return;
+      }
+    }
+    double? parsedAmount = await readAmountFromClipboard();
+    if (parsedAmount != null) {
+      setState(() {
+        this.amount = parsedAmount.toString();
+      });
+      widget.setSelectedAmount(parsedAmount, parsedAmount.toString());
       bottomSheetControllerGlobal.reMeasure();
     }
   }
 
   pasteFromClipboardIntoCalculation() async {
+    String? clipboardText = await readClipboard(showSnackbar: false);
+    if (clipboardText != null) {
+      String sanitized = sanitizeCalculationString(clipboardText);
+      if (sanitized.isNotEmpty) {
+        for (String char in sanitized.split("")) {
+          addToAmount(char, hapticFeedback: false);
+        }
+        return;
+      }
+    }
     double? amount = await readAmountFromClipboard();
     if (amount != null) {
       for (String number in removeTrailingZeroes(amount.toString()).split("")) {
@@ -727,6 +796,13 @@ class _SelectAmountState extends State<SelectAmount> {
                         : CustomContextMenu(
                             buttonItems: [
                               ContextMenuButtonItem(
+                                type: ContextMenuButtonType.copy,
+                                onPressed: () {
+                                  ContextMenuController.removeAny();
+                                  copyToClipboard(calculationString);
+                                },
+                              ),
+                              ContextMenuButtonItem(
                                 type: ContextMenuButtonType.paste,
                                 onPressed: () {
                                   ContextMenuController.removeAny();
@@ -738,7 +814,7 @@ class _SelectAmountState extends State<SelectAmount> {
                               color: Colors.transparent,
                               borderRadius: 10,
                               onTap: () {
-                                return;
+                                evaluatePartialCalculation();
                               },
                               onLongPress: onLongPress,
                               child: Padding(

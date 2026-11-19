@@ -196,8 +196,8 @@
 - [ ] Improved editing selected transactions
 - [x] Edit include/exclude toggle when editing the amount of selected transactions *(Implemented in Milestone 1)*
 - [x] Edit note on all selected transactions *(Implemented in Milestone 1: Bulk Edit Note)*
-- [ ] Evaluate a partial calculation when entering amounts
-- [ ] Support copying and pasting calculations when entering amounts
+- [x] Evaluate a partial calculation when entering amounts *(Implemented in selectAmount.dart)*
+- [x] Support copying and pasting calculations when entering amounts *(Implemented in selectAmount.dart)*
 - [ ] Improved archiving/hiding of budgets, goals, long term loans
 - [ ] Completely removed from selectable lists
 - [ ] Improved UI when item is archived and editing full list
@@ -209,7 +209,7 @@
 - [ ] Improved overflow behavior for text
 - [ ] Improved auto scrolling when rearranging items
 - [ ] Improved bottom sheet interaction and flow
-- [ ] Onboarding UI guide and overlay hints
+- [x] Onboarding UI guide and overlay hints *(Implemented in onBoardingPage.dart)*
 - [ ] Add subscription page graph visual
 - [x] New progress bar style *(Implemented: LinearProgressBarStyleSetting with WavyProgressBarPainter)*
 - [ ] New date and time picker style
@@ -217,7 +217,7 @@
 - [ ] Custom currency number format: symbol / currency code
 - [x] Subcategory filter support for all transaction budgets *(Implemented in Milestone 3: AddBudgetPage & tables.dart)*
 - [x] Ability to archive accounts *(Implemented in Milestone 1 & Account Customization: AddWalletPage & EditWalletsPage)*
-- [ ] Budget spending limit total type
+- [x] Budget spending limit total type *(Implemented in editBudgetLimitsPage.dart TotalSpentToggle)*
 - [ ] Budget page sorting transactions
 - [ ] Custom exchange rate when creating a transfer
 - [x] Pinned transaction manager shortcut from the `+` long-press menu *(current `todo.md`)*
@@ -239,7 +239,7 @@
 - [ ] Show amount remaining repetitive transactions when an end date is provided
 - [ ] Accounts list page
 - [ ] Improved editing decimal places flow for accounts
-- [ ] Account summary statistics page supports custom cycle for each account
+- [x] Account summary statistics page supports custom cycle for each account *(Implemented in walletDetailsPage.dart)*
 - [ ] Ability to group accounts by color and view grouped totals in the home page accounts list
 - [ ] Improve homepage banner settings
 - [ ] Add homepage overdue transactions warning banner if there are transactions past due
@@ -247,7 +247,7 @@
 - [ ] Long pressing heatmap on homepage opens heatmap settings
 - [ ] Set primary account behavior setting for accounts list home page section
 - [ ] Improve line graph settings on homepage
-- [ ] Reorder and disable shortcuts on more page and full screen sidebar navigation
+- [x] Reorder and disable shortcuts on more page and full screen sidebar navigation *(Implemented in editMorePage.dart & settingsPage.dart)*
 - [x] Add page shortcuts to More page: FAQ, all transaction page, search transaction page, bill splitter *(Implemented: BillSplitterShortcutSetting)*
 - [ ] Moved edit page specific settings to separate popup in More page
 - [ ] Refactor category grid selection and drag and drop to rearrange grid

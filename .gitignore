@@ -47,3 +47,7 @@ app.*.map.json
 /android/app/keystore.jks
 key.properties
 keystore.jks
+
+# Agent metadata
+.agents/
+skills-lock.json

@@ -1,6 +1,7 @@
 import 'package:budget/database/tables.dart';
 import 'package:budget/functions.dart';
 import 'package:budget/pages/addTransactionPage.dart';
+import 'package:budget/pages/editBudgetPage.dart';
 import 'package:budget/struct/currencyFunctions.dart';
 import 'package:budget/struct/databaseGlobal.dart';
 import 'package:budget/struct/settings.dart';
@@ -53,36 +54,41 @@ class _EditBudgetLimitsPageState extends State<EditBudgetLimitsPage> {
           child: Padding(
             padding: EdgeInsetsDirectional.symmetric(
                 horizontal: getHorizontalPaddingConstrained(context)),
-            child: SettingsContainerDropdown(
-              title: widget.budget.income == true
-                  ? "saving-limit-type".tr()
-                  : "spending-limit-type".tr(),
-              icon: appStateSettings["outlinedIcons"]
-                  ? Icons.confirmation_num_outlined
-                  : Icons.confirmation_num_rounded,
-              initial: selectedIsAbsoluteSpendingLimit.toString(),
-              items: ["true", "false"],
-              onChanged: (value) async {
-                bool result = value == "true";
-                if (result != selectedIsAbsoluteSpendingLimit) {
-                  await database
-                      .toggleAbsolutePercentSpendingCategoryBudgetLimits(
-                    Provider.of<AllWallets>(context, listen: false),
-                    widget.budget.budgetPk,
-                    budgetAmount,
-                    !result,
-                  );
-                  await database.createOrUpdateBudget(
-                      widget.budget.copyWith(isAbsoluteSpendingLimit: result));
-                  setState(() {
-                    selectedIsAbsoluteSpendingLimit = result;
-                  });
-                }
-              },
-              getLabel: (item) {
-                if (item == "true") return "amount".tr().capitalizeFirst;
-                if (item == "false") return "percent".tr().capitalizeFirst;
-              },
+            child: Column(
+              children: [
+                SettingsContainerDropdown(
+                  title: widget.budget.income == true
+                      ? "saving-limit-type".tr()
+                      : "spending-limit-type".tr(),
+                  icon: appStateSettings["outlinedIcons"]
+                      ? Icons.confirmation_num_outlined
+                      : Icons.confirmation_num_rounded,
+                  initial: selectedIsAbsoluteSpendingLimit.toString(),
+                  items: ["true", "false"],
+                  onChanged: (value) async {
+                    bool result = value == "true";
+                    if (result != selectedIsAbsoluteSpendingLimit) {
+                      await database
+                          .toggleAbsolutePercentSpendingCategoryBudgetLimits(
+                        Provider.of<AllWallets>(context, listen: false),
+                        widget.budget.budgetPk,
+                        budgetAmount,
+                        !result,
+                      );
+                      await database.createOrUpdateBudget(
+                          widget.budget.copyWith(isAbsoluteSpendingLimit: result));
+                      setState(() {
+                        selectedIsAbsoluteSpendingLimit = result;
+                      });
+                    }
+                  },
+                  getLabel: (item) {
+                    if (item == "true") return "amount".tr().capitalizeFirst;
+                    if (item == "false") return "percent".tr().capitalizeFirst;
+                  },
+                ),
+                TotalSpentToggle(),
+              ],
             ),
           ),
         ),

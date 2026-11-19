@@ -74,14 +74,33 @@ class InitializeBiometrics extends StatefulWidget {
 final GlobalKey<InitializeBiometricsState> initializeBiometricsKey =
     GlobalKey<InitializeBiometricsState>();
 
-class InitializeBiometricsState extends State<InitializeBiometrics> {
+class InitializeBiometricsState extends State<InitializeBiometrics>
+    with WidgetsBindingObserver {
   AuthResult authResult = AuthResult.waiting;
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     Future.delayed(Duration.zero, () async {
       _biometricCheck();
     });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      if (appStateSettings["requireAuth"] == true &&
+          appStateSettings["biometricAutoLockOnBackground"] == true &&
+          authResult == AuthResult.authenticated) {
+        requireAuthentication();
+      }
+    }
   }
 
   _biometricCheck() async {

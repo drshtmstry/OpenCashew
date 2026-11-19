@@ -146,6 +146,8 @@ class WalletDetailsPageState extends State<WalletDetailsPage>
   bool appStateSettingsNetAllSpendingTotal =
       appStateSettings["netAllSpendingTotal"] == true;
 
+  String get cycleSettingsExtension => widget.wallet?.walletPk ?? "";
+
   void scrollToTop() {
     pageState.currentState?.scrollToTop();
   }
@@ -191,7 +193,7 @@ class WalletDetailsPageState extends State<WalletDetailsPage>
         title: "select-period".tr(),
         child: WalletPickerPeriodCycle(
           allWalletsSettingKey: null,
-          cycleSettingsExtension: "",
+          cycleSettingsExtension: cycleSettingsExtension,
           homePageWidgetDisplay: null,
           onlyShowCycleOption: onlyShowCycleOption,
         ),
@@ -247,10 +249,10 @@ class WalletDetailsPageState extends State<WalletDetailsPage>
       setState(() {
         selectedDateTimeRangeIndex = index;
         selectedDateTimeRange = getCycleDateTimeRange(
-          "",
+          cycleSettingsExtension,
           currentDate: getDatePastToDetermineBudgetDate(
             index,
-            getCustomCycleTempBudget(""),
+            getCustomCycleTempBudget(cycleSettingsExtension),
           ),
         );
       });
@@ -263,7 +265,7 @@ class WalletDetailsPageState extends State<WalletDetailsPage>
     // Force set date time range in case its set back to null we want to override its original value
     searchFilters = searchFilters?.copyWith(
       dateTimeRange: getDateTimeRangeForPassedSearchFilters(
-          cycleSettingsExtension: "",
+          cycleSettingsExtension: cycleSettingsExtension,
           selectedDateTimeRange: selectedDateTimeRange),
       forceSetDateTimeRange: true,
     );
@@ -671,7 +673,7 @@ class WalletDetailsPageState extends State<WalletDetailsPage>
           totalWithCountStream: database.watchTotalWithCountOfWallet(
             isIncome: null,
             allWallets: Provider.of<AllWallets>(context),
-            cycleSettingsExtension: "",
+            cycleSettingsExtension: cycleSettingsExtension,
             // When wallet type is normal, forcefully show all time for net-spending
             followCustomPeriodCycle: widget.wallet == null ? true : false,
             searchFilters: widget.wallet != null
@@ -691,7 +693,7 @@ class WalletDetailsPageState extends State<WalletDetailsPage>
                           : searchFilters)
                       ?.copyWith(
                     dateTimeRange: getDateTimeRangeForPassedSearchFilters(
-                      cycleSettingsExtension: "",
+                      cycleSettingsExtension: cycleSettingsExtension,
                       selectedDateTimeRange: selectedDateTimeRange,
                     ),
                     walletPks: walletPks,
@@ -773,7 +775,8 @@ class WalletDetailsPageState extends State<WalletDetailsPage>
                         if (widget.wallet != null)
                           AmountSpentEntryRow(
                             hide: getDateTimeRangeForPassedSearchFilters(
-                                    cycleSettingsExtension: "",
+                                    cycleSettingsExtension:
+                                        cycleSettingsExtension,
                                     selectedDateTimeRange:
                                         selectedDateTimeRange) ==
                                 null,
@@ -784,7 +787,8 @@ class WalletDetailsPageState extends State<WalletDetailsPage>
                                   ?.copyWith(
                                 dateTimeRange:
                                     getDateTimeRangeForPassedSearchFilters(
-                                        cycleSettingsExtension: "",
+                                        cycleSettingsExtension:
+                                            cycleSettingsExtension,
                                         selectedDateTimeRange:
                                             selectedDateTimeRange),
                                 walletPks: walletPks,
@@ -797,7 +801,7 @@ class WalletDetailsPageState extends State<WalletDetailsPage>
                                 database.watchTotalWithCountOfWallet(
                               isIncome: null,
                               allWallets: Provider.of<AllWallets>(context),
-                              cycleSettingsExtension: "",
+                              cycleSettingsExtension: cycleSettingsExtension,
                               followCustomPeriodCycle: true,
                               searchFilters: widget.wallet != null
                                   ? SearchFilters()
@@ -816,7 +820,8 @@ class WalletDetailsPageState extends State<WalletDetailsPage>
                                 ?.copyWith(
                               dateTimeRange:
                                   getDateTimeRangeForPassedSearchFilters(
-                                      cycleSettingsExtension: "",
+                                      cycleSettingsExtension:
+                                          cycleSettingsExtension,
                                       selectedDateTimeRange:
                                           selectedDateTimeRange),
                               walletPks: walletPks,
@@ -830,7 +835,7 @@ class WalletDetailsPageState extends State<WalletDetailsPage>
                             isIncome: false,
                             allWallets: Provider.of<AllWallets>(context),
                             followCustomPeriodCycle: widget.wallet == null,
-                            cycleSettingsExtension: "",
+                            cycleSettingsExtension: cycleSettingsExtension,
                             searchFilters: (searchFilters ?? SearchFilters())
                                 .copyWith(walletPks: walletPks),
                             forcedDateTimeRange: selectedDateTimeRange,
@@ -846,7 +851,8 @@ class WalletDetailsPageState extends State<WalletDetailsPage>
                                 ?.copyWith(
                               dateTimeRange:
                                   getDateTimeRangeForPassedSearchFilters(
-                                      cycleSettingsExtension: "",
+                                      cycleSettingsExtension:
+                                          cycleSettingsExtension,
                                       selectedDateTimeRange:
                                           selectedDateTimeRange),
                               walletPks: walletPks,
@@ -860,7 +866,7 @@ class WalletDetailsPageState extends State<WalletDetailsPage>
                             isIncome: true,
                             allWallets: Provider.of<AllWallets>(context),
                             followCustomPeriodCycle: widget.wallet == null,
-                            cycleSettingsExtension: "",
+                            cycleSettingsExtension: cycleSettingsExtension,
                             searchFilters: (searchFilters ?? SearchFilters())
                                 .copyWith(walletPks: walletPks),
                             forcedDateTimeRange: selectedDateTimeRange,
@@ -876,7 +882,8 @@ class WalletDetailsPageState extends State<WalletDetailsPage>
                                 categoryPks: ["0"],
                                 dateTimeRange:
                                     getDateTimeRangeForPassedSearchFilters(
-                                        cycleSettingsExtension: "",
+                                        cycleSettingsExtension:
+                                            cycleSettingsExtension,
                                         selectedDateTimeRange:
                                             selectedDateTimeRange),
                                 walletPks: walletPks,
@@ -895,7 +902,8 @@ class WalletDetailsPageState extends State<WalletDetailsPage>
                                   allWallets: Provider.of<AllWallets>(context),
                                   followCustomPeriodCycle:
                                       widget.wallet == null,
-                                  cycleSettingsExtension: "",
+                                  cycleSettingsExtension:
+                                      cycleSettingsExtension,
                                   searchFilters: rowFilters,
                                   forcedDateTimeRange: selectedDateTimeRange,
                                 ),
@@ -913,7 +921,8 @@ class WalletDetailsPageState extends State<WalletDetailsPage>
                                       ?.copyWith(
                                     dateTimeRange:
                                         getDateTimeRangeForPassedSearchFilters(
-                                            cycleSettingsExtension: "",
+                                            cycleSettingsExtension:
+                                                cycleSettingsExtension,
                                             selectedDateTimeRange:
                                                 selectedDateTimeRange),
                                     walletPks: walletPks,
@@ -931,7 +940,7 @@ class WalletDetailsPageState extends State<WalletDetailsPage>
                             isCredit: true,
                             allWallets: Provider.of<AllWallets>(context),
                             followCustomPeriodCycle: widget.wallet == null,
-                            cycleSettingsExtension: "",
+                            cycleSettingsExtension: cycleSettingsExtension,
                             searchFilters: (searchFilters ?? SearchFilters())
                                 .copyWith(walletPks: walletPks),
                             forcedDateTimeRange: selectedDateTimeRange,
@@ -942,7 +951,7 @@ class WalletDetailsPageState extends State<WalletDetailsPage>
                             isCredit: true,
                             allWallets: Provider.of<AllWallets>(context),
                             followCustomPeriodCycle: widget.wallet == null,
-                            cycleSettingsExtension: "",
+                            cycleSettingsExtension: cycleSettingsExtension,
                             searchFilters: (searchFilters ?? SearchFilters())
                                 .copyWith(walletPks: walletPks),
                             forcedDateTimeRange: selectedDateTimeRange,
@@ -961,7 +970,8 @@ class WalletDetailsPageState extends State<WalletDetailsPage>
                                       ?.copyWith(
                                     dateTimeRange:
                                         getDateTimeRangeForPassedSearchFilters(
-                                            cycleSettingsExtension: "",
+                                            cycleSettingsExtension:
+                                                cycleSettingsExtension,
                                             selectedDateTimeRange:
                                                 selectedDateTimeRange),
                                     walletPks: walletPks,
@@ -979,7 +989,7 @@ class WalletDetailsPageState extends State<WalletDetailsPage>
                             isCredit: false,
                             allWallets: Provider.of<AllWallets>(context),
                             followCustomPeriodCycle: widget.wallet == null,
-                            cycleSettingsExtension: "",
+                            cycleSettingsExtension: cycleSettingsExtension,
                             searchFilters: (searchFilters ?? SearchFilters())
                                 .copyWith(walletPks: walletPks),
                             forcedDateTimeRange: selectedDateTimeRange,
@@ -990,7 +1000,7 @@ class WalletDetailsPageState extends State<WalletDetailsPage>
                             isCredit: false,
                             allWallets: Provider.of<AllWallets>(context),
                             followCustomPeriodCycle: widget.wallet == null,
-                            cycleSettingsExtension: "",
+                            cycleSettingsExtension: cycleSettingsExtension,
                             searchFilters: (searchFilters ?? SearchFilters())
                                 .copyWith(walletPks: walletPks),
                             forcedDateTimeRange: selectedDateTimeRange,

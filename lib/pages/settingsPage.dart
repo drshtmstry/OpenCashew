@@ -7,6 +7,7 @@ import 'package:budget/pages/calendarPage.dart';
 import 'package:budget/pages/budgetsListPage.dart';
 import 'package:budget/pages/creditDebtTransactionsPage.dart';
 import 'package:budget/pages/editHomePage.dart';
+import 'package:budget/pages/editMorePage.dart';
 import 'package:budget/pages/editObjectivesPage.dart';
 import 'package:budget/pages/homePage/homePageNetWorth.dart';
 import 'package:budget/pages/objectivesListPage.dart';
@@ -99,6 +100,18 @@ class MoreActionsPageState extends State<MoreActionsPage> {
             showButtons: true,
             keepOutFirst: true,
             items: [
+              DropdownItemMenu(
+                id: "edit-shortcuts",
+                label: "edit-shortcuts".tr() != "edit-shortcuts"
+                    ? "edit-shortcuts".tr()
+                    : "Edit Shortcuts",
+                icon: appStateSettings["outlinedIcons"]
+                    ? Icons.tune_outlined
+                    : Icons.tune_rounded,
+                action: () {
+                  pushRoute(context, const EditMorePage());
+                },
+              ),
               if (appStateSettings["showFAQAndHelpLink"] == true)
                 DropdownItemMenu(
                   id: "open-faq",
@@ -128,136 +141,168 @@ class MorePages extends StatelessWidget {
   Widget build(BuildContext context) {
     bool hasSideNavigation = getIsFullScreen(context);
 
+    if (hasSideNavigation) {
+      return Padding(
+        padding: const EdgeInsetsDirectional.symmetric(horizontal: 4),
+        child: Column(
+          children: [
+            SettingsPageContent(),
+          ],
+        ),
+      );
+    }
+
+    List<dynamic> savedOrder = appStateSettings["morePageOrder"] ?? [];
+    List<String> order = List<String>.from(savedOrder.map((e) => e.toString()));
+    for (String defKey in defaultMorePageOrder) {
+      if (!order.contains(defKey)) {
+        order.add(defKey);
+      }
+    }
+    List<dynamic> savedDisabled = appStateSettings["morePageDisabled"] ?? [];
+    List<String> disabled =
+        List<String>.from(savedDisabled.map((e) => e.toString()));
+
+    Map<String, Widget> fullWidthWidgets = {
+      "settings": Row(
+        children: [
+          Expanded(
+            flex: 1,
+            child: SettingsContainerOpenPage(
+              openPage: SettingsPageFramework(
+                key: settingsPageFrameworkStateKey,
+              ),
+              title: navBarIconsData["settings"]!.labelLong.tr(),
+              icon: navBarIconsData["settings"]!.iconData,
+              description: appStateSettings["showExtraInfoText"] == false
+                  ? null
+                  : "settings-and-customization-description".tr(),
+              isOutlined: true,
+              isWideOutlined: true,
+            ),
+          ),
+        ],
+      ),
+      "allSpending": Row(
+        children: [
+          Expanded(
+            child: SettingsContainerOpenPage(
+              openPage: WalletDetailsPage(wallet: null),
+              title: navBarIconsData["allSpending"]!.labelLong.tr(),
+              icon: navBarIconsData["allSpending"]!.iconData,
+              description: appStateSettings["showExtraInfoText"] == false
+                  ? null
+                  : "all-spending-description".tr(),
+              isOutlined: true,
+              isWideOutlined: true,
+            ),
+          ),
+        ],
+      ),
+      "editData": const Padding(
+        padding: EdgeInsetsDirectional.only(top: 5),
+        child: EditDataGrid(),
+      ),
+    };
+
+    Map<String, Widget> halfWidthWidgets = {
+      "about": SettingsContainerOpenPage(
+        openPage: AboutPage(),
+        title: "about-app".tr(namedArgs: {"app": globalAppName}),
+        icon: navBarIconsData["about"]!.iconData,
+        isOutlined: true,
+      ),
+      "googleAccount": GoogleAccountLoginButton(
+        key: settingsGoogleAccountLoginButtonKey,
+      ),
+      "subscriptions": SettingsContainerOpenPage(
+        openPage: SubscriptionsPage(),
+        title: navBarIconsData["subscriptions"]!.label.tr(),
+        icon: navBarIconsData["subscriptions"]!.iconData,
+        isOutlined: true,
+      ),
+      "scheduled": SettingsContainerOpenPage(
+        openPage:
+            UpcomingOverdueTransactions(overdueTransactions: null),
+        title: navBarIconsData["scheduled"]!.label.tr(),
+        icon: navBarIconsData["scheduled"]!.iconData,
+        isOutlined: true,
+      ),
+      "activityLog": SettingsContainerOpenPage(
+        openPage: ActivityPage(),
+        title: "activity-log".tr() != "activity-log"
+            ? "activity-log".tr()
+            : "Activity Log",
+        icon: appStateSettings["outlinedIcons"]
+            ? Icons.ballot_outlined
+            : Icons.ballot_rounded,
+        isOutlined: true,
+      ),
+      "billSplitter": SettingsContainerOpenPage(
+        openPage: BillSplitter(),
+        title: "bill-splitter".tr(),
+        icon: appStateSettings["outlinedIcons"]
+            ? Icons.summarize_outlined
+            : Icons.summarize_rounded,
+        isOutlined: true,
+      ),
+      "calendar": SettingsContainerOpenPage(
+        openPage: const CalendarPage(),
+        title: "calendar".tr(),
+        icon: appStateSettings["outlinedIcons"]
+            ? Icons.calendar_month_outlined
+            : Icons.calendar_month_rounded,
+        isOutlined: true,
+      ),
+    };
+
+    List<Widget> outputWidgets = [];
+    List<Widget> pendingHalfWidgets = [];
+
+    void flushHalfWidgets() {
+      if (pendingHalfWidgets.isEmpty) return;
+      if (pendingHalfWidgets.length == 2) {
+        outputWidgets.add(
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Expanded(child: pendingHalfWidgets[0]),
+              Expanded(child: pendingHalfWidgets[1]),
+            ],
+          ),
+        );
+      } else if (pendingHalfWidgets.length == 1) {
+        outputWidgets.add(
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Expanded(child: pendingHalfWidgets[0]),
+            ],
+          ),
+        );
+      }
+      pendingHalfWidgets.clear();
+    }
+
+    for (String key in order) {
+      if (disabled.contains(key)) continue;
+
+      if (fullWidthWidgets.containsKey(key)) {
+        flushHalfWidgets();
+        outputWidgets.add(fullWidthWidgets[key]!);
+      } else if (halfWidthWidgets.containsKey(key)) {
+        pendingHalfWidgets.add(halfWidthWidgets[key]!);
+        if (pendingHalfWidgets.length == 2) {
+          flushHalfWidgets();
+        }
+      }
+    }
+    flushHalfWidgets();
+
     return Padding(
       padding: const EdgeInsetsDirectional.symmetric(horizontal: 4),
       child: Column(
-        children: [
-          if (hasSideNavigation == false)
-            Row(
-              children: [
-                Expanded(
-                  flex: 1,
-                  child: SettingsContainerOpenPage(
-                    openPage: SettingsPageFramework(
-                      key: settingsPageFrameworkStateKey,
-                    ),
-                    title: navBarIconsData["settings"]!.labelLong.tr(),
-                    icon: navBarIconsData["settings"]!.iconData,
-                    description: appStateSettings["showExtraInfoText"] == false
-                        ? null
-                        : "settings-and-customization-description".tr(),
-                    isOutlined: true,
-                    // description: "Theme, Language, CSV Import",
-                    isWideOutlined: true,
-                  ),
-                ),
-              ],
-            ),
-          if (hasSideNavigation == false)
-            Row(
-              children: [
-                Expanded(
-                  child: SettingsContainerOpenPage(
-                    openPage: WalletDetailsPage(wallet: null),
-                    title: navBarIconsData["allSpending"]!.labelLong.tr(),
-                    icon: navBarIconsData["allSpending"]!.iconData,
-                    description: appStateSettings["showExtraInfoText"] == false
-                        ? null
-                        : "all-spending-description".tr(),
-                    isOutlined: true,
-                    isWideOutlined: true,
-                  ),
-                ),
-              ],
-            ),
-            if (hasSideNavigation == false) ...[
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Expanded(
-                    child: SettingsContainerOpenPage(
-                      openPage: AboutPage(),
-                      title: "about-app".tr(namedArgs: {"app": globalAppName}),
-                      icon: navBarIconsData["about"]!.iconData,
-                      isOutlined: true,
-                    ),
-                  ),
-                  Expanded(
-                    child: GoogleAccountLoginButton(
-                      key: settingsGoogleAccountLoginButtonKey,
-                    ),
-                  ),
-                ],
-              ),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Expanded(
-                    child: SettingsContainerOpenPage(
-                      openPage: SubscriptionsPage(),
-                      title: navBarIconsData["subscriptions"]!.label.tr(),
-                      icon: navBarIconsData["subscriptions"]!.iconData,
-                      isOutlined: true,
-                    ),
-                  ),
-                  Expanded(
-                    child: SettingsContainerOpenPage(
-                      openPage:
-                          UpcomingOverdueTransactions(overdueTransactions: null),
-                      title: navBarIconsData["scheduled"]!.label.tr(),
-                      icon: navBarIconsData["scheduled"]!.iconData,
-                      isOutlined: true,
-                    ),
-                  ),
-                ],
-              ),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Expanded(
-                    child: SettingsContainerOpenPage(
-                      openPage: ActivityPage(),
-                      title: "activity-log".tr() != "activity-log"
-                          ? "activity-log".tr()
-                          : "Activity Log",
-                      icon: appStateSettings["outlinedIcons"]
-                          ? Icons.ballot_outlined
-                          : Icons.ballot_rounded,
-                      isOutlined: true,
-                    ),
-                  ),
-                  Expanded(
-                    child: SettingsContainerOpenPage(
-                      openPage: BillSplitter(),
-                      title: "bill-splitter".tr(),
-                      icon: appStateSettings["outlinedIcons"]
-                          ? Icons.summarize_outlined
-                          : Icons.summarize_rounded,
-                      isOutlined: true,
-                    ),
-                  ),
-                ],
-              ),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Expanded(
-                    child: SettingsContainerOpenPage(
-                      openPage: const CalendarPage(),
-                      title: "calendar".tr(),
-                      icon: appStateSettings["outlinedIcons"]
-                          ? Icons.calendar_month_outlined
-                          : Icons.calendar_month_rounded,
-                      isOutlined: true,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 5),
-              const EditDataGrid(),
-            ],
-            if (hasSideNavigation) SettingsPageContent(),
-        ],
+        children: outputWidgets,
       ),
     );
   }
