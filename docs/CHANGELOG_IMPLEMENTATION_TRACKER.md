@@ -257,7 +257,7 @@
 - [ ] Improve custom date format when importing CSV
 - [-] Auto detection and support for unstandardized CSV formats, such as semicolon separated entries *(Descoped / Excluded from plan)*
 - [ ] Improve dropdown settings UI component
-- [ ] New onboarding tutorial and feature highlight overlay
+- [x] New onboarding tutorial and feature highlight overlay *(Implemented: onBoardingPage.dart matching 6.x design)*
 - [ ] Add FAQ/Guide informational links throughout interface
 - [ ] New budget, accounts, income/expense home screen widget (A)
 - [x] New net worth widgets to reflect new layout *(Implemented: WidgetSettings in settingsPage.dart)*

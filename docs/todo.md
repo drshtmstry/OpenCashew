@@ -79,7 +79,7 @@
 
 ## 🔴 User Experience & Guidance
 
-- [ ] **New Onboarding Tutorial and Feature Highlight Overlays** — guided walkthrough for first-time users.
+- [x] **New Onboarding Tutorial and Feature Highlight Overlays** — guided walkthrough matching 6.x design with top-left dismiss, typography, budget information popup, and Google Sign-in / local skip flow.
 
 ---
 
